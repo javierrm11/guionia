@@ -64,7 +64,8 @@ export default async function EstructuraPage({
                     <button
                       type="submit"
                       disabled={index === 0}
-                      className="text-text-secondary disabled:opacity-30"
+                      aria-label="Mover escena arriba"
+                      className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                     >
                       <ArrowUp size={16} strokeWidth={1.5} />
                     </button>
@@ -76,7 +77,8 @@ export default async function EstructuraPage({
                     <button
                       type="submit"
                       disabled={index === escenas.length - 1}
-                      className="text-text-secondary disabled:opacity-30"
+                      aria-label="Mover escena abajo"
+                      className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                     >
                       <ArrowDown size={16} strokeWidth={1.5} />
                     </button>
@@ -96,7 +98,7 @@ export default async function EstructuraPage({
                 <form action={eliminarEscenaEstructura}>
                   <input type="hidden" name="id" value={escena.id} />
                   <input type="hidden" name="estructura_id" value={id} />
-                  <ConfirmButton message="¿Eliminar esta escena?" className="text-small text-accent">
+                  <ConfirmButton message="¿Eliminar esta escena?" className="p-2 -m-2 text-small text-accent">
                     Eliminar
                   </ConfirmButton>
                 </form>
@@ -114,7 +116,9 @@ export default async function EstructuraPage({
           <input type="hidden" name="estructura_id" value={id} />
 
           <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Tipo</span>
+            <span className="text-h3 text-text-secondary">
+              Tipo<span className="text-accent"> *</span>
+            </span>
             <select
               name="tipo_escena"
               required
@@ -133,7 +137,9 @@ export default async function EstructuraPage({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Duración (segundos)</span>
+            <span className="text-h3 text-text-secondary">
+              Duración (segundos)<span className="text-accent"> *</span>
+            </span>
             <input
               type="number"
               name="duracion_segundos"

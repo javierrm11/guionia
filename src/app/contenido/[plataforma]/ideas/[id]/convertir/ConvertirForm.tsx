@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import type { Plataforma } from "@/lib/plataformas";
 import { AiEscenaButton } from "@/components/AiEscenaButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { convertirEnGuion } from "./actions";
 
 type Frase = {
@@ -175,7 +176,8 @@ export function ConvertirForm({
                     type="button"
                     onClick={() => moverEscena(index, -1)}
                     disabled={index === 0}
-                    className="text-text-secondary disabled:opacity-30"
+                    aria-label="Mover escena arriba"
+                    className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                   >
                     <ArrowUp size={14} strokeWidth={1.5} />
                   </button>
@@ -183,7 +185,8 @@ export function ConvertirForm({
                     type="button"
                     onClick={() => moverEscena(index, 1)}
                     disabled={index === escenas.length - 1}
-                    className="text-text-secondary disabled:opacity-30"
+                    aria-label="Mover escena abajo"
+                    className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                   >
                     <ArrowDown size={14} strokeWidth={1.5} />
                   </button>
@@ -307,9 +310,12 @@ export function ConvertirForm({
         </div>
       ) : (
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Texto del guion</span>
+          <span className="text-h3 text-text-secondary">
+            Texto del guion<span className="text-accent"> *</span>
+          </span>
           <textarea
             name="texto"
+            required
             rows={8}
             className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
           />
@@ -317,7 +323,9 @@ export function ConvertirForm({
       )}
 
       <label className="flex flex-col gap-1">
-        <span className="text-h3 text-text-secondary">Fecha de publicación</span>
+        <span className="text-h3 text-text-secondary">
+          Fecha de publicación<span className="text-accent"> *</span>
+        </span>
         <input
           type="date"
           name="fecha_publicacion"
@@ -327,12 +335,12 @@ export function ConvertirForm({
         />
       </label>
 
-      <button
-        type="submit"
-        className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+      <SubmitButton
+        pendingLabel="Convirtiendo…"
+        className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
       >
         Convertir en guion
-      </button>
+      </SubmitButton>
     </form>
   );
 }

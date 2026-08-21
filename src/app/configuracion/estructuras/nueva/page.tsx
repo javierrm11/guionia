@@ -6,7 +6,9 @@ export default function NuevaEstructuraPage() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <form action={crearEstructura} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Nombre</span>
+          <span className="text-h3 text-text-secondary">
+            Nombre<span className="text-accent"> *</span>
+          </span>
           <input
             type="text"
             name="nombre"
@@ -18,7 +20,9 @@ export default function NuevaEstructuraPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Plataforma</span>
+          <span className="text-h3 text-text-secondary">
+            Plataforma<span className="text-accent"> *</span>
+          </span>
           <select
             name="plataforma"
             required
@@ -37,7 +41,9 @@ export default function NuevaEstructuraPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Duración total (segundos)</span>
+          <span className="text-h3 text-text-secondary">
+            Duración total (segundos)<span className="text-accent"> *</span>
+          </span>
           <input
             type="number"
             name="duracion_segundos"

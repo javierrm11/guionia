@@ -56,7 +56,7 @@ export function GoogleSignInButton() {
       type: "standard",
       theme: "outline",
       size: "large",
-      width: "320",
+      width: String(contenedorRef.current.offsetWidth),
     });
   }, [router]);
 

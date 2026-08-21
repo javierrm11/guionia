@@ -17,6 +17,10 @@ export async function guardarPlataformasActivas(formData: FormData) {
     .filter((v): v is string => typeof v === "string")
     .filter(isPlataforma);
 
+  if (seleccionadas.length === 0) {
+    redirect("/configuracion/plataformas?plataformas_error=1");
+  }
+
   const { data: actuales } = await supabase.from("plataformas_activas").select("plataforma");
   const actualesSet = new Set((actuales ?? []).map((r) => r.plataforma));
   const nuevasSet = new Set(seleccionadas);

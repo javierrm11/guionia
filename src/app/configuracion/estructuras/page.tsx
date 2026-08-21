@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/Badge";
+import { SubmitButton } from "@/components/SubmitButton";
 import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 import { duplicarEstructura } from "./actions";
 
@@ -60,9 +61,9 @@ export default async function EstructurasPage() {
                   <td className="px-3 py-2 text-right">
                     <form action={duplicarEstructura}>
                       <input type="hidden" name="id" value={e.id} />
-                      <button type="submit" className="text-small text-accent">
+                      <SubmitButton pendingLabel="Duplicando…" className="p-2 -m-2 text-small text-accent">
                         Duplicar
-                      </button>
+                      </SubmitButton>
                     </form>
                   </td>
                 </tr>

@@ -20,6 +20,8 @@ export function TopBar() {
   const enConfiguracion = pathname.startsWith("/configuracion");
   const enAuth = RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
   const enRaiz = pathname === "/contenido" || pathname === "/configuracion";
+  const enBusqueda = pathname === "/contenido/buscar";
+  const mostrarBusqueda = (enRaiz && !enConfiguracion) || enBusqueda;
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export function TopBar() {
 
   return (
     <div className="flex h-14 items-center gap-2 px-4">
-      {!enRaiz ? (
+      {!enRaiz && (
         <button
           type="button"
           onClick={() => router.back()}
@@ -39,9 +41,9 @@ export function TopBar() {
         >
           <ArrowLeft size={20} strokeWidth={1.5} />
         </button>
-      ) : enConfiguracion ? (
-        <div className="flex-1" />
-      ) : (
+      )}
+
+      {mostrarBusqueda ? (
         <form action="/contenido/buscar" className="flex-1">
           <div className="relative">
             <Search
@@ -59,9 +61,9 @@ export function TopBar() {
             />
           </div>
         </form>
+      ) : (
+        <div className="flex-1" />
       )}
-
-      {!enRaiz && <div className="flex-1" />}
 
       <Link
         href={enConfiguracion ? "/contenido" : "/configuracion"}

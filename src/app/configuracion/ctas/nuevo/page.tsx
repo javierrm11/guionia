@@ -9,7 +9,9 @@ export default function NuevoCtaPage() {
         <input type="hidden" name="redirectTo" value="/configuracion/ctas" />
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Plataforma</span>
+          <span className="text-h3 text-text-secondary">
+            Plataforma<span className="text-accent"> *</span>
+          </span>
           <select
             name="plataforma"
             required
@@ -28,7 +30,9 @@ export default function NuevoCtaPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Texto del CTA</span>
+          <span className="text-h3 text-text-secondary">
+            Texto del CTA<span className="text-accent"> *</span>
+          </span>
           <textarea
             name="texto"
             required

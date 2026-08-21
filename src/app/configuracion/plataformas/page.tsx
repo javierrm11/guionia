@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Clapperboard, Music } from "lucide-react";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
 import { ConfirmButton } from "@/components/ConfirmButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import {
@@ -24,6 +25,7 @@ export default async function PlataformasPage({
     tiktok_conectado?: string;
     tiktok_error?: string;
     tiktok_importados?: string;
+    plataformas_error?: string;
   }>;
 }) {
   const {
@@ -33,6 +35,7 @@ export default async function PlataformasPage({
     tiktok_conectado,
     tiktok_error,
     tiktok_importados,
+    plataformas_error,
   } = await searchParams;
   const supabase = await createClient();
 
@@ -62,6 +65,9 @@ export default async function PlataformasPage({
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <PlataformasActivasForm activas={activas} action={guardarPlataformasActivas} />
+      {plataformas_error && (
+        <p className="text-small text-danger">Marca al menos una plataforma para continuar.</p>
+      )}
 
       <section className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
         <h2 className="text-h2">Cuentas conectadas</h2>
@@ -69,7 +75,7 @@ export default async function PlataformasPage({
         {youtube_conectado && (
           <p className="text-small text-success">Cuenta de YouTube conectada.</p>
         )}
-        {youtube_error && (
+        {youtube_error && !conexionYoutube && (
           <p className="text-small text-danger">
             No se pudo conectar con YouTube. Inténtalo de nuevo.
           </p>
@@ -84,7 +90,7 @@ export default async function PlataformasPage({
         {tiktok_conectado && (
           <p className="text-small text-success">Cuenta de TikTok conectada.</p>
         )}
-        {tiktok_error && (
+        {tiktok_error && !conexionTiktok && (
           <p className="text-small text-danger">
             No se pudo conectar con TikTok. Inténtalo de nuevo.
           </p>
@@ -114,28 +120,42 @@ export default async function PlataformasPage({
             )}
             <div className="flex flex-col">
               <span className="text-body text-text-primary">YouTube</span>
-              <span className="text-caption text-text-secondary">
-                {conexionYoutube ? conexionYoutube.canal_titulo : "No conectado"}
+              <span className={`text-caption ${youtube_error && conexionYoutube ? "text-danger" : "text-text-secondary"}`}>
+                {conexionYoutube
+                  ? youtube_error
+                    ? "Conexión caducada"
+                    : conexionYoutube.canal_titulo
+                  : "No conectado"}
               </span>
             </div>
           </div>
 
           {conexionYoutube ? (
-            <div className="flex items-center gap-3">
-              <form action={sincronizarYoutube}>
-                <button type="submit" className="text-small text-accent">
-                  Sincronizar
-                </button>
-              </form>
-              <form action={desconectarYoutube}>
-                <ConfirmButton
-                  message="¿Desconectar tu cuenta de YouTube?"
-                  className="text-small text-accent"
-                >
-                  Desconectar
-                </ConfirmButton>
-              </form>
-            </div>
+            youtube_error ? (
+              <a
+                href="/api/youtube/conectar"
+                className="p-2 -m-2 text-small text-accent"
+              >
+                Reconectar
+              </a>
+            ) : (
+              <div className="flex items-center gap-3">
+                <form action={sincronizarYoutube}>
+                  <SubmitButton pendingLabel="Sincronizando…" className="p-2 -m-2 text-small text-accent">
+                    Sincronizar
+                  </SubmitButton>
+                </form>
+                <form action={desconectarYoutube}>
+                  <ConfirmButton
+                    message="¿Desconectar tu cuenta de YouTube?"
+                    pendingLabel="Desconectando…"
+                    className="p-2 -m-2 text-small text-accent"
+                  >
+                    Desconectar
+                  </ConfirmButton>
+                </form>
+              </div>
+            )
           ) : (
             <a
               href="/api/youtube/conectar"
@@ -163,28 +183,42 @@ export default async function PlataformasPage({
             )}
             <div className="flex flex-col">
               <span className="text-body text-text-primary">TikTok</span>
-              <span className="text-caption text-text-secondary">
-                {conexionTiktok ? conexionTiktok.display_name : "No conectado"}
+              <span className={`text-caption ${tiktok_error && conexionTiktok ? "text-danger" : "text-text-secondary"}`}>
+                {conexionTiktok
+                  ? tiktok_error
+                    ? "Conexión caducada"
+                    : conexionTiktok.display_name
+                  : "No conectado"}
               </span>
             </div>
           </div>
 
           {conexionTiktok ? (
-            <div className="flex items-center gap-3">
-              <form action={sincronizarTiktok}>
-                <button type="submit" className="text-small text-accent">
-                  Sincronizar
-                </button>
-              </form>
-              <form action={desconectarTiktok}>
-                <ConfirmButton
-                  message="¿Desconectar tu cuenta de TikTok?"
-                  className="text-small text-accent"
-                >
-                  Desconectar
-                </ConfirmButton>
-              </form>
-            </div>
+            tiktok_error ? (
+              <a
+                href="/api/tiktok/conectar"
+                className="p-2 -m-2 text-small text-accent"
+              >
+                Reconectar
+              </a>
+            ) : (
+              <div className="flex items-center gap-3">
+                <form action={sincronizarTiktok}>
+                  <SubmitButton pendingLabel="Sincronizando…" className="p-2 -m-2 text-small text-accent">
+                    Sincronizar
+                  </SubmitButton>
+                </form>
+                <form action={desconectarTiktok}>
+                  <ConfirmButton
+                    message="¿Desconectar tu cuenta de TikTok?"
+                    pendingLabel="Desconectando…"
+                    className="p-2 -m-2 text-small text-accent"
+                  >
+                    Desconectar
+                  </ConfirmButton>
+                </form>
+              </div>
+            )
           ) : (
             <a
               href="/api/tiktok/conectar"

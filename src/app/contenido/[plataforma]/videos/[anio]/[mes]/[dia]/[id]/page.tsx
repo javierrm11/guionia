@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -6,7 +7,9 @@ import { CopiarGuionButton } from "@/components/CopiarGuionButton";
 import { SerieSection } from "@/components/SerieSection";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { EscenaTextoEditor } from "@/components/EscenaTextoEditor";
-import { RetencionChart } from "@/components/RetencionChart";
+import { RetencionSection } from "@/components/RetencionSection";
+import { RetencionLoader } from "@/components/RetencionLoader";
+import { SubmitButton } from "@/components/SubmitButton";
 import { Eye, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
@@ -14,8 +17,6 @@ import { obtenerAccessTokenValido as obtenerAccessTokenValidoYoutube } from "@/l
 import {
   extraerVideoId as extraerVideoIdYoutube,
   obtenerEstadisticasVideos as obtenerEstadisticasVideosYoutube,
-  obtenerRetencionVideo,
-  type PuntoRetencion,
 } from "@/lib/youtube/oauth";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoTiktok } from "@/lib/tiktok/conexion";
 import {
@@ -92,7 +93,9 @@ export default async function GuionPage({
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
 
   let estadisticasYoutube: { vistas: number; likes: number; comentarios: number } | null = null;
-  let retencionYoutube: PuntoRetencion[] = [];
+  let estadisticasYoutubeError = false;
+  let youtubeVideoId: string | null = null;
+  let youtubeAccessToken: string | null = null;
   if (plataforma === "youtube" && guion.estado === "publicado" && guion.url_publicado) {
     const videoId = guion.youtube_video_id ?? extraerVideoIdYoutube(guion.url_publicado);
     if (videoId) {
@@ -101,13 +104,14 @@ export default async function GuionPage({
       } = await supabase.auth.getUser();
       const accessToken = user ? await obtenerAccessTokenValidoYoutube(supabase, user.id) : null;
       if (accessToken) {
-        const [statsResult, retencionResult] = await Promise.allSettled([
-          obtenerEstadisticasVideosYoutube([videoId], accessToken),
-          obtenerRetencionVideo(videoId, accessToken),
-        ]);
-        estadisticasYoutube =
-          statsResult.status === "fulfilled" ? (statsResult.value[videoId] ?? null) : null;
-        retencionYoutube = retencionResult.status === "fulfilled" ? retencionResult.value : [];
+        youtubeVideoId = videoId;
+        youtubeAccessToken = accessToken;
+        try {
+          const stats = await obtenerEstadisticasVideosYoutube([videoId], accessToken);
+          estadisticasYoutube = stats[videoId] ?? null;
+        } catch {
+          estadisticasYoutubeError = true;
+        }
       }
     }
   }
@@ -118,6 +122,7 @@ export default async function GuionPage({
     comentarios: number;
     compartidos: number;
   } | null = null;
+  let estadisticasTiktokError = false;
   if (plataforma === "tiktok" && guion.estado === "publicado" && guion.url_publicado) {
     const videoId = guion.tiktok_video_id ?? extraerVideoIdTiktok(guion.url_publicado);
     if (videoId) {
@@ -130,7 +135,7 @@ export default async function GuionPage({
           const stats = await obtenerEstadisticasVideosTiktok([videoId], accessToken);
           estadisticasTiktok = stats[videoId] ?? null;
         } catch {
-          estadisticasTiktok = null;
+          estadisticasTiktokError = true;
         }
       }
     }
@@ -146,6 +151,8 @@ export default async function GuionPage({
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
+      <p className="text-h2">{guion.titulo}</p>
+
       <div className="flex items-center gap-2">
         {guion.numero != null && (
           <span className="text-small text-text-secondary">#{guion.numero}</span>
@@ -199,7 +206,8 @@ export default async function GuionPage({
                     <button
                       type="submit"
                       disabled={index === 0}
-                      className="text-text-secondary disabled:opacity-30"
+                      aria-label="Mover escena arriba"
+                      className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                     >
                       <ArrowUp size={14} strokeWidth={1.5} />
                     </button>
@@ -212,7 +220,8 @@ export default async function GuionPage({
                     <button
                       type="submit"
                       disabled={index === escenas.length - 1}
-                      className="text-text-secondary disabled:opacity-30"
+                      aria-label="Mover escena abajo"
+                      className="p-2 -m-2 text-text-secondary disabled:opacity-30"
                     >
                       <ArrowDown size={14} strokeWidth={1.5} />
                     </button>
@@ -227,7 +236,7 @@ export default async function GuionPage({
                 <form action={eliminarEscenaGuion} className="ml-auto">
                   <input type="hidden" name="id" value={escena.id} />
                   <input type="hidden" name="redirectTo" value={rutaActual} />
-                  <ConfirmButton message="¿Eliminar esta escena?" className="text-small text-accent">
+                  <ConfirmButton message="¿Eliminar esta escena?" className="p-2 -m-2 text-small text-accent">
                     Eliminar
                   </ConfirmButton>
                 </form>
@@ -290,7 +299,9 @@ export default async function GuionPage({
             <input type="hidden" name="redirectTo" value={rutaActual} />
 
             <label className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">Tipo</span>
+              <span className="text-h3 text-text-secondary">
+                Tipo<span className="text-accent"> *</span>
+              </span>
               <select
                 name="tipo_escena"
                 required
@@ -318,12 +329,12 @@ export default async function GuionPage({
               />
             </label>
 
-            <button
-              type="submit"
-              className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+            <SubmitButton
+              pendingLabel="Añadiendo…"
+              className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
             >
               + Añadir escena
-            </button>
+            </SubmitButton>
           </form>
         </div>
       ) : (
@@ -394,6 +405,15 @@ export default async function GuionPage({
         </div>
       )}
 
+      {estadisticasYoutubeError && (
+        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+          <h2 className="text-h2">Estadísticas de YouTube</h2>
+          <p className="text-small text-danger">
+            No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
+          </p>
+        </div>
+      )}
+
       {estadisticasYoutube && (
         <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
           <h2 className="text-h2">Estadísticas de YouTube</h2>
@@ -419,10 +439,18 @@ export default async function GuionPage({
         </div>
       )}
 
-      {retencionYoutube.length >= 2 && (
+      {youtubeVideoId && youtubeAccessToken && (
+        <Suspense fallback={<RetencionLoader />}>
+          <RetencionSection videoId={youtubeVideoId} accessToken={youtubeAccessToken} />
+        </Suspense>
+      )}
+
+      {estadisticasTiktokError && (
         <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-          <h2 className="text-h2">Retención de audiencia</h2>
-          <RetencionChart datos={retencionYoutube} />
+          <h2 className="text-h2">Estadísticas de TikTok</h2>
+          <p className="text-small text-danger">
+            No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
+          </p>
         </div>
       )}
 
@@ -472,12 +500,12 @@ export default async function GuionPage({
             <input type="hidden" name="plataforma" value={plataforma} />
             <input type="hidden" name="siguiente" value={siguiente} />
             <input type="hidden" name="redirectTo" value={rutaActual} />
-            <button
-              type="submit"
-              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+            <SubmitButton
+              pendingLabel="Guardando…"
+              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
             >
               Marcar como {ESTADO_PIEZA_LABEL[siguiente].toLowerCase()}
-            </button>
+            </SubmitButton>
           </form>
         ))}
     </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { registroAction } from "./actions";
 
 export default async function RegistroPage({
@@ -23,7 +24,9 @@ export default async function RegistroPage({
           <>
             <form action={registroAction} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1">
-                <span className="text-h3 text-text-secondary">Email</span>
+                <span className="text-h3 text-text-secondary">
+                  Email<span className="text-accent"> *</span>
+                </span>
                 <input
                   type="email"
                   name="email"
@@ -34,7 +37,9 @@ export default async function RegistroPage({
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-h3 text-text-secondary">Contraseña</span>
+                <span className="text-h3 text-text-secondary">
+                  Contraseña<span className="text-accent"> *</span>
+                </span>
                 <input
                   type="password"
                   name="password"
@@ -45,7 +50,9 @@ export default async function RegistroPage({
               </label>
 
               <label className="flex flex-col gap-1">
-                <span className="text-h3 text-text-secondary">Confirmar contraseña</span>
+                <span className="text-h3 text-text-secondary">
+                  Confirmar contraseña<span className="text-accent"> *</span>
+                </span>
                 <input
                   type="password"
                   name="confirmar_password"
@@ -57,12 +64,12 @@ export default async function RegistroPage({
 
               {error && <p className="text-small text-danger">{error}</p>}
 
-              <button
-                type="submit"
-                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+              <SubmitButton
+                pendingLabel="Creando cuenta…"
+                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
               >
                 Crear cuenta
-              </button>
+              </SubmitButton>
             </form>
 
             <div className="flex items-center gap-2">

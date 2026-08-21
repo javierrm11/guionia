@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { loginAction } from "./actions";
 
 export default async function LoginPage({
@@ -16,7 +17,9 @@ export default async function LoginPage({
       <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-6">
         <form action={loginAction} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Email</span>
+            <span className="text-h3 text-text-secondary">
+              Email<span className="text-accent"> *</span>
+            </span>
             <input
               type="email"
               name="email"
@@ -27,7 +30,9 @@ export default async function LoginPage({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Contraseña</span>
+            <span className="text-h3 text-text-secondary">
+              Contraseña<span className="text-accent"> *</span>
+            </span>
             <input
               type="password"
               name="password"
@@ -38,12 +43,12 @@ export default async function LoginPage({
 
           {error && <p className="text-small text-danger">{error}</p>}
 
-          <button
-            type="submit"
-            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          <SubmitButton
+            pendingLabel="Entrando…"
+            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
           >
             Entrar
-          </button>
+          </SubmitButton>
         </form>
 
         <div className="flex items-center gap-2">

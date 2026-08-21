@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
+import { SubmitButton } from "@/components/SubmitButton";
 import { publicarConMetadatos } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +68,7 @@ export default async function PublicarPage({
             <input
               type="text"
               name="titulo_publicacion"
+              autoFocus
               defaultValue={guion.titulo_publicacion ?? ""}
               className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
             />
@@ -80,7 +82,7 @@ export default async function PublicarPage({
           <textarea
             name="descripcion_publicacion"
             rows={5}
-            autoFocus
+            autoFocus={plataforma !== "youtube"}
             defaultValue={guion.descripcion_publicacion ?? ""}
             className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
           />
@@ -99,12 +101,12 @@ export default async function PublicarPage({
           </label>
         )}
 
-        <button
-          type="submit"
-          className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+        <SubmitButton
+          pendingLabel="Publicando…"
+          className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
         >
           Marcar como publicado
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

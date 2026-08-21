@@ -38,7 +38,7 @@ export default async function HooksPage() {
                 <form action={eliminarFrase}>
                   <input type="hidden" name="id" value={h.id} />
                   <input type="hidden" name="redirectTo" value={RUTA} />
-                  <ConfirmButton message="¿Eliminar este hook?" className="text-small text-accent">
+                  <ConfirmButton message="¿Eliminar este hook?" className="p-2 -m-2 text-small text-accent">
                     Eliminar
                   </ConfirmButton>
                 </form>

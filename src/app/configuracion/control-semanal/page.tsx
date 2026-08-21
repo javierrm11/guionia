@@ -51,7 +51,7 @@ export default async function ControlSemanalPage() {
                         <input type="hidden" name="id" value={c.id} />
                         <ConfirmButton
                           message="¿Eliminar esta cadencia?"
-                          className="text-small text-accent"
+                          className="p-2 -m-2 text-small text-accent"
                         >
                           Eliminar
                         </ConfirmButton>
@@ -77,6 +77,9 @@ export default async function ControlSemanalPage() {
             + Añadir
           </Link>
         </div>
+        <p className="text-caption text-text-disabled">
+          Solo como referencia manual — no genera recordatorios ni aparece en el dashboard.
+        </p>
 
         {plantilla && plantilla.length > 0 ? (
           <div className="overflow-x-auto rounded-md border border-border">
@@ -102,7 +105,7 @@ export default async function ControlSemanalPage() {
                         <input type="hidden" name="id" value={p.id} />
                         <ConfirmButton
                           message="¿Eliminar esta entrada de la plantilla?"
-                          className="text-small text-accent"
+                          className="p-2 -m-2 text-small text-accent"
                         >
                           Eliminar
                         </ConfirmButton>

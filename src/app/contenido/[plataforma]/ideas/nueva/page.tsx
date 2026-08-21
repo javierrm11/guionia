@@ -17,7 +17,9 @@ export default async function NuevaIdeaPage({
         <input type="hidden" name="plataforma" value={plataforma} />
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Título</span>
+          <span className="text-h3 text-text-secondary">
+            Título<span className="text-accent"> *</span>
+          </span>
           <input
             type="text"
             name="titulo"

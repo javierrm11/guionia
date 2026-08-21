@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { PLATAFORMAS, PLATAFORMA_ICON, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 
@@ -10,8 +13,20 @@ export function PlataformasActivasForm({
   action: (formData: FormData) => void | Promise<void>;
   submitLabel?: string;
 }) {
+  const [error, setError] = useState(false);
+
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form
+      action={action}
+      onSubmit={(e) => {
+        const datos = new FormData(e.currentTarget);
+        if (datos.getAll("plataforma").length === 0) {
+          e.preventDefault();
+          setError(true);
+        }
+      }}
+      className="flex flex-col gap-4"
+    >
       <div className="grid grid-cols-2 gap-4">
         {PLATAFORMAS.map((p) => {
           const Icon = PLATAFORMA_ICON[p];
@@ -25,6 +40,7 @@ export function PlataformasActivasForm({
                 name="plataforma"
                 value={p}
                 defaultChecked={activas.includes(p)}
+                onChange={() => setError(false)}
                 className="peer sr-only"
               />
               <span className="pointer-events-none absolute top-2 right-2 hidden h-5 w-5 items-center justify-center rounded-full bg-accent text-white peer-checked:flex">
@@ -38,6 +54,10 @@ export function PlataformasActivasForm({
           );
         })}
       </div>
+
+      {error && (
+        <p className="text-small text-danger">Marca al menos una plataforma para continuar.</p>
+      )}
 
       <button
         type="submit"

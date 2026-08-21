@@ -3,7 +3,13 @@ import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
-import { ESTADOS_VIDEO, ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, pad2 } from "@/lib/contenido";
+import {
+  ESTADOS_VIDEO,
+  ESTADO_PIEZA_LABEL,
+  ESTADO_PIEZA_TONE,
+  MES_LABEL,
+  pad2,
+} from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +40,10 @@ export default async function DiaPage({
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
+      <h1 className="text-h1">
+        {diaNum} de {MES_LABEL[mesNum - 1]} de {anio}
+      </h1>
+
       {guiones && guiones.length > 0 ? (
         <div className="overflow-hidden rounded-md border border-border">
           <table className="w-full border-collapse text-body">

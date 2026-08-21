@@ -6,7 +6,9 @@ export default function NuevaPlantillaPage() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <form action={crearPlantilla} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Día de la semana</span>
+          <span className="text-h3 text-text-secondary">
+            Día de la semana<span className="text-accent"> *</span>
+          </span>
           <select
             name="dia_semana"
             required
@@ -41,7 +43,9 @@ export default function NuevaPlantillaPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Nota</span>
+          <span className="text-h3 text-text-secondary">
+            Nota<span className="text-accent"> *</span>
+          </span>
           <input
             type="text"
             name="nota"

@@ -6,7 +6,9 @@ export default function NuevaCadenciaPage() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <form action={crearCadencia} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Plataforma</span>
+          <span className="text-h3 text-text-secondary">
+            Plataforma<span className="text-accent"> *</span>
+          </span>
           <select
             name="plataforma"
             required
@@ -25,7 +27,9 @@ export default function NuevaCadenciaPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Cantidad</span>
+          <span className="text-h3 text-text-secondary">
+            Cantidad<span className="text-accent"> *</span>
+          </span>
           <input
             type="number"
             name="cantidad"
@@ -37,7 +41,9 @@ export default function NuevaCadenciaPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Periodo</span>
+          <span className="text-h3 text-text-secondary">
+            Periodo<span className="text-accent"> *</span>
+          </span>
           <select
             name="periodo"
             required

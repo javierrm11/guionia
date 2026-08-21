@@ -38,7 +38,7 @@ export default async function CtasPage() {
                 <form action={eliminarFrase}>
                   <input type="hidden" name="id" value={c.id} />
                   <input type="hidden" name="redirectTo" value={RUTA} />
-                  <ConfirmButton message="¿Eliminar este CTA?" className="text-small text-accent">
+                  <ConfirmButton message="¿Eliminar este CTA?" className="p-2 -m-2 text-small text-accent">
                     Eliminar
                   </ConfirmButton>
                 </form>

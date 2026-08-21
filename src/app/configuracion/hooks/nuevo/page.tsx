@@ -9,7 +9,9 @@ export default function NuevoHookPage() {
         <input type="hidden" name="redirectTo" value="/configuracion/hooks" />
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Plataforma</span>
+          <span className="text-h3 text-text-secondary">
+            Plataforma<span className="text-accent"> *</span>
+          </span>
           <select
             name="plataforma"
             required
@@ -28,7 +30,9 @@ export default function NuevoHookPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Texto del hook</span>
+          <span className="text-h3 text-text-secondary">
+            Texto del hook<span className="text-accent"> *</span>
+          </span>
           <textarea
             name="texto"
             required
