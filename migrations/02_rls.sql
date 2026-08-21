@@ -1,0 +1,6 @@
+-- MoleroDev — Panel de Administración
+-- 02: Row Level Security
+--
+-- Pendiente. La app es de uso personal (sin usuarios) por ahora, así que
+-- no hay políticas RLS todavía. Cuando se necesiten (ej. si se añade
+-- autenticación o más de una persona usa el panel), van aquí.

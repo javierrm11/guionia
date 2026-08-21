@@ -1,0 +1,210 @@
+const SCOPES = [
+  "https://www.googleapis.com/auth/youtube.readonly",
+  "https://www.googleapis.com/auth/yt-analytics.readonly",
+].join(" ");
+
+function clientId() {
+  const id = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (!id) throw new Error("Falta NEXT_PUBLIC_GOOGLE_CLIENT_ID");
+  return id;
+}
+
+function clientSecret() {
+  const secret = process.env.GOOGLE_CLIENT_SECRET;
+  if (!secret) throw new Error("Falta GOOGLE_CLIENT_SECRET en .env.local");
+  return secret;
+}
+
+export function construirUrlAutorizacion(redirectUri: string, state: string): string {
+  const params = new URLSearchParams({
+    client_id: clientId(),
+    redirect_uri: redirectUri,
+    response_type: "code",
+    scope: SCOPES,
+    access_type: "offline",
+    prompt: "consent",
+    state,
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
+
+type TokenResponse = {
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
+};
+
+export async function intercambiarCodigo(
+  code: string,
+  redirectUri: string
+): Promise<TokenResponse> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: clientId(),
+      client_secret: clientSecret(),
+      redirect_uri: redirectUri,
+      grant_type: "authorization_code",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudo intercambiar el código de Google (${res.status})`);
+  }
+
+  return res.json();
+}
+
+export async function renovarAccessToken(refreshToken: string): Promise<TokenResponse> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      refresh_token: refreshToken,
+      client_id: clientId(),
+      client_secret: clientSecret(),
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudo renovar el token de YouTube (${res.status})`);
+  }
+
+  return res.json();
+}
+
+export type CanalYoutube = {
+  id: string;
+  titulo: string;
+  thumbnailUrl: string | null;
+};
+
+export async function obtenerCanalPropio(accessToken: string): Promise<CanalYoutube> {
+  const res = await fetch(
+    "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudo leer el canal de YouTube (${res.status})`);
+  }
+
+  const data = await res.json();
+  const canal = data.items?.[0];
+  if (!canal) throw new Error("La cuenta de Google no tiene ningún canal de YouTube");
+
+  return {
+    id: canal.id,
+    titulo: canal.snippet.title,
+    thumbnailUrl: canal.snippet.thumbnails?.default?.url ?? null,
+  };
+}
+
+export type EstadisticasVideo = {
+  vistas: number;
+  likes: number;
+  comentarios: number;
+};
+
+/** Extrae el ID de vídeo de una URL de YouTube (watch, youtu.be o shorts). */
+export function extraerVideoId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1) || null;
+    if (u.hostname.endsWith("youtube.com")) {
+      if (u.pathname === "/watch") return u.searchParams.get("v");
+      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] ?? null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export type VideoCanal = {
+  videoId: string;
+  titulo: string;
+  publicadoEn: string;
+};
+
+/** Lista los vídeos subidos al canal propio (los más recientes primero), hasta `limite`. */
+export async function obtenerVideosDelCanal(
+  accessToken: string,
+  limite = 100
+): Promise<VideoCanal[]> {
+  const canalRes = await fetch(
+    "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!canalRes.ok) {
+    throw new Error(`No se pudo leer el canal de YouTube (${canalRes.status})`);
+  }
+  const canalData = await canalRes.json();
+  const playlistSubidas = canalData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+  if (!playlistSubidas) return [];
+
+  const videos: VideoCanal[] = [];
+  let pageToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      part: "snippet",
+      playlistId: playlistSubidas,
+      maxResults: "50",
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (!res.ok) {
+      throw new Error(`No se pudo leer los vídeos del canal (${res.status})`);
+    }
+    const data = await res.json();
+
+    for (const item of data.items ?? []) {
+      const videoId = item.snippet?.resourceId?.videoId;
+      if (!videoId) continue;
+      videos.push({
+        videoId,
+        titulo: item.snippet.title,
+        publicadoEn: item.snippet.publishedAt,
+      });
+    }
+
+    pageToken = data.nextPageToken;
+  } while (pageToken && videos.length < limite);
+
+  return videos.slice(0, limite);
+}
+
+export async function obtenerEstadisticasVideos(
+  videoIds: string[],
+  accessToken: string
+): Promise<Record<string, EstadisticasVideo>> {
+  if (videoIds.length === 0) return {};
+
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(",")}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudieron leer las estadísticas de YouTube (${res.status})`);
+  }
+
+  const data = await res.json();
+  const resultado: Record<string, EstadisticasVideo> = {};
+  for (const item of data.items ?? []) {
+    resultado[item.id] = {
+      vistas: Number(item.statistics.viewCount ?? 0),
+      likes: Number(item.statistics.likeCount ?? 0),
+      comentarios: Number(item.statistics.commentCount ?? 0),
+    };
+  }
+  return resultado;
+}

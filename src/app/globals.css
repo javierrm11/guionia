@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+:root {
+  /* Fondo — degradado "Neón cíber": azul eléctrico → violeta vibrante →
+     magenta. El violeta (#5B2FB0) es el punto más claro que pasa el mínimo
+     de contraste de texto (4.5:1, contraste real ~5.0 con blanco encima)
+     validado con dataviz — más claro que esto y el texto deja de leerse bien. */
+  --bg-body-a: #0057d6;
+  --bg-body-b: #5b2fb0;
+  --bg-body-c: #e0138a;
+  --glass-blur: 24px;
+  --glass-saturate: 150%;
+
+  /* Color — neutros (glass: translúcidos sobre el degradado). Cristal más
+     denso que la primera pasada — más opacidad, blur y saturación, más
+     una sombra propia — para que las cajas se lean como más "sólidas" sin
+     perder el degradado detrás. Subir la opacidad más de aquí empeora el
+     contraste en los tramos claros del degradado (azul/magenta), así que
+     este es el techo validado con dataviz, no un tope arbitrario. */
+  --bg-primary: rgba(255, 255, 255, 0.26);
+  --bg-secondary: rgba(255, 255, 255, 0.32);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  --border: transparent;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-disabled: rgba(255, 255, 255, 0.55);
+
+  /* Color — acento. --accent es para RELLENOS sólidos (botones con texto
+     blanco encima) — necesita ser lo bastante oscuro para que el blanco
+     tenga contraste. --link es para texto/iconos sobre el cristal — necesita
+     ser claro para leerse en cualquier zona del degradado. Comparten familia
+     de color pero no pueden ser el mismo token sin sacrificar uno de los dos. */
+  --accent: #c21c79;
+  --accent-hover: #a11764;
+  --accent-bg: rgba(255, 255, 255, 0.3);
+  --link: #f3efff;
+
+  /* Color — IA. Con el fondo "Neón cíber" siendo azul de por sí, --ai y
+     --accent se validaron juntos con dataviz (ΔE 22.2 bajo daltonismo) para
+     que un botón de IA junto a un botón normal no se confundan. */
+  --ai: #2f6fff;
+  --ai-hover: #1e56e0;
+
+  /* Color — semántico. Sigue usándose como texto plano/relleno translúcido
+     en el resto de la app (mensajes de error, "Hoy" en riesgo, barra de
+     progreso...), donde lo pálido da buen contraste sobre el cristal. */
+  --success: #baffc9;
+  --success-bg: rgba(76, 214, 140, 0.4);
+  --warning: #ffdca8;
+  --warning-bg: rgba(255, 179, 122, 0.4);
+  --neutral: rgba(255, 255, 255, 0.88);
+  --neutral-bg: rgba(255, 255, 255, 0.24);
+  --danger: #ffb199;
+  --danger-bg: rgba(255, 90, 60, 0.4);
+
+  /* Color — badges de estado. Paleta aparte, validada con el skill dataviz
+     (node validate_palette.js) para que los 4 estados se distingan entre sí
+     bajo daltonismo cuando aparecen unos junto a otros en una tabla — los
+     tonos pálidos de arriba, siendo casi todos blanco/pastel, no pasaban esa
+     comprobación. Relleno sólido + texto de alto contraste (blanco, salvo en
+     warning que por ser muy luminoso usa texto oscuro). */
+  --badge-success: #0b7a52;
+  --badge-warning: #b8830a;
+  --badge-warning-text: #241608;
+  --badge-danger: #b62525;
+  --badge-neutral: #6b7280;
+
+  /* Radio */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-disabled: var(--text-disabled);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-bg: var(--accent-bg);
+
+  --color-ai: var(--ai);
+  --color-ai-hover: var(--ai-hover);
+
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-neutral: var(--neutral);
+  --color-neutral-bg: var(--neutral-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+
+  --color-badge-success: var(--badge-success);
+  --color-badge-warning: var(--badge-warning);
+  --color-badge-warning-text: var(--badge-warning-text);
+  --color-badge-danger: var(--badge-danger);
+  --color-badge-neutral: var(--badge-neutral);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+
+  --font-sans: var(--font-inter), -apple-system, "Segoe UI", sans-serif;
+
+  /* Tipografía — CLAUDE.md */
+  --text-h1: 24px;
+  --text-h1--line-height: 1.3;
+  --text-h1--font-weight: 600;
+
+  --text-h2: 18px;
+  --text-h2--line-height: 1.3;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 14px;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 500;
+
+  --text-body: 14px;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+
+  --text-small: 13px;
+  --text-small--line-height: 1.5;
+  --text-small--font-weight: 400;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 500;
+}
+
+body {
+  position: relative;
+  min-height: 100%;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Degradado + bokeh, detrás de todo el contenido. Absolute (no fixed): se
+   desplaza con la página en vez de quedarse clavado al viewport, así las
+   burbujas aparecen en distintos puntos del contenido al hacer scroll. */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    /* burbujas grandes y visibles, repartidas por toda la pantalla */
+    radial-gradient(130px circle at 14% 10%, rgba(255, 255, 255, 0.4), transparent 70%),
+    radial-gradient(140px circle at 88% 30%, rgba(0, 102, 255, 0.4), transparent 70%),
+    radial-gradient(160px circle at 20% 78%, rgba(224, 19, 138, 0.4), transparent 70%),
+    /* resplandores de fondo, más grandes y difusos */
+    radial-gradient(560px circle at 8% 6%, rgba(255, 255, 255, 0.14), transparent 60%),
+    radial-gradient(480px circle at 96% 24%, rgba(124, 58, 237, 0.3), transparent 60%),
+    radial-gradient(520px circle at 4% 68%, rgba(224, 19, 138, 0.26), transparent 60%),
+    radial-gradient(540px circle at 92% 96%, rgba(0, 87, 214, 0.24), transparent 60%),
+    linear-gradient(160deg, var(--bg-body-a) 0%, var(--bg-body-b) 45%, var(--bg-body-c) 100%);
+}
+
+/* Los "cristales": cualquier tarjeta/superficie que use los tokens de fondo
+   lleva además el desenfoque + saturación (el "pop" de color del cristal
+   denso) y una sombra propia que las separa del fondo, más un borde de
+   brillo sutil. */
+.bg-bg-primary,
+.bg-bg-secondary {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: var(--glass-shadow);
+}
+
+input,
+textarea,
+select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-disabled);
+}
+
+/* El menú desplegable de <select> lo pinta el sistema operativo, no CSS/blur.
+   color-scheme: dark le pide al navegador que use su paleta oscura nativa
+   para ese popup (fondo oscuro, texto claro, resaltado coherente) en vez del
+   blanco por defecto; option fuerza el tono exacto donde el navegador lo
+   permite. */
+select {
+  color-scheme: dark;
+}
+
+option {
+  background-color: #3a1420;
+  color: var(--text-primary);
+}
+
+/* Los links/iconos ghost usan .text-accent en el markup (acento único de la
+   app), pero leen mejor sobre el cristal con el tono claro --link en vez del
+   tono oscuro pensado para botones de relleno sólido. */
+.text-accent {
+  color: var(--link);
+}
