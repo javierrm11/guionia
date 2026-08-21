@@ -6,6 +6,7 @@ import { CopiarGuionButton } from "@/components/CopiarGuionButton";
 import { SerieSection } from "@/components/SerieSection";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { EscenaTextoEditor } from "@/components/EscenaTextoEditor";
+import { RetencionChart } from "@/components/RetencionChart";
 import { Eye, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
@@ -13,6 +14,8 @@ import { obtenerAccessTokenValido as obtenerAccessTokenValidoYoutube } from "@/l
 import {
   extraerVideoId as extraerVideoIdYoutube,
   obtenerEstadisticasVideos as obtenerEstadisticasVideosYoutube,
+  obtenerRetencionVideo,
+  type PuntoRetencion,
 } from "@/lib/youtube/oauth";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoTiktok } from "@/lib/tiktok/conexion";
 import {
@@ -89,6 +92,7 @@ export default async function GuionPage({
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
 
   let estadisticasYoutube: { vistas: number; likes: number; comentarios: number } | null = null;
+  let retencionYoutube: PuntoRetencion[] = [];
   if (plataforma === "youtube" && guion.estado === "publicado" && guion.url_publicado) {
     const videoId = guion.youtube_video_id ?? extraerVideoIdYoutube(guion.url_publicado);
     if (videoId) {
@@ -97,12 +101,13 @@ export default async function GuionPage({
       } = await supabase.auth.getUser();
       const accessToken = user ? await obtenerAccessTokenValidoYoutube(supabase, user.id) : null;
       if (accessToken) {
-        try {
-          const stats = await obtenerEstadisticasVideosYoutube([videoId], accessToken);
-          estadisticasYoutube = stats[videoId] ?? null;
-        } catch {
-          estadisticasYoutube = null;
-        }
+        const [statsResult, retencionResult] = await Promise.allSettled([
+          obtenerEstadisticasVideosYoutube([videoId], accessToken),
+          obtenerRetencionVideo(videoId, accessToken),
+        ]);
+        estadisticasYoutube =
+          statsResult.status === "fulfilled" ? (statsResult.value[videoId] ?? null) : null;
+        retencionYoutube = retencionResult.status === "fulfilled" ? retencionResult.value : [];
       }
     }
   }
@@ -411,6 +416,13 @@ export default async function GuionPage({
               <span className="text-caption text-text-secondary">comentarios</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {retencionYoutube.length >= 2 && (
+        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+          <h2 className="text-h2">Retención de audiencia</h2>
+          <RetencionChart datos={retencionYoutube} />
         </div>
       )}
 

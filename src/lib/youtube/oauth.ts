@@ -208,3 +208,41 @@ export async function obtenerEstadisticasVideos(
   }
   return resultado;
 }
+
+export type PuntoRetencion = {
+  /** Posición en el vídeo, de 0 (inicio) a 1 (final). */
+  elapsedRatio: number;
+  /** Proporción de audiencia viendo ese instante (puede superar 1 por repeticiones). */
+  audienceWatchRatio: number;
+};
+
+/** Curva de retención de audiencia de un vídeo (YouTube Analytics API). [] si no hay datos suficientes. */
+export async function obtenerRetencionVideo(
+  videoId: string,
+  accessToken: string
+): Promise<PuntoRetencion[]> {
+  const params = new URLSearchParams({
+    ids: "channel==MINE",
+    startDate: "2005-02-01",
+    endDate: new Date().toISOString().slice(0, 10),
+    metrics: "audienceWatchRatio",
+    dimensions: "elapsedVideoTimeRatio",
+    filters: `video==${videoId}`,
+  });
+
+  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudo leer la retención de YouTube (${res.status})`);
+  }
+
+  const data = await res.json();
+  const puntos: PuntoRetencion[] = (data.rows ?? []).map((fila: [number, number]) => ({
+    elapsedRatio: fila[0],
+    audienceWatchRatio: fila[1],
+  }));
+
+  return puntos.sort((a, b) => a.elapsedRatio - b.elapsedRatio);
+}
