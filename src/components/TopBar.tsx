@@ -5,7 +5,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Search, Settings } from "lucide-react";
 
-const RUTAS_AUTH = ["/login", "/registro", "/olvide-password", "/restablecer-password", "/auth"];
+const RUTAS_AUTH = [
+  "/login",
+  "/registro",
+  "/olvide-password",
+  "/restablecer-password",
+  "/auth",
+  "/legal",
+];
 
 export function TopBar() {
   const pathname = usePathname();
