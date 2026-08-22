@@ -36,7 +36,7 @@ export default async function BuscarPage({
       : { data: [] };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       {etiquetasPopulares.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {etiquetasPopulares.map((etiqueta) => (

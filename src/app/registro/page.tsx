@@ -10,8 +10,9 @@ export default async function RegistroPage({
   const { error, revisaEmail, email } = await searchParams;
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex min-h-[30vh] flex-1 items-end justify-center pb-8">
+    <div className="flex flex-1 flex-col lg:items-center lg:justify-center lg:p-8">
+      <div className="flex w-full flex-1 flex-col lg:max-w-sm lg:flex-none lg:overflow-hidden lg:rounded-md lg:shadow-2xl">
+      <div className="flex min-h-[30vh] flex-1 items-end justify-center pb-8 lg:min-h-56 lg:flex-none">
         <span className="text-h1">Guionia</span>
       </div>
 
@@ -62,6 +63,7 @@ export default async function RegistroPage({
             Inicia sesión
           </Link>
         </p>
+      </div>
       </div>
     </div>
   );

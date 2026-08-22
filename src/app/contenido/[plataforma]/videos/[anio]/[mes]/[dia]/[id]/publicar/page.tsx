@@ -36,7 +36,7 @@ export default async function PublicarPage({
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <p className="text-h2">{guion.titulo}</p>
 
       <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-4">

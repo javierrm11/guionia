@@ -19,7 +19,7 @@ export default async function CtasPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <Link
         href="/configuracion/ctas/nuevo"
         className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
@@ -28,7 +28,7 @@ export default async function CtasPage() {
       </Link>
 
       {ctas && ctas.length > 0 ? (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2 lg:grid lg:grid-cols-2">
           {ctas.map((c) => (
             <li key={c.id} className="flex flex-col gap-1 rounded-md border border-border p-3">
               <div className="flex items-center justify-between gap-2">

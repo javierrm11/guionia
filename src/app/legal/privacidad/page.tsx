@@ -4,7 +4,7 @@ export const metadata = {
 
 export default function PrivacidadPage() {
   return (
-    <div className="flex flex-1 flex-col gap-6 p-6">
+    <div className="flex flex-1 flex-col gap-6 p-6 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-10">
       <h1 className="text-h1">Política de Privacidad</h1>
       <p className="text-small text-text-secondary">Última actualización: 21 de agosto de 2026</p>
 

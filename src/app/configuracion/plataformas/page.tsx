@@ -63,7 +63,7 @@ export default async function PlataformasPage({
     : { data: null };
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <PlataformasActivasForm activas={activas} action={guardarPlataformasActivas} />
       {plataformas_error && (
         <p className="text-small text-danger">Marca al menos una plataforma para continuar.</p>

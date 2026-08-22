@@ -150,7 +150,7 @@ export default async function GuionPage({
       : (guion.texto ?? "");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <p className="text-h2">{guion.titulo}</p>
 
       <div className="flex items-center gap-2">

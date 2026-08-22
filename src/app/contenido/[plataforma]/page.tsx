@@ -14,7 +14,7 @@ export default async function PlataformaPage({
   const IconoPlataforma = PLATAFORMA_ICON[plataforma];
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <div className="flex items-center gap-2">
         <IconoPlataforma size={20} strokeWidth={1.5} className="text-accent" />
         <h1 className="text-h1">{PLATAFORMA_LABEL[plataforma]}</h1>

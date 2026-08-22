@@ -12,7 +12,7 @@ export default async function NuevaIdeaPage({
   if (!isPlataforma(plataforma)) notFound();
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
       <form action={crearIdea} className="flex flex-col gap-4">
         <input type="hidden" name="plataforma" value={plataforma} />
 

@@ -97,7 +97,7 @@ export default async function IdeasGlobalPage({
   const olvidadas = activas.filter((i) => diasDesde(i.created_at) >= DIAS_OLVIDO).length;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <div className="flex items-end justify-between gap-3 px-1">
         <div className="flex flex-col gap-0.5">
           <h1 className="text-h1">Ideas</h1>
@@ -152,9 +152,11 @@ export default async function IdeasGlobalPage({
             </h2>
             <span className="text-caption text-text-disabled">{activas.length}</span>
           </div>
-          {activas.map((idea) => (
-            <TarjetaIdea key={idea.id} idea={idea} />
-          ))}
+          <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
+            {activas.map((idea) => (
+              <TarjetaIdea key={idea.id} idea={idea} />
+            ))}
+          </div>
         </section>
       )}
 

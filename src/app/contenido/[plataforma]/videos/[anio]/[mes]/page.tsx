@@ -77,7 +77,7 @@ export default async function CalendarioPage({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <div className="flex items-center justify-between">
         <Link
           href={`/contenido/${plataforma}/videos/${mesAnterior.anio}/${pad2(mesAnterior.mes)}`}
@@ -128,7 +128,7 @@ export default async function CalendarioPage({
             <Link
               key={dia}
               href={`/contenido/${plataforma}/videos/${anio}/${pad2(mes)}/${pad2(dia)}`}
-              className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-bg-secondary ${colorBorde}`}
+              className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-bg-secondary lg:min-h-24 lg:p-2 ${colorBorde}`}
             >
               <span
                 className={`text-caption ${riesgo ? "text-danger" : "text-text-secondary"}`}

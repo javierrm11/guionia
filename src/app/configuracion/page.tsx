@@ -4,8 +4,8 @@ import { logoutAction } from "../login/actions";
 
 export default function ConfiguracionPage() {
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <Tile href="/configuracion/plataformas" label="Plataformas" icon={Video} />
         <Tile
           href="/configuracion/control-semanal"

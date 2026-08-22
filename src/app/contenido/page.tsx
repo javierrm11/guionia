@@ -93,7 +93,7 @@ export default async function ContenidoPage() {
   const progresoPorPlataforma = new Map(progreso.map((p) => [p.plataforma, p]));
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:gap-6 lg:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-h1">Control</h1>
         <span className="text-caption rounded-full bg-neutral-bg px-2.5 py-1 text-text-secondary">
@@ -109,6 +109,7 @@ export default async function ContenidoPage() {
         </div>
       </section>
 
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
       <section className="flex flex-col gap-0.5 rounded-md bg-bg-primary py-1">
         <div className="flex items-center justify-between px-4 pt-2 pb-1">
           <span className="text-caption text-text-secondary uppercase" style={{ letterSpacing: "0.06em" }}>
@@ -210,6 +211,7 @@ export default async function ContenidoPage() {
           </div>
         )}
       </section>
+      </div>
 
       <CapturaRapidaForm plataformas={plataformasActivas as Plataforma[]} />
     </div>

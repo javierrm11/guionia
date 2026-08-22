@@ -39,7 +39,7 @@ export default async function DiaPage({
     .order("numero");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <h1 className="text-h1">
         {diaNum} de {MES_LABEL[mesNum - 1]} de {anio}
       </h1>

@@ -15,7 +15,7 @@ export default async function ControlSemanalPage() {
   ]);
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-h2">Cadencia fija</h2>

@@ -3,7 +3,7 @@ import { crearEstructura } from "../actions";
 
 export default function NuevaEstructuraPage() {
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
       <form action={crearEstructura} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
           <span className="text-h3 text-text-secondary">

@@ -25,7 +25,7 @@ export default async function IdeasPage({
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <Link
         href={`/contenido/${plataforma}/ideas/nueva`}
         className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"

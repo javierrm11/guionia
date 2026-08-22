@@ -37,7 +37,7 @@ export default async function EstructuraPage({
     .order("orden");
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <div className="flex flex-col gap-1">
         <h1 className="text-h1">{estructura.nombre}</h1>
         <p className="text-small text-text-secondary">

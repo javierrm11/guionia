@@ -3,7 +3,7 @@ import { crearFrase } from "../../_shared/frasesActions";
 
 export default function NuevoCtaPage() {
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
+    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
       <form action={crearFrase} className="flex flex-col gap-4">
         <input type="hidden" name="tipo_escena" value="cta" />
         <input type="hidden" name="redirectTo" value="/configuracion/ctas" />
