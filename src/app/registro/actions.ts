@@ -11,10 +11,14 @@ export async function registroAction(formData: FormData) {
 
   if (typeof email !== "string" || !email) throw new Error("El email es obligatorio");
   if (typeof password !== "string" || password.length < 6) {
-    redirect(`/registro?error=${encodeURIComponent("La contraseña debe tener al menos 6 caracteres")}`);
+    redirect(
+      `/registro?error=${encodeURIComponent("La contraseña debe tener al menos 6 caracteres")}&email=${encodeURIComponent(email)}`
+    );
   }
   if (password !== confirmarPassword) {
-    redirect(`/registro?error=${encodeURIComponent("Las contraseñas no coinciden")}`);
+    redirect(
+      `/registro?error=${encodeURIComponent("Las contraseñas no coinciden")}&email=${encodeURIComponent(email)}`
+    );
   }
 
   const origin = (await headers()).get("origin");
@@ -27,7 +31,7 @@ export async function registroAction(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/registro?error=${encodeURIComponent(error.message)}`);
+    redirect(`/registro?error=${encodeURIComponent(error.message)}&email=${encodeURIComponent(email)}`);
   }
 
   if (data.session) {
