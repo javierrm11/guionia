@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Search, Settings } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 
 const RUTAS_AUTH = [
   "/login",
@@ -14,14 +13,19 @@ const RUTAS_AUTH = [
   "/legal",
 ];
 
+/** Con la barra inferior encargándose de Inicio / Ideas / Configuración, la
+ *  barra superior se queda solo con el buscador (en las raíces y en
+ *  /contenido/buscar) y el botón de volver en el resto de pantallas. */
 export function TopBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const enConfiguracion = pathname.startsWith("/configuracion");
   const enAuth = RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
-  const enRaiz = pathname === "/contenido" || pathname === "/configuracion";
+  const enRaiz =
+    pathname === "/contenido" ||
+    pathname === "/contenido/plataformas" ||
+    pathname === "/configuracion";
   const enBusqueda = pathname === "/contenido/buscar";
-  const mostrarBusqueda = (enRaiz && !enConfiguracion) || enBusqueda;
+  const mostrarBusqueda = pathname === "/contenido" || enBusqueda;
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -57,25 +61,13 @@ export function TopBar() {
               name="q"
               defaultValue={query}
               placeholder="Buscar por título o etiqueta…"
-              className="w-full rounded-sm border border-border bg-bg-primary py-2 pr-3 pl-9 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              className="w-full rounded-sm bg-bg-primary py-2 pr-3 pl-9 text-body focus:ring-2 focus:ring-accent-bg focus:outline-none"
             />
           </div>
         </form>
       ) : (
         <div className="flex-1" />
       )}
-
-      <Link
-        href={enConfiguracion ? "/contenido" : "/configuracion"}
-        aria-label={enConfiguracion ? "Volver a Contenido" : "Configuración"}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-bg-primary text-text-secondary"
-      >
-        {enConfiguracion ? (
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        ) : (
-          <Settings size={20} strokeWidth={1.5} />
-        )}
-      </Link>
     </div>
   );
 }

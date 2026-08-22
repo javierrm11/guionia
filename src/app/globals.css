@@ -1,13 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  /* Fondo — degradado "Neón cíber": azul eléctrico → violeta vibrante →
-     magenta. El violeta (#5B2FB0) es el punto más claro que pasa el mínimo
-     de contraste de texto (4.5:1, contraste real ~5.0 con blanco encima)
-     validado con dataviz — más claro que esto y el texto deja de leerse bien. */
-  --bg-body-a: #0057d6;
-  --bg-body-b: #5b2fb0;
-  --bg-body-c: #e0138a;
+  /* Fondo — degradado "Atardecer": índigo → rosa → coral. */
+  --bg-body-a: #4c1d95;
+  --bg-body-b: #be185d;
+  --bg-body-c: #ea580c;
   --glass-blur: 24px;
   --glass-saturate: 150%;
 
@@ -30,14 +27,15 @@
      tenga contraste. --link es para texto/iconos sobre el cristal — necesita
      ser claro para leerse en cualquier zona del degradado. Comparten familia
      de color pero no pueden ser el mismo token sin sacrificar uno de los dos. */
-  --accent: #c21c79;
-  --accent-hover: #a11764;
+  --accent: #c2410c;
+  --accent-hover: #a1360a;
   --accent-bg: rgba(255, 255, 255, 0.3);
-  --link: #f3efff;
+  --link: #fff1e6;
 
-  /* Color — IA. Con el fondo "Neón cíber" siendo azul de por sí, --ai y
-     --accent se validaron juntos con dataviz (ΔE 22.2 bajo daltonismo) para
-     que un botón de IA junto a un botón normal no se confundan. */
+  /* Color — IA. --ai y --accent se validan juntos con dataviz (ΔE 33.6
+     bajo daltonismo, 37.0 en visión normal) para que un botón de IA junto
+     a un botón normal no se confundan — se repite cada vez que cambia
+     cualquiera de los dos. */
   --ai: #2f6fff;
   --ai-hover: #1e56e0;
 

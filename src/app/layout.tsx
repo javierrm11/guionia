@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TopBar } from "@/components/TopBar";
+import { BottomNav } from "@/components/BottomNav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col text-text-primary">
         <TopBar />
-        <main className="flex flex-1 flex-col">{children}</main>
+        {/* pb-28 deja hueco para la barra inferior flotante */}
+        <main className="flex flex-1 flex-col pb-28">{children}</main>
+        <BottomNav />
       </body>
     </html>
   );
