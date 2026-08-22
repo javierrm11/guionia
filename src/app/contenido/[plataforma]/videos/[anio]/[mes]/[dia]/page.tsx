@@ -44,6 +44,13 @@ export default async function DiaPage({
         {diaNum} de {MES_LABEL[mesNum - 1]} de {anio}
       </h1>
 
+      <Link
+        href={`/contenido/${plataforma}/videos/nueva?fecha=${fecha}`}
+        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+      >
+        + Nuevo vídeo
+      </Link>
+
       {guiones && guiones.length > 0 ? (
         <div className="overflow-hidden rounded-md border border-border">
           <table className="w-full border-collapse text-body">

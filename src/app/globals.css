@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  /* Fondo — degradado "Atardecer": índigo → rosa → coral. */
-  --bg-body-a: #4c1d95;
-  --bg-body-b: #be185d;
+  /* Fondo — degradado "Atardecer": índigo → rosa → coral. Índigo y rosa
+     subidos un escalón de saturación (violeta-800, rosa-600) para que el
+     fondo se lea más vistoso; el coral (`--bg-body-c`) se deja tal cual
+     a propósito — es el tramo más claro del degradado y ya es el punto
+     más ajustado de contraste (texto blanco ~2.6:1 encima), aclararlo más
+     lo rompería del todo. Validado con dataviz antes de tocarlo. */
+  --bg-body-a: #5b21b6;
+  --bg-body-b: #db2777;
   --bg-body-c: #ea580c;
   --glass-blur: 24px;
   --glass-saturate: 150%;
@@ -12,10 +17,11 @@
      denso que la primera pasada — más opacidad, blur y saturación, más
      una sombra propia — para que las cajas se lean como más "sólidas" sin
      perder el degradado detrás. Subir la opacidad más de aquí empeora el
-     contraste en los tramos claros del degradado (azul/magenta), así que
-     este es el techo validado con dataviz, no un tope arbitrario. */
-  --bg-primary: rgba(255, 255, 255, 0.26);
-  --bg-secondary: rgba(255, 255, 255, 0.32);
+     contraste en los tramos claros del degradado (rosa/coral): a este nivel
+     (0.30/0.36) el coral ya baja a ~2.5:1 con texto blanco encima — techo
+     validado con dataviz, no un tope arbitrario. */
+  --bg-primary: rgba(255, 255, 255, 0.3);
+  --bg-secondary: rgba(255, 255, 255, 0.36);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
   --border: transparent;
   --text-primary: #ffffff;

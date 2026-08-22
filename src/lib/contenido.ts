@@ -145,39 +145,6 @@ export async function getPendientesDePublicar(
   return data ?? [];
 }
 
-export type PiezaSemana = {
-  id: string;
-  titulo: string;
-  plataforma: Plataforma;
-  estado: string;
-  fecha_publicacion: string;
-};
-
-/**
- * Todas las piezas ya convertidas a guion (cualquier estado de producción,
- * incluido publicado) con fecha dentro de [semanaInicio, semanaFin], de las
- * plataformas activas. Base de la vista "Esta semana" del dashboard.
- */
-export async function getPiezasSemana(
-  supabase: SupabaseClient,
-  plataformas: Plataforma[],
-  semanaInicio: string,
-  semanaFin: string
-): Promise<PiezaSemana[]> {
-  if (plataformas.length === 0) return [];
-
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("id, titulo, plataforma, estado, fecha_publicacion")
-    .in("plataforma", plataformas)
-    .in("estado", ESTADOS_VIDEO)
-    .gte("fecha_publicacion", semanaInicio)
-    .lte("fecha_publicacion", semanaFin)
-    .order("fecha_publicacion", { ascending: true });
-
-  return data ?? [];
-}
-
 /** Etiquetas más usadas en todas las piezas, de más a menos frecuente. */
 export async function getEtiquetasPopulares(
   supabase: SupabaseClient,

@@ -96,6 +96,13 @@ export default async function CalendarioPage({
         </Link>
       </div>
 
+      <Link
+        href={`/contenido/${plataforma}/videos/nueva`}
+        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+      >
+        + Nuevo vídeo
+      </Link>
+
       <div className="grid grid-cols-7 gap-1">
         {DIAS_CABECERA.map((d) => (
           <div key={d} className="text-caption text-center text-text-secondary">

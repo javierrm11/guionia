@@ -7,6 +7,6 @@ import type { Plataforma } from "@/lib/plataformas";
 export const PLATAFORMA_TONO: Record<Plataforma, string> = {
   tiktok: "var(--bg-body-c)",
   instagram: "var(--bg-body-b)",
-  linkedin: "#7c3aed",
+  linkedin: "#8b5cf6",
   youtube: "var(--accent)",
 };

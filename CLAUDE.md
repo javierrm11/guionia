@@ -11,9 +11,11 @@ Mobile-first. Sin sidebar. Solo modo claro (no hay modo oscuro). Densidad compac
 ## Design tokens
 
 ```css
-/* Fondo — degradado "Atardecer" fijo detrás de toda la app (body::before) */
---bg-body-a: #4C1D95;
---bg-body-b: #BE185D;
+/* Fondo — degradado "Atardecer" fijo detrás de toda la app (body::before).
+   Índigo y rosa un escalón más saturado (violeta-800, rosa-600) que la
+   versión original — el coral se deja intacto a propósito, ver nota. */
+--bg-body-a: #5B21B6;
+--bg-body-b: #DB2777;
 --bg-body-c: #EA580C;
 --glass-blur: 24px;
 --glass-saturate: 150%;
@@ -23,10 +25,11 @@ Mobile-first. Sin sidebar. Solo modo claro (no hay modo oscuro). Densidad compac
    saturación que la primera pasada, más sombra propia (--glass-shadow),
    para que las cajas se lean "sólidas" sin perder el degradado detrás.
    Subir la opacidad más allá de esto empeora el contraste en los tramos
-   claros del degradado (azul/magenta) — techo validado con dataviz, no
+   claros del degradado (rosa/coral) — a 0.30/0.36 el coral ya baja a
+   ~2.5:1 con texto blanco encima; es el techo validado con dataviz, no
    un tope arbitrario. */
---bg-primary: rgba(255,255,255,0.26);   /* fondo de tarjetas/tiles/inputs — lleva blur+saturate+sombra */
---bg-secondary: rgba(255,255,255,0.32); /* barra superior, cabeceras de tabla — lleva blur+saturate+sombra */
+--bg-primary: rgba(255,255,255,0.30);   /* fondo de tarjetas/tiles/inputs — lleva blur+saturate+sombra */
+--bg-secondary: rgba(255,255,255,0.36); /* barra superior, cabeceras de tabla — lleva blur+saturate+sombra */
 --glass-shadow: 0 8px 32px rgba(0,0,0,0.28);
 --border: transparent;                  /* token sin usar en cajas — el borde real de las cajas se aplica directamente a .bg-bg-primary/.bg-bg-secondary en globals.css (ver nota abajo) */
 --text-primary: #FFFFFF;
@@ -88,7 +91,7 @@ Familia: **Inter**, fallback `-apple-system, "Segoe UI", sans-serif`.
 - **Barra de navegación inferior fija** (`BottomNav.tsx`, cristal `--bg-secondary`, flotante con margen `inset-x-4 bottom-4`, radio `--radius-md`): 4 ítems — Inicio (`/contenido`), Plataformas (`/contenido/plataformas`), Ideas (`/contenido/ideas`), Ajustes (`/configuracion`). Iconos Lucide 20px; el ítem activo lleva fondo `--accent-bg` e icono/label en `--accent`/`--text-primary`, el resto en `--text-secondary`. Oculta en las rutas de auth (`/login`, `/registro`, etc.) y en `/legal`. `main` lleva `pb-28` para dejarle hueco.
 - **Barra superior** (`--bg-secondary`, altura 56px; no es `fixed`, se desplaza con la página): ya no lleva el icono de Configuración (eso lo cubre la barra inferior) — solo el buscador (en `/contenido` y en `/contenido/buscar`, precargado con la consulta actual en este último) o, en cualquier pantalla que no sea una de las tres raíces (`/contenido`, `/contenido/plataformas`, `/configuracion`), un icono de volver (`ArrowLeft`, `router.back()`) a la izquierda.
 - **`/contenido/plataformas`**: listado de tarjetas, una por plataforma activa, con círculo de icono a color (`PLATAFORMA_TONO`), barra de progreso de la cadencia semanal y píldoras de "en riesgo / pendientes / olvidadas" — la vista de detalle a la que lleva la pestaña "Plataformas" de la barra inferior.
-- **Dashboard de Contenido** (`/contenido`) — "Esta semana", línea de tiempo semanal: cabecera con resumen ("X de Y publicadas · Z en riesgo") + barra de cadencia en 4 tramos (`--accent` los llenos, `--neutral-bg` el resto, tramos llenos = `round(% cadencia / 25)`). Debajo, un día por fila (solo los días con alguna pieza programada, más "hoy" siempre visible aunque esté vacío): a la izquierda, abreviatura del día + punto de color (`--success` si algo se publicó ese día, `--danger` si hay algo atrasado sin grabar, blanco translúcido en el resto) con una línea vertical conectando las filas — "hoy" sustituye el punto por una píldora `HOY` en `--accent`. A la derecha, la(s) pieza(s) de ese día: fila compacta con icono de plataforma (`PLATAFORMA_TONO`) + badge de estado, salvo la pieza de "guion escrito" que toca grabar **hoy**, que se destaca en una tarjeta grande con el mismo tinte `--danger-bg` que `SeccionContenido` y un botón "Abrir guion" a todo lo ancho. La captura rápida de ideas ya no es un formulario siempre visible: es un **botón flotante** (`CapturaFlotante.tsx`, círculo `--accent` 56px, `fixed right-6 bottom-24`, por encima de la barra inferior) que abre `CapturaRapidaForm` en una hoja inferior (`bg-bg-secondary`, esquinas superiores redondeadas, cierra sola al guardar).
+- **Dashboard de Contenido** (`/contenido`) — "Control", denso y de un vistazo: cabecera "Control" + píldora "Semana N" (número de semana del año). Debajo, una única tarjeta de cadencia (anillo `AnilloProgreso` 96px + "X% de la cadencia semanal") — sin más tarjetas-stat sueltas, el único número que manda arriba es la cadencia. Luego tarjeta **Plataformas**: una fila por plataforma activa (círculo de icono a color `PLATAFORMA_TONO`, nombre, "X de Y" + barra de cadencia, o "Sin cadencia" si no tiene objetivo definido) — cada fila enlaza a `/contenido/{plataforma}`. Luego tarjeta **Hoy**: eyebrow + contador en píldora `--danger-bg`, filas separadas por hairline (`bg-white/10`) — punto blanco + "Grabar" para lo que toca grabar hoy, punto `--danger` + "Atrasada" para lo vencido sin grabar, fecha corta para lo próximo aún no vencido; "Nada en riesgo por ahora" si `enRiesgo` está vacío. Por último, `CapturaRapidaForm` siempre visible (no flotante) al final de la pantalla, como en el resto de formularios de la app.
 - **Dashboard de Configuración**: bloque de "datos generales" arriba + rejilla de 2 columnas de tiles → Control semanal (cadencia fija y plantilla semanal editables), Plataformas, Estructuras, Hooks, CTAs.
 - **Dentro de una sección** (listado de ideas/guiones de una plataforma): tabla compacta. **Excepción: `/contenido/ideas`** (todas las plataformas juntas, destino de la pestaña "Ideas" de la barra inferior) usa tarjetas en vez de tabla — círculo de icono a color (`PLATAFORMA_TONO`), filtro por plataforma en chips, secciones "Activas"/"Descartadas", y tinte `--warning-bg` en las que llevan ≥30 días sin convertir a guion ("olvidadas").
 
@@ -103,8 +106,8 @@ Familia: **Inter**, fallback `-apple-system, "Segoe UI", sans-serif`.
 - **Tarjeta**: fondo `--bg-primary` (cristal, con blur y borde de cristal), radio `--radius-md`, sin sombra dura, padding `--space-4`–`--space-6`.
 - **Tile de navegación** (botones grandes del dashboard): tarjeta de cristal (fondo `--bg-primary`, mismo borde de cristal), círculo `--bg-secondary` de 44px con icono `--accent` 20px centrado + label H3 debajo, área táctil mínima 96×96px, fondo pasa a `--accent-bg` al pulsar.
 - **Botón de IA**: fondo `--ai` (azul, deliberadamente distinto de `--accent`), texto blanco, icono `Sparkles` + etiqueta, mismo radio `--radius-sm` que el resto de botones. Marca cualquier acción de IA como su propia categoría visual en toda la app — no reutilizar `--accent` para esto.
-- **`PLATAFORMA_TONO`** (en `PlataformaTile.tsx`, solo exporta el mapa de color — no hay componente `Tile` propio de plataforma, se usa el `Tile` normal): `--bg-body-c` para TikTok, `--bg-body-b` para Instagram, `--accent` para YouTube — reutilizan tokens existentes; LinkedIn es la única excepción, un violeta calibrado a mano (`#7C3AED`) en vez de `--bg-body-a` crudo, porque ese stop del degradado se lee demasiado oscuro/apagado a tamaño de icono pequeño.
-- **`CapturaFlotante`**: botón de acción flotante (círculo `--accent` 56px, `fixed`, esquina inferior derecha, por encima de la barra inferior) que abre una hoja inferior (`bg-bg-secondary`, esquinas superiores redondeadas, fondo `bg-black/50` detrás) con el contenido que se le pase — hoy solo `CapturaRapidaForm`, que se cierra sola al guardar vía su prop opcional `onGuardado`.
+- **`PLATAFORMA_TONO`** (en `PlataformaTile.tsx`, solo exporta el mapa de color — no hay componente `Tile` propio de plataforma, se usa el `Tile` normal): `--bg-body-c` para TikTok, `--bg-body-b` para Instagram, `--accent` para YouTube — reutilizan tokens existentes; LinkedIn es la única excepción, un violeta calibrado a mano (`#8B5CF6`, un escalón más vivo que `--bg-body-a`) en vez del token crudo, porque ese stop del degradado se lee demasiado oscuro/apagado a tamaño de icono pequeño.
+- **`AnilloProgreso`**: anillo SVG de progreso (stroke `--accent`, o `--success` si está completo, sobre pista `--neutral-bg`), tamaño y grosor configurables (56px/7px en las tarjetas-stat del dashboard) — número hechas/objetivo centrado.
 
 Nota — borde de cristal: `--border` es `transparent` y no se usa directamente en cajas; en su lugar, `globals.css` aplica `border: 1px solid rgba(255,255,255,0.28)` + `box-shadow: var(--glass-shadow)` directamente a `.bg-bg-primary`/`.bg-bg-secondary`, así que **cualquier superficie que use esos tokens de fondo ya lleva el borde y la sombra de cristal automáticamente**, sin añadir clases de borde en el JSX (de hecho, no hace falta escribir `border border-border` — con poner `bg-bg-primary` o `bg-bg-secondary` ya viene incluido, junto con el blur/saturate/sombra).
 

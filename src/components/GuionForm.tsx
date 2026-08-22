@@ -2,11 +2,10 @@
 
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
+import { PILAR_LABEL, TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import type { Plataforma } from "@/lib/plataformas";
 import { AiEscenaButton } from "@/components/AiEscenaButton";
 import { SubmitButton } from "@/components/SubmitButton";
-import { convertirEnGuion } from "./actions";
 
 type Frase = {
   id: string;
@@ -47,23 +46,36 @@ function nuevoClientId() {
   return `nueva-${contadorEscenaId}`;
 }
 
-export function ConvertirForm({
+/**
+ * Formulario de guion, compartido por dos flujos:
+ * - Convertir una idea existente en guion (`ideaId` presente, título y pilar
+ *   fijos — vienen de la idea, no se editan aquí).
+ * - Crear un vídeo directamente, sin pasar por una idea (`ideaId` ausente:
+ *   título y pilar se piden en el propio formulario).
+ * Quién llama decide la acción de servidor (`convertirEnGuion` o
+ * `crearVideoDirecto`) vía la prop `action`.
+ */
+export function GuionForm({
   plataforma,
   ideaId,
-  tituloIdea,
-  pilar,
+  tituloInicial = "",
+  pilarInicial = null,
   estructuras,
   frases,
   fechaHoy,
+  action,
 }: {
   plataforma: Plataforma;
-  ideaId: string;
-  tituloIdea: string;
-  pilar: string | null;
+  ideaId?: string;
+  tituloInicial?: string;
+  pilarInicial?: string | null;
   estructuras: Estructura[];
   frases: Frase[];
   fechaHoy: string;
+  action: (formData: FormData) => void | Promise<void>;
 }) {
+  const [titulo, setTitulo] = useState(tituloInicial);
+  const [pilar, setPilar] = useState(pilarInicial ?? "");
   const [estructuraId, setEstructuraId] = useState("");
   const [escenas, setEscenas] = useState<EscenaEditable[]>([]);
   const [nuevoTipo, setNuevoTipo] = useState<TipoEscena | "">("");
@@ -123,10 +135,46 @@ export function ConvertirForm({
   }
 
   return (
-    <form action={convertirEnGuion} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="plataforma" value={plataforma} />
-      <input type="hidden" name="id" value={ideaId} />
+      {ideaId && <input type="hidden" name="id" value={ideaId} />}
       <input type="hidden" name="estructura_id" value={estructuraId} />
+
+      {!ideaId && (
+        <>
+          <label className="flex flex-col gap-1">
+            <span className="text-h3 text-text-secondary">
+              Título<span className="text-accent"> *</span>
+            </span>
+            <input
+              type="text"
+              name="titulo"
+              required
+              autoFocus
+              value={titulo}
+              onChange={(e) => setTitulo(e.target.value)}
+              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-h3 text-text-secondary">Pilar</span>
+            <select
+              name="pilar"
+              value={pilar}
+              onChange={(e) => setPilar(e.target.value)}
+              className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            >
+              <option value="">Sin definir</option>
+              {Object.entries(PILAR_LABEL).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </>
+      )}
 
       {estructuras.length > 0 && (
         <label className="flex flex-col gap-1">
@@ -241,8 +289,8 @@ export function ConvertirForm({
               <AiEscenaButton
                 contexto={{
                   plataforma,
-                  tituloIdea,
-                  pilar,
+                  tituloIdea: titulo,
+                  pilar: pilar || null,
                   tipoEscena: escena.tipoEscena,
                   duracionSegundos: escena.duracion === "" ? null : escena.duracion,
                   otrasEscenas: escenas
@@ -336,10 +384,10 @@ export function ConvertirForm({
       </label>
 
       <SubmitButton
-        pendingLabel="Convirtiendo…"
+        pendingLabel={ideaId ? "Convirtiendo…" : "Creando…"}
         className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
       >
-        Convertir en guion
+        {ideaId ? "Convertir en guion" : "Crear vídeo"}
       </SubmitButton>
     </form>
   );

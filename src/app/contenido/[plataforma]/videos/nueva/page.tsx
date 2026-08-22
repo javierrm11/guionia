@@ -2,28 +2,22 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma, todayISO } from "@/lib/plataformas";
 import { GuionForm } from "@/components/GuionForm";
-import { convertirEnGuion } from "./actions";
+import { crearVideoDirecto } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function ConvertirEnGuionPage({
+export default async function NuevoVideoPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ plataforma: string; id: string }>;
+  params: Promise<{ plataforma: string }>;
+  searchParams: Promise<{ fecha?: string }>;
 }) {
-  const { plataforma, id } = await params;
+  const { plataforma } = await params;
+  const { fecha } = await searchParams;
   if (!isPlataforma(plataforma)) notFound();
 
   const supabase = await createClient();
-
-  const { data: idea } = await supabase
-    .from("piezas_contenido")
-    .select("*")
-    .eq("id", id)
-    .eq("plataforma", plataforma)
-    .maybeSingle();
-
-  if (!idea) notFound();
 
   const { data: estructuras } = await supabase
     .from("estructuras_guion")
@@ -39,17 +33,14 @@ export default async function ConvertirEnGuionPage({
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
-      <p className="text-body text-text-secondary">{idea.titulo}</p>
+      <h1 className="text-h1">Nuevo vídeo</h1>
 
       <GuionForm
         plataforma={plataforma}
-        ideaId={idea.id}
-        tituloInicial={idea.titulo}
-        pilarInicial={idea.pilar}
         estructuras={estructuras ?? []}
         frases={frases ?? []}
-        fechaHoy={todayISO()}
-        action={convertirEnGuion}
+        fechaHoy={fecha ?? todayISO()}
+        action={crearVideoDirecto}
       />
     </div>
   );
