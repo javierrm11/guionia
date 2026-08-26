@@ -103,6 +103,93 @@ export async function obtenerCanalPropio(accessToken: string): Promise<CanalYout
   };
 }
 
+export type EstadisticasCanal = {
+  suscriptores: number;
+  vistasTotales: number;
+  videos: number;
+};
+
+/** Totales acumulados del canal (no por rango de fechas) — suscriptores, vistas y vídeos de siempre. */
+export async function obtenerEstadisticasCanal(accessToken: string): Promise<EstadisticasCanal> {
+  const res = await fetch(
+    "https://www.googleapis.com/youtube/v3/channels?part=statistics&mine=true",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudieron leer las estadísticas del canal (${res.status})`);
+  }
+
+  const data = await res.json();
+  const stats = data.items?.[0]?.statistics;
+  if (!stats) throw new Error("La cuenta de Google no tiene ningún canal de YouTube");
+
+  return {
+    suscriptores: Number(stats.subscriberCount ?? 0),
+    vistasTotales: Number(stats.viewCount ?? 0),
+    videos: Number(stats.videoCount ?? 0),
+  };
+}
+
+export type MetricasPeriodo = {
+  vistas: number;
+  comentarios: number;
+  likes: number;
+  suscriptoresGanados: number;
+};
+
+/** Fecha ISO (YYYY-MM-DD) del primer día de un mes, `desplaze` meses respecto al actual (0 = este mes). */
+function primerDiaDeMes(desplaze: number): string {
+  const fecha = new Date();
+  fecha.setDate(1);
+  fecha.setMonth(fecha.getMonth() + desplaze);
+  return fecha.toISOString().slice(0, 10);
+}
+
+/**
+ * Compara el mes en curso con el mes anterior: vistas, comentarios, likes y
+ * suscriptores ganados. Una sola llamada a la Analytics API con
+ * `dimensions=month` sobre el rango que cubre ambos meses.
+ */
+export async function obtenerComparativaMensual(
+  accessToken: string
+): Promise<{ actual: MetricasPeriodo; anterior: MetricasPeriodo | null }> {
+  const params = new URLSearchParams({
+    ids: "channel==MINE",
+    startDate: primerDiaDeMes(-1),
+    endDate: new Date().toISOString().slice(0, 10),
+    metrics: "views,comments,likes,subscribersGained",
+    dimensions: "month",
+  });
+
+  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudo leer la comparativa mensual (${res.status})`);
+  }
+
+  const data = await res.json();
+  const filas: [string, number, number, number, number][] = data.rows ?? [];
+
+  const aMetricas = (fila?: [string, number, number, number, number]): MetricasPeriodo => ({
+    vistas: fila?.[1] ?? 0,
+    comentarios: fila?.[2] ?? 0,
+    likes: fila?.[3] ?? 0,
+    suscriptoresGanados: fila?.[4] ?? 0,
+  });
+
+  // Las filas vienen ordenadas por mes ascendente: la última es el mes en curso.
+  const filaActual = filas[filas.length - 1];
+  const filaAnterior = filas.length > 1 ? filas[filas.length - 2] : undefined;
+
+  return {
+    actual: aMetricas(filaActual),
+    anterior: filaAnterior ? aMetricas(filaAnterior) : null,
+  };
+}
+
 export type EstadisticasVideo = {
   vistas: number;
   likes: number;

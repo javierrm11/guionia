@@ -109,7 +109,7 @@ export default async function ContenidoPage() {
             const prog = progresoPorPlataforma.get(p);
 
             return (
-              <div key={p} className="flex items-center gap-2.5">
+              <Link key={p} href={`/contenido/${p}/videos`} className="flex items-center gap-2.5">
                 <span
                   className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]"
                   style={{ backgroundColor: tono }}
@@ -124,7 +124,7 @@ export default async function ContenidoPage() {
                     {prog ? `${prog.hechas} de ${prog.cantidad}` : "Sin cadencia"}
                   </p>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

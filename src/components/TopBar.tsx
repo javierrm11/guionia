@@ -14,9 +14,10 @@ const RUTAS_AUTH = [
   "/legal",
 ];
 
-/** Con la barra inferior encargándose de Inicio / Ideas / Configuración, la
- *  barra superior se queda solo con el buscador (en las raíces y en
- *  /contenido/buscar) y el botón de volver en el resto de pantallas. */
+/** Con la barra inferior encargándose de Inicio / Plataformas / Ideas / Cuenta,
+ *  la barra superior se queda solo con el buscador (en las raíces y en
+ *  /contenido/buscar) y el botón de volver en el resto de pantallas —
+ *  incluida /configuracion, que ya no es una raíz, se llega desde Cuenta. */
 export function TopBar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -24,7 +25,7 @@ export function TopBar() {
   const enRaiz =
     pathname === "/contenido" ||
     pathname === "/contenido/plataformas" ||
-    pathname === "/configuracion";
+    pathname === "/contenido/cuenta";
   const enBusqueda = pathname === "/contenido/buscar";
   const mostrarBusqueda = pathname === "/contenido" || enBusqueda;
   /** `/contenido` tiene la banda `OndaCadencia` detrás de la cabecera, así

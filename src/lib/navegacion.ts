@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Lightbulb, Settings, type LucideIcon } from "lucide-react";
+import { Home, LayoutGrid, Lightbulb, User, type LucideIcon } from "lucide-react";
 
 export const RUTAS_AUTH = [
   "/login",
@@ -26,13 +26,14 @@ export const ITEMS_NAV: readonly ItemNav[] = [
     prefijo: "/contenido/plataformas",
   },
   { href: "/contenido/ideas", label: "Ideas", icon: Lightbulb, prefijo: "/contenido/ideas" },
-  { href: "/configuracion", label: "Ajustes", icon: Settings, prefijo: "/configuracion" },
+  { href: "/contenido/cuenta", label: "Cuenta", icon: User, prefijo: "/contenido/cuenta" },
 ];
 
 export function esRutaActiva(pathname: string, prefijo: string) {
   return prefijo === "/contenido"
     ? pathname.startsWith("/contenido") &&
         !pathname.startsWith("/contenido/ideas") &&
-        !pathname.startsWith("/contenido/plataformas")
+        !pathname.startsWith("/contenido/plataformas") &&
+        !pathname.startsWith("/contenido/cuenta")
     : pathname.startsWith(prefijo);
 }

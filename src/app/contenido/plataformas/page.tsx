@@ -76,7 +76,7 @@ export default async function PlataformasPage() {
 
         return (
           <section key={plataforma} className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4">
-            <Link href={`/contenido/${plataforma}`} className="flex items-center gap-3">
+            <Link href={`/contenido/${plataforma}/videos`} className="flex items-center gap-3">
               <span
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
                 style={{ backgroundColor: tono }}
