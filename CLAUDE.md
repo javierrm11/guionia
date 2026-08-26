@@ -6,72 +6,69 @@ No introduzcas colores, tipografías, componentes o patrones de navegación que 
 
 ## Plataforma
 
-Mobile-first, con tablet y escritorio como capas añadidas encima (`lg:` en adelante) — el layout base sigue siendo el de una columna en móvil; ver [Tablet y escritorio](#tablet-y-escritorio) para el detalle. Solo modo claro (no hay modo oscuro). Densidad compacta. **Estilo glass, cristal denso**: fondo con degradado "Atardecer" (índigo → rosa → coral), con 3 burbujas grandes y difuminadas (130-160px) de distintos colores repartidas por la pantalla, más resplandores aún mayores en las esquinas, detrás de toda la app. Se desplaza con la página (no se queda fijo al hacer scroll); las superficies (tarjetas, tiles, barra superior, inputs) son cristales translúcidos con `backdrop-filter: blur() saturate()`, sombra propia y un borde de brillo sutil, dejando ver el degradado a través de ellas — más opacos/densos que un glassmorphism típico (referencia: Centro de Control de iOS, no macOS/Windows), para que la superficie se lea "sólida" sin perder el color de fondo. Esquinas redondeadas generosas (más que en un diseño plano convencional).
+Mobile-first, con tablet y escritorio como capas añadidas encima (`lg:` en adelante) — el layout base sigue siendo el de una columna en móvil; ver [Tablet y escritorio](#tablet-y-escritorio) para el detalle. Solo modo claro (no hay modo oscuro). Densidad compacta. **Estilo claro, tarjetas planas** (referencia: iOS/Material plano, no glassmorphism): fondo gris muy claro (`--bg-page`, `#F5F5F7`) liso detrás de toda la app, sin degradado ni burbujas. Las superficies (tarjetas, tiles, barra superior/inferior, inputs) son blancas sólidas (`--bg-primary`/`--bg-secondary`), separadas del fondo con una sombra suave de dos capas (`--card-shadow`) en vez de blur o borde de cristal. Esquinas redondeadas generosas (más que en un diseño plano convencional).
 
 ## Design tokens
 
 ```css
-/* Fondo — degradado "Atardecer" fijo detrás de toda la app (body::before).
-   Índigo y rosa un escalón más saturado (violeta-800, rosa-600) que la
-   versión original — el coral se deja intacto a propósito, ver nota. */
---bg-body-a: #5B21B6;
---bg-body-b: #DB2777;
---bg-body-c: #EA580C;
---glass-blur: 24px;
---glass-saturate: 150%;
+/* Fondo de página — plano, sin degradado ni cristal. */
+--bg-page: #F5F5F7;
 
-/* Color — neutros (glass: translúcidos sobre el degradado).
-   Cristal denso, no un glassmorphism típico: más opacidad, blur y
-   saturación que la primera pasada, más sombra propia (--glass-shadow),
-   para que las cajas se lean "sólidas" sin perder el degradado detrás.
-   Subir la opacidad más allá de esto empeora el contraste en los tramos
-   claros del degradado (rosa/coral) — a 0.30/0.36 el coral ya baja a
-   ~2.5:1 con texto blanco encima; es el techo validado con dataviz, no
-   un tope arbitrario. */
---bg-primary: rgba(255,255,255,0.30);   /* fondo de tarjetas/tiles/inputs — lleva blur+saturate+sombra */
---bg-secondary: rgba(255,255,255,0.36); /* barra superior, cabeceras de tabla — lleva blur+saturate+sombra */
---glass-shadow: 0 8px 32px rgba(0,0,0,0.28);
---border: transparent;                  /* token sin usar en cajas — el borde real de las cajas se aplica directamente a .bg-bg-primary/.bg-bg-secondary en globals.css (ver nota abajo) */
---text-primary: #FFFFFF;
---text-secondary: rgba(255,255,255,0.78);
---text-disabled: rgba(255,255,255,0.55);
+/* Color — neutros. Tarjetas blancas sólidas; se separan del fondo con
+   --card-shadow (dos capas, sombra suave) en vez de un borde — .bg-bg-primary
+   y .bg-bg-secondary la llevan aplicada automáticamente en globals.css. */
+--bg-primary: #FFFFFF;
+--bg-secondary: #FFFFFF;
+--card-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 6px 16px rgba(16,24,40,0.05);
+--border: #ECECEF;      /* borde real y visible (inputs, divisores) — a diferencia del cristal, aquí sí se usa directamente */
+--text-primary: #111114;
+--text-secondary: #6E6E76; /* un punto más oscuro que el gris "de fábrica" del mockup de origen (#8B8B93, ~3.4:1) para pasar 4.5:1 AA sobre blanco */
+--text-disabled: #B4B3BC;
 
-/* Color — acento (único en toda la app, sin color por módulo).
-   --accent es solo para RELLENOS sólidos (botones con texto blanco encima):
-   necesita ser oscuro/saturado para que el blanco tenga contraste.
-   --link es para texto y iconos sueltos sobre el cristal (enlaces, botones
-   ghost, icono de Tile): necesita ser claro para leerse sobre cualquier zona
-   del degradado. Comparten familia de color pero son dos tokens porque un
-   único tono no puede servir bien a la vez de fondo-con-texto-blanco y de
-   texto-sobre-fondo-oscuro. En el CSS, `.text-accent` se sobrescribe para
-   usar `--link` — en JSX se sigue escribiendo `text-accent` como siempre. */
---accent: #C2410C;          /* botones primarios, pestaña/ítem activo, foco */
---accent-hover: #A1360A;
---accent-bg: rgba(255,255,255,0.3); /* fondo de resaltado (hover de tiles, focus ring) */
---link: #FFF1E6;            /* links, botones ghost, iconos sueltos */
+/* Color — acento (único en toda la app, sin color por módulo). Sobre fondo
+   claro, un único tono sirve tanto para relleno sólido (texto blanco encima)
+   como para texto/iconos sueltos — a diferencia del cristal oscuro anterior,
+   no hace falta un segundo tono claro para legibilidad. `--link` existe como
+   alias por si algún día vuelve a hacer falta divergir, pero hoy vale lo mismo
+   que `--accent`. */
+--accent: #6C5CE0;
+--accent-hover: #5A4BC4;
+--accent-bg: rgba(108,92,224,0.12); /* fondo de resaltado (hover de tiles, focus ring) */
+--link: #6C5CE0;
+
+/* Color — IA. --ai y --accent deben distinguirse claramente entre sí (morado
+   vs. azul) para que un botón de IA y uno normal no se confundan si aparecen
+   juntos. */
+--ai: #2F6FED;
+--ai-hover: #1F57C9;
 
 /* Color — semántico. Texto plano/relleno translúcido en el resto de la app
-   (mensajes de error, "Hoy" en riesgo, barra de progreso...); no confundir
-   con la paleta --badge-* de abajo, que es la de los badges de estado. */
---success: #BAFFC9;   --success-bg: rgba(76,214,140,0.4);   /* Publicado, Activo */
---warning: #FFDCA8;   --warning-bg: rgba(255,179,122,0.4);  /* Borrador, Grabado, Pausado */
---neutral: rgba(255,255,255,0.88); --neutral-bg: rgba(255,255,255,0.24); /* Idea, Pendiente */
---danger:  #FFB199;   --danger-bg:  rgba(255,90,60,0.4);    /* Descartada, Cancelado */
+   (mensajes de error, "Hoy" en riesgo, barra de progreso...); oscurecidos lo
+   justo para pasar 4.5:1 sobre blanco como texto — a diferencia del cristal
+   oscuro, aquí NO funcionan los tonos pálidos. No confundir con la paleta
+   --badge-* de abajo, que es la de los badges de estado. */
+--success: #0B8259;   --success-bg: #E3F7EF;   /* Publicado, Activo */
+--warning: #B45F04;   --warning-bg: #FDF0E0;   /* Borrador, Grabado, Pausado */
+--neutral: #55555C;   --neutral-bg: #F1F0EE;   /* Idea, Pendiente */
+--danger:  #D2483B;   --danger-bg:  #FCE9E7;   /* Descartada, Cancelado, Atrasada */
 
 /* Espaciado (base 4px) */
 --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
 --space-6: 24px; --space-8: 32px; --space-12: 48px;
 
 /* Radio */
---radius-sm: 12px;  /* botones, inputs, badges */
+--radius-sm: 12px;  /* botones, inputs, badges, iconos cuadrados de plataforma */
 --radius-md: 20px;  /* tarjetas, contenedores, tiles */
 ```
 
-Los tokens están centralizados en `globals.css` (`:root` + `@theme inline`). Como toda la UI usa las clases semánticas de Tailwind (`bg-bg-primary`, `text-text-secondary`, `border-border`, etc.) en vez de colores sueltos, cualquier ajuste de paleta se hace ahí y se propaga solo — no hay colores hardcodeados en componentes. El `backdrop-filter` del cristal se aplica de forma global a `.bg-bg-primary`/`.bg-bg-secondary` y a `input`/`textarea`/`select`, así que cualquier superficie nueva que use esos tokens es "glass" automáticamente, sin clases extra.
+Los tokens están centralizados en `globals.css` (`:root` + `@theme inline`). Como toda la UI usa las clases semánticas de Tailwind (`bg-bg-primary`, `text-text-secondary`, `border-border`, etc.) en vez de colores sueltos, cualquier ajuste de paleta se hace ahí y se propaga solo — no hay colores hardcodeados en componentes (los pocos hex sueltos que quedan en JSX, como `PLATAFORMA_TONO`, son colores de marca de cada plataforma, no del sistema). `.bg-bg-primary`/`.bg-bg-secondary` llevan `--card-shadow` aplicado automáticamente en globals.css, así que cualquier superficie nueva que use esos tokens ya se lee como tarjeta sin clases extra.
 
 ## Tipografía
 
-Familia: **Inter**, fallback `-apple-system, "Segoe UI", sans-serif`.
+Dos familias, ambas de Google Fonts vía `next/font/google`:
+
+- **Inter** (`--font-inter`, clase Tailwind `font-sans` — la que aplica por defecto en todo el texto), fallback `-apple-system, "Segoe UI", sans-serif`.
+- **Space Grotesk** (`--font-space-grotesk`, clase Tailwind `font-display`) — solo para texto de énfasis puntual: el número grande de un gauge/stat (ej. el % de `GaugeCadencia`), los eyebrows en mayúsculas de una sección (ej. "PLATAFORMAS"/"HOY" en Control) y algún título corto y directo (ej. "¿Qué idea se te acaba de ocurrir?"). El resto del texto —cuerpo, labels de formulario, nombres de plataforma, badges, nav— se queda en Inter. No sustituye a Inter como familia base, es un acento tipográfico, así que úsalo con moderación.
 
 | Estilo | Tamaño | Peso |
 |---|---|---|
@@ -88,44 +85,42 @@ Familia: **Inter**, fallback `-apple-system, "Segoe UI", sans-serif`.
 
 ## Navegación
 
-- **Barra de navegación inferior fija** (`BottomNav.tsx`, cristal `--bg-secondary`, flotante con margen `inset-x-4 bottom-4`, radio `--radius-md`): 4 ítems — Inicio (`/contenido`), Plataformas (`/contenido/plataformas`), Ideas (`/contenido/ideas`), Ajustes (`/configuracion`). Iconos Lucide 20px; el ítem activo lleva fondo `--accent-bg` e icono/label en `--accent`/`--text-primary`, el resto en `--text-secondary`. Oculta en las rutas de auth (`/login`, `/registro`, etc.) y en `/legal`, y también en escritorio (`lg:hidden` — ahí la navegación vive en `Sidebar`, ver [Tablet y escritorio](#tablet-y-escritorio)). `main` lleva `pb-28` para dejarle hueco (`lg:pb-8` en escritorio, donde no hace falta).
-- **Barra superior** (`--bg-secondary`, altura 56px; no es `fixed`, se desplaza con la página): ya no lleva el icono de Configuración (eso lo cubre la barra inferior) — solo el buscador (en `/contenido` y en `/contenido/buscar`, precargado con la consulta actual en este último) o, en cualquier pantalla que no sea una de las tres raíces (`/contenido`, `/contenido/plataformas`, `/configuracion`), un icono de volver (`ArrowLeft`, `router.back()`) a la izquierda.
-- **`/contenido/plataformas`**: listado de tarjetas, una por plataforma activa, con círculo de icono a color (`PLATAFORMA_TONO`), barra de progreso de la cadencia semanal y píldoras de "en riesgo / pendientes / olvidadas" — la vista de detalle a la que lleva la pestaña "Plataformas" de la barra inferior.
-- **Dashboard de Contenido** (`/contenido`) — "Control", denso y de un vistazo: cabecera "Control" + píldora "Semana N" (número de semana del año). Debajo, una única tarjeta de cadencia (anillo `AnilloProgreso` 96px + "X% de la cadencia semanal") — sin más tarjetas-stat sueltas, el único número que manda arriba es la cadencia. Luego tarjeta **Plataformas**: una fila por plataforma activa (círculo de icono a color `PLATAFORMA_TONO`, nombre, "X de Y" + barra de cadencia, o "Sin cadencia" si no tiene objetivo definido) — cada fila enlaza a `/contenido/{plataforma}`. Luego tarjeta **Hoy**: eyebrow + contador en píldora `--danger-bg`, filas separadas por hairline (`bg-white/10`) — punto blanco + "Grabar" para lo que toca grabar hoy, punto `--danger` + "Atrasada" para lo vencido sin grabar, fecha corta para lo próximo aún no vencido; "Nada en riesgo por ahora" si `enRiesgo` está vacío. Por último, `CapturaRapidaForm` siempre visible (no flotante) al final de la pantalla, como en el resto de formularios de la app.
+- **Barra de navegación inferior fija** (`BottomNav.tsx`, blanca `--bg-secondary`, a todo el ancho y pegada al borde inferior — `inset-x-0 bottom-0`, `border-t border-border`, sin sombra ni esquinas redondeadas, con relleno de `env(safe-area-inset-bottom)`): 4 ítems — Inicio (`/contenido`), Plataformas (`/contenido/plataformas`), Ideas (`/contenido/ideas`), Ajustes (`/configuracion`). Iconos Lucide 20px; el ítem activo se distingue solo por color, sin fondo — icono/label en `--text-primary` si está activo, `--text-disabled` el resto. Oculta en las rutas de auth (`/login`, `/registro`, etc.) y en `/legal`, y también en escritorio (`lg:hidden` — ahí la navegación vive en `Sidebar`, ver [Tablet y escritorio](#tablet-y-escritorio)). `main` (componente `Main.tsx`) lleva `pb-28` para dejarle hueco (`lg:pb-8` en escritorio, donde no hace falta) — excepto en las rutas de auth, donde no hay `BottomNav` que despejar y por tanto tampoco ese padding.
+- **Barra superior** (`--bg-secondary`, altura 56px; no es `fixed`, se desplaza con la página): ya no lleva el icono de Configuración (eso lo cubre la barra inferior) — solo el buscador (en `/contenido` y en `/contenido/buscar`, precargado con la consulta actual en este último) o, en cualquier pantalla que no sea una de las tres raíces (`/contenido`, `/contenido/plataformas`, `/configuracion`), un icono de volver (`ArrowLeft`, `router.back()`) a la izquierda. Solo en `/contenido`, además, un icono de Tendencias (`TrendingUp`) a la derecha del buscador, enlazando a `/contenido/tendencias` — sin etiqueta de texto. En `/contenido` específicamente, el buscador y el icono de Tendencias van en blanco (`text-white`/`border-white/40`, placeholder vía la variable `--placeholder-color` que sobreescribe `--text-disabled`) porque ahí se apoyan sobre `OndaCadencia` — ver más abajo.
+- **`/contenido/plataformas`**: listado de tarjetas, una por plataforma activa, con icono cuadrado a color (`PLATAFORMA_TONO`, radio `--radius-sm`), barra de progreso de la cadencia semanal y píldoras de "en riesgo / pendientes / olvidadas" — la vista de detalle a la que lleva la pestaña "Plataformas" de la barra inferior.
+- **Dashboard de Contenido** (`/contenido`) — "Control": **excepción al patrón de tarjetas** del resto de la app — es una lista continua de secciones separadas por hairline (`border-b border-border`), sin fondo propio ni sombra en cada bloque (a diferencia de `Tarjeta` en [Componentes](#componentes)). No lleva cabecera "Control" ni píldora de semana, ni la fila "Tendencias" (ese enlace vive en la `TopBar`, ver arriba). Detrás de la cabecera va **`OndaCadencia`**: una banda con el borde inferior ondulado, sin texto propio, rellena de `--ai` (el único azul del sistema) — su altura (constantes `ALTURA_MIN`/`ALTURA_MAX` en el propio componente, en ajuste) crece con el % de la cadencia semanal, calculada para cubrir siempre la sección de cadencia y terminar justo antes de Plataformas, pegada tras la `TopBar` (`position: absolute; top: -56px`, dentro de un contenedor `relative`; la `TopBar` necesita `relative z-10` para pintarse por delante de la onda, que sin `position` propia se pintaría detrás igualmente incluso con `z-0`). Sobre la onda va **`GaugeCadencia`**: el mismo gauge circular de 270° con marcas de reloj alrededor que ya se usaba en versiones anteriores del dashboard, pero en blanco (pista `rgba(255,255,255,0.25)`, arco relleno `#FFFFFF`, marcas `rgba(255,255,255,0.35)`, punto indicador blanco con borde `--ai`) — el resto de texto de la sección ("de la cadencia semanal") también en blanco (`text-white`/`text-white/80`), no en los tokens de texto habituales, porque siempre está sobre la onda. Orden del contenido: sección de cadencia (gauge + "X% de la cadencia semanal") — sin más tarjetas-stat sueltas, el único número que manda arriba es la cadencia. Luego **Plataformas**: una rejilla de 2 columnas (`grid grid-cols-2`, incluso en móvil) de tiles compactos — icono cuadrado a color `PLATAFORMA_TONO` de 30px, nombre y "X de Y"/"Sin cadencia" apilados debajo, sin barra de progreso ni divisores entre tiles (solo el `gap` de la rejilla). No hay sección "Hoy" en este dashboard. Luego, a todo el ancho, **Atrasadas** (solo si hay alguna; eyebrow en `--danger` + contador en píldora `--neutral-bg`, filas con punto `--danger` + título, sin badge de texto — el propio eyebrow ya dice que están atrasadas). La captura rápida de ideas (`CapturaRapidaForm`, título + chips de plataforma + input subrayado) ya no va fija en la pantalla — vive dentro de **`CapturaFlotante`**, una notificación flotante (estilo TikTok) que aparece sola a los 2 segundos de entrar en `/contenido` (`setTimeout` + animación de entrada por `@keyframes`), anclada abajo (`fixed bottom-24`, encima de `BottomNav`; en escritorio pasa a la esquina inferior derecha, `lg:right-6 lg:w-96`), con una X para cerrarla y que se cierra sola al guardar una idea.
 - **Dashboard de Configuración**: bloque de "datos generales" arriba + rejilla de 2 columnas de tiles → Control semanal (cadencia fija y plantilla semanal editables), Plataformas, Estructuras, Hooks, CTAs.
 
 ## Tablet y escritorio
 
 Un único breakpoint hace casi todo el trabajo: **`lg:` (≥1024px)**. Por debajo de eso (móvil y tablet en vertical/apaisado estrecho) la app es exactamente el layout mobile-first de siempre — nada cambia hasta `lg:`. `md:` (≥768px) se usa una sola vez (rejilla de Configuración, ver abajo) para un escalón intermedio en tablet ancha.
 
-- **Navegación**: a partir de `lg:`, `BottomNav` desaparece (`lg:hidden`) y aparece **`Sidebar.tsx`** — panel de cristal fijo a la izquierda (`--bg-secondary`, `lg:w-60`, `lg:sticky lg:top-0 lg:h-screen`), con el wordmark "Guionia" arriba y los mismos 4 destinos que `BottomNav` en filas horizontales (icono 20px + label, en vez de apilados). Ambos componentes leen la misma lista de ítems y la misma lógica de "activo" desde `src/lib/navegacion.ts` — cualquier cambio de destinos se hace ahí una sola vez. `layout.tsx` pasa a `lg:flex-row` a nivel de `<body>` para colocar el sidebar junto al resto (`TopBar` + `main`) en vez de encima.
+- **Navegación**: a partir de `lg:`, `BottomNav` desaparece (`lg:hidden`) y aparece **`Sidebar.tsx`** — panel blanco fijo a la izquierda (`--bg-secondary`, `lg:w-60`, `lg:sticky lg:top-0 lg:h-screen`), con el wordmark "Guionia" arriba y los mismos 4 destinos que `BottomNav` en filas horizontales (icono 20px + label, en vez de apilados). Ambos componentes leen la misma lista de ítems y la misma lógica de "activo" desde `src/lib/navegacion.ts` — cualquier cambio de destinos se hace ahí una sola vez. `layout.tsx` pasa a `lg:flex-row` a nivel de `<body>` para colocar el sidebar junto al resto (`TopBar` + `main`) en vez de encima.
 - **Ancho del contenido**: cada pantalla limita su ancho y se centra en escritorio con `lg:mx-auto lg:w-full lg:max-w-{N} lg:p-8` en el contenedor raíz (nunca a todo lo ancho del viewport — un formulario de un solo campo no debe estirarse a 1600px). Convención de anchos según el tipo de pantalla:
   - Formulario enfocado (nueva idea, nuevo hook/CTA, nueva estructura/cadencia/plantilla, publicar): `max-w-xl` o `max-w-2xl`.
   - Detalle (idea, guion, estructura): `max-w-2xl` o `max-w-3xl` según cuánto contenido lleve (el guion, con escenas + estadísticas, usa `3xl`).
   - Listado/dashboard con tarjetas (Plataformas, Ideas, Configuración, Control): `max-w-3xl` o `max-w-4xl`.
   - Calendario mensual: `max-w-3xl`, y las celdas crecen (`lg:min-h-24`) para aprovechar el alto extra.
-- **Multi-columna real**: donde había una lista de tarjetas de una sola columna, en escritorio pasa a rejilla — `lg:grid lg:grid-cols-2` en Plataformas (dashboard y `/contenido/plataformas`), ideas activas de `/contenido/ideas`, y las listas de hooks/CTAs. El dashboard de Configuración (tiles) usa `md:grid-cols-3` (un escalón antes, porque son tiles pequeños). El dashboard de Contenido pone **Plataformas** y **Hoy** lado a lado (`lg:grid lg:grid-cols-2`) en vez de apiladas, con la tarjeta de cadencia arriba a todo lo ancho.
-- **Login / registro**: son la excepción — llevan su propio layout de "hero + hoja inferior" a pantalla completa en móvil (sin `Sidebar`/`BottomNav`, están en `RUTAS_AUTH`). En escritorio no se estiran a todo el viewport: se centran como una tarjeta de ancho fijo (`lg:max-w-sm`, hero con alto fijo `lg:min-h-56 lg:flex-none` en vez de `min-h-[30vh]` relativo al viewport, `lg:rounded-md lg:shadow-2xl` para que se lea como una tarjeta flotante sobre el fondo).
-- **Dentro de una sección** (listado de ideas/guiones de una plataforma): tabla compacta. **Excepción: `/contenido/ideas`** (todas las plataformas juntas, destino de la pestaña "Ideas" de la barra inferior) usa tarjetas en vez de tabla — círculo de icono a color (`PLATAFORMA_TONO`), filtro por plataforma en chips, secciones "Activas"/"Descartadas", y tinte `--warning-bg` en las que llevan ≥30 días sin convertir a guion ("olvidadas").
+- **Multi-columna real**: donde había una lista de tarjetas de una sola columna, en escritorio pasa a rejilla — `lg:grid lg:grid-cols-2` en Plataformas (`/contenido/plataformas`), ideas activas de `/contenido/ideas`, y las listas de hooks/CTAs. El dashboard de Configuración (tiles) usa `md:grid-cols-3` (un escalón antes, porque son tiles pequeños). El dashboard de Contenido es la excepción — su rejilla de Plataformas es de 2 columnas ya desde móvil (no solo en `lg:`, así lo pide el diseño de esa pantalla), con la sección de cadencia arriba y Atrasadas debajo, ambas a todo el ancho.
+- **Login / registro**: son la excepción — llevan su propio layout de "hero + hoja inferior" a pantalla completa en móvil (sin `Sidebar`/`BottomNav`, están en `RUTAS_AUTH`). En escritorio no se estiran a todo el viewport: se centran como una tarjeta de ancho fijo (`lg:max-w-sm`, hero con alto fijo `lg:min-h-56 lg:flex-none` en vez de `min-h-[30vh]` relativo al viewport, `lg:rounded-md lg:shadow-2xl` para que se lea como una tarjeta flotante sobre el fondo). Estas 4 pantallas (login, registro, olvide/restablecer contraseña) activan ese margen ya en `md:` en vez de esperar a `lg:` — al no llevar `Sidebar`, no dependen del breakpoint del resto de la app y se ven mejor centradas desde antes, en tablet.
+- **Dentro de una sección** (listado de ideas/guiones de una plataforma): tabla compacta. **Excepción: `/contenido/ideas`** (todas las plataformas juntas, destino de la pestaña "Ideas" de la barra inferior) usa tarjetas en vez de tabla — icono cuadrado a color (`PLATAFORMA_TONO`), filtro por plataforma en chips, secciones "Activas"/"Descartadas", y tinte `--warning-bg` en las que llevan ≥30 días sin convertir a guion ("olvidadas").
 
 ## Componentes
 
 - **Botón primario**: fondo `--accent`, texto blanco, radio `--radius-sm`, sin sombra ni borde.
-- **Botón secundario**: sin fondo propio (deja ver el cristal del contenedor), sin borde, texto `--text-primary`.
+- **Botón secundario**: sin fondo propio, sin borde, texto `--text-primary`.
 - **Botón ghost**: sin fondo/borde, texto `--accent` — acciones secundarias en tablas.
-- **Input**: fondo `--bg-primary` con blur y borde de cristal (ver nota), radio `--radius-sm`; foco = anillo `--accent-bg`.
+- **Input**: fondo `--bg-primary` (blanco) con borde `--border`, radio `--radius-sm`; foco = anillo `--accent-bg`. Excepción: el buscador de `TopBar` y el campo de `CapturaRapidaForm` van sin caja — fondo transparente, solo `border-b border-border` (foco = `border-accent`), a juego con el resto de filas subrayadas de "Control". Importante: `input`/`textarea`/`select` llevan `background: var(--input-bg, var(--bg-primary))` en `globals.css` (regla sin `@layer`, así que gana siempre a `bg-transparent` u otra clase de Tailwind con la misma especificidad) — para un input transparente hay que pasar `style={{ "--input-bg": "transparent" }}`, no basta con la clase.
 - **Tabla**: fila ~36px alto, cabecera fondo `--bg-secondary` (texto H3), sin líneas verticales ni horizontales, filas separadas solo por el cambio de tono al hover (`--bg-secondary`).
 - **Badge de estado**: forma píldora de **relleno sólido** (no translúcida), texto Caption blanco (`--badge-warning-text` oscuro solo en warning, por ser el tono más luminoso), padding horizontal `--space-2`. Usa la paleta `--badge-*` (no `--success`/`--warning`/`--danger`/`--neutral` — ver nota).
-- **Tarjeta**: fondo `--bg-primary` (cristal, con blur y borde de cristal), radio `--radius-md`, sin sombra dura, padding `--space-4`–`--space-6`.
-- **Tile de navegación** (botones grandes del dashboard): tarjeta de cristal (fondo `--bg-primary`, mismo borde de cristal), círculo `--bg-secondary` de 44px con icono `--accent` 20px centrado + label H3 debajo, área táctil mínima 96×96px, fondo pasa a `--accent-bg` al pulsar.
+- **Tarjeta**: fondo `--bg-primary` (blanco, con `--card-shadow`), radio `--radius-md`, sin borde, padding `--space-4`–`--space-6`.
+- **Tile de navegación** (botones grandes del dashboard): tarjeta blanca (fondo `--bg-primary`, `--card-shadow`), círculo `--bg-secondary` de 44px con icono `--accent` 20px centrado + label H3 debajo, área táctil mínima 96×96px, fondo pasa a `--accent-bg` al pulsar.
 - **Botón de IA**: fondo `--ai` (azul, deliberadamente distinto de `--accent`), texto blanco, icono `Sparkles` + etiqueta, mismo radio `--radius-sm` que el resto de botones. Marca cualquier acción de IA como su propia categoría visual en toda la app — no reutilizar `--accent` para esto.
-- **`PLATAFORMA_TONO`** (en `PlataformaTile.tsx`, solo exporta el mapa de color — no hay componente `Tile` propio de plataforma, se usa el `Tile` normal): `--bg-body-c` para TikTok, `--bg-body-b` para Instagram, `--accent` para YouTube — reutilizan tokens existentes; LinkedIn es la única excepción, un violeta calibrado a mano (`#8B5CF6`, un escalón más vivo que `--bg-body-a`) en vez del token crudo, porque ese stop del degradado se lee demasiado oscuro/apagado a tamaño de icono pequeño.
-- **`AnilloProgreso`**: anillo SVG de progreso (stroke `--accent`, o `--success` si está completo, sobre pista `--neutral-bg`), tamaño y grosor configurables (56px/7px en las tarjetas-stat del dashboard) — número hechas/objetivo centrado.
+- **`PLATAFORMA_TONO`** (en `PlataformaTile.tsx`, solo exporta el mapa de color — no hay componente `Tile` propio de plataforma, se usa el `Tile` normal): colores de marca sólidos, propios de cada plataforma (no derivados de los tokens del sistema) — TikTok `#111114`, Instagram `#D6336C`, LinkedIn `#0A66C2`, YouTube `#FF3B30`. Se aplican sobre un icono **cuadrado redondeado** (radio `--radius-sm`, no círculo) de 32-44px según el contexto, con el icono de Lucide en blanco centrado.
+- **`OlaProgreso`**: gauge circular "ola de líquido" — un nivel azul (`--ai`, el único azul del sistema; reutilizado aquí como decorativo, no como marca de IA) sube dentro de un círculo (`--neutral-bg` de fondo) hasta el % de la cadencia semanal, con una animación de oleaje continua (SVG + `@keyframes` en un `<style>` local, sin JS). Número hechas/objetivo centrado, en blanco cuando el nivel lo cubre (≥50%) o en `--text-primary` si no.
 
-Nota — borde de cristal: `--border` es `transparent` y no se usa directamente en cajas; en su lugar, `globals.css` aplica `border: 1px solid rgba(255,255,255,0.28)` + `box-shadow: var(--glass-shadow)` directamente a `.bg-bg-primary`/`.bg-bg-secondary`, así que **cualquier superficie que use esos tokens de fondo ya lleva el borde y la sombra de cristal automáticamente**, sin añadir clases de borde en el JSX (de hecho, no hace falta escribir `border border-border` — con poner `bg-bg-primary` o `bg-bg-secondary` ya viene incluido, junto con el blur/saturate/sombra).
+Nota — `--border` es un color real y visible (`#ECECEF`), no un token especial: se escribe `border border-border` en el JSX igual que cualquier otro borde, sin casos especiales que recordar. `.bg-bg-primary`/`.bg-bg-secondary` no añaden borde, solo `--card-shadow` (la separación del fondo es por sombra, no por borde).
 
-Nota — dos paletas semánticas, a propósito: `--success`/`--warning`/`--danger`/`--neutral` (pálidos) siguen usándose tal cual como texto plano/relleno translúcido en el resto de la app (mensaje de error, día "en riesgo" del calendario, sección "Hoy", barra de progreso) — ahí el tono pálido es lo que da contraste sobre el cristal oscuro. `--badge-success`/`--badge-warning`/`--badge-danger`/`--badge-neutral` (saturados, relleno sólido) son **solo para `Badge.tsx`**, donde los 4 estados aparecen unos junto a otros en listas/tablas y necesitan distinguirse entre sí bajo daltonismo — algo que los tonos pálidos, casi todos blanquecinos, no garantizaban. Al ser rellenos sólidos con su propio texto de contraste, no dependen del fondo de la página — cambiar la paleta del degradado (`--bg-body-*`) no obliga a retocarlos.
+Nota — dos paletas semánticas, a propósito: `--success`/`--warning`/`--danger`/`--neutral` (oscurecidos para AA) siguen usándose tal cual como texto plano/relleno translúcido en el resto de la app (mensaje de error, día "en riesgo" del calendario, sección "Hoy", barra de progreso). `--badge-success`/`--badge-warning`/`--badge-danger`/`--badge-neutral` (saturados, relleno sólido) son **solo para `Badge.tsx`**, donde los 4 estados aparecen unos junto a otros en listas/tablas y necesitan distinguirse entre sí bajo daltonismo. Al ser rellenos sólidos con su propio texto de contraste, no dependen del fondo de la página — cambiar `--bg-page` no obliga a retocarlos.
 
-Validado con el skill `dataviz`. El check real que importa es **`--accent` vs `--ai`** (para que un botón de IA y uno normal nunca se confundan si aparecen juntos): `node scripts/validate_palette.js "#C2410C,#2F6FFF" --mode dark --surface "#260F4B" --pairs all` — pasa limpio (ΔE 33.6 daltonismo, 37.0 visión normal). El acento (`--accent`) sí depende del fondo: contraste de blanco encima recalculado a mano (~5.17:1, por encima del mínimo 4.5:1) contra el nuevo degradado "Atardecer".
-
-Nota — el chequeo `--pairs all` con los 4 badges + `--accent` + `--ai` en la misma tirada **siempre falla** en alguna pareja (ya fallaba con la paleta "Neón cíber" anterior: `#C21C79`↔`#6B7280` ΔE 1.8) porque exige que un badge y un botón se distingan como si fueran la misma leyenda categórica — no es así: ambos llevan texto propio, el color nunca es la única pista. El gate real es solo `--accent` vs `--ai`. Con la paleta "Atardecer", `--accent` (#C2410C) y el tono de TikTok (`--bg-body-c`, #EA580C) quedan cerca en tono (ambos coral/naranja, ΔE 9.5 en visión normal) — aceptado con el mismo criterio: los tiles de plataforma siempre llevan icono + etiqueta de texto, nunca dependen solo del color. **Si se cambia la paleta del degradado otra vez, hay que repetir `--accent` vs `--ai` y el contraste de blanco sobre `--accent` — los `--badge-*` no hace falta tocarlos.**
+Nota — contraste comprobado a mano (fórmula WCAG) al definir esta paleta clara: `--text-primary` 18.9:1, `--text-secondary` 5.1:1, `--accent`/`--ai` con texto blanco encima 4.9:1/4.6:1 — todos ≥ 4.5:1 sobre `#FFFFFF`. `--text-disabled` (2.1:1) queda deliberadamente por debajo, como en cualquier estado disabled/placeholder. `--accent` (morado `#6C5CE0`) y `--ai` (azul `#2F6FED`) son hues claramente distintos — sigue siendo la pareja que más importa no confundir (botón de IA vs. botón normal). **No se ha vuelto a correr el script `validate_palette.js` del skill `dataviz` con esta paleta** (no se localizó en esta sesión) — si se retoca cualquiera de estos dos tonos, conviene pasarlo por ahí para el contraste bajo daltonismo, no solo WCAG.

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
-import { ArrowUp, Lightbulb } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 import { crearIdeaRapida } from "@/app/contenido/_shared/ideaRapidaActions";
@@ -38,19 +38,10 @@ export function CapturaRapidaForm({
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <form
-      ref={formRef}
-      action={crearIdeaRapida}
-      className="flex flex-col gap-3 rounded-md bg-bg-secondary p-4"
-    >
+    <form ref={formRef} action={crearIdeaRapida} className="flex flex-col gap-4">
       <LimpiarAlGuardar formRef={formRef} onGuardado={onGuardado} />
 
-      <div className="flex items-center gap-2.5">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bg-secondary">
-          <Lightbulb size={16} strokeWidth={1.5} className="text-accent" />
-        </span>
-        <span className="text-h3">¿Qué idea se te acaba de ocurrir?</span>
-      </div>
+      <span className="text-h3 font-display font-semibold">¿Qué idea se te acaba de ocurrir?</span>
 
       {/* Mismo campo `plataforma` que antes, en chips en vez de <select>. */}
       <div className="flex flex-wrap gap-2">
@@ -76,7 +67,8 @@ export function CapturaRapidaForm({
           name="titulo"
           required
           placeholder="Escríbela antes de que se te olvide…"
-          className="min-h-11 flex-1 rounded-sm px-3 py-2 text-body focus:ring-2 focus:ring-accent-bg focus:outline-none"
+          style={{ "--input-bg": "transparent" } as React.CSSProperties}
+          className="min-h-11 flex-1 border-b border-border px-0.5 py-2 text-body focus:border-accent focus:outline-none"
         />
         <SubmitButton
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white active:bg-accent-hover disabled:opacity-60"

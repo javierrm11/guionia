@@ -1,11 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
 import { PILAR_LABEL, TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import type { Plataforma } from "@/lib/plataformas";
 import { AiEscenaButton } from "@/components/AiEscenaButton";
+import { Puntuacion } from "@/components/Puntuacion";
+import { PuntuacionEscena } from "@/components/PuntuacionEscena";
+import { PuntuacionGrande } from "@/components/PuntuacionGrande";
 import { SubmitButton } from "@/components/SubmitButton";
+import { calcularPuntuacionVideo } from "@/lib/puntuacion";
 
 type Frase = {
   id: string;
@@ -74,18 +78,32 @@ export function GuionForm({
   fechaHoy: string;
   action: (formData: FormData) => void | Promise<void>;
 }) {
+  const [paso, setPaso] = useState<1 | 2>(1);
   const [titulo, setTitulo] = useState(tituloInicial);
   const [pilar, setPilar] = useState(pilarInicial ?? "");
+  const [fecha, setFecha] = useState(fechaHoy);
   const [estructuraId, setEstructuraId] = useState("");
   const [escenas, setEscenas] = useState<EscenaEditable[]>([]);
   const [nuevoTipo, setNuevoTipo] = useState<TipoEscena | "">("");
   const [nuevaDuracion, setNuevaDuracion] = useState("");
+  const [textosPuntuacion, setTextosPuntuacion] = useState<Record<string, string>>({});
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const estructuraActual = estructuras.find((e) => e.id === estructuraId) ?? null;
   const duracionTotal = escenas.reduce(
     (acc, e) => acc + (typeof e.duracion === "number" ? e.duracion : 0),
     0
+  );
+
+  const escenasPuntuacion = escenas.map((e) => ({
+    tipoEscena: e.tipoEscena,
+    texto: textosPuntuacion[e.clientId] ?? "",
+    duracionSegundos: e.duracion === "" ? null : e.duracion,
+  }));
+
+  const resultadoGeneral = useMemo(
+    () => calcularPuntuacionVideo(titulo, pilar || null, escenasPuntuacion),
+    [titulo, pilar, escenasPuntuacion]
   );
 
   function elegirEstructura(id: string) {
@@ -134,67 +152,120 @@ export function GuionForm({
     setNuevaDuracion("");
   }
 
+  const pilarLabel = pilar ? PILAR_LABEL[pilar] : null;
+  const subtitulo = [pilarLabel, estructuraActual?.nombre].filter(Boolean).join(" · ");
+
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="plataforma" value={plataforma} />
       {ideaId && <input type="hidden" name="id" value={ideaId} />}
       <input type="hidden" name="estructura_id" value={estructuraId} />
+      {!ideaId && <input type="hidden" name="titulo" value={titulo} />}
+      {!ideaId && <input type="hidden" name="pilar" value={pilar} />}
+      <input type="hidden" name="fecha_publicacion" value={fecha} />
 
-      {!ideaId && (
+      {paso === 1 ? (
         <>
+          {!ideaId && (
+            <>
+              <h1 className="text-h1">Nuevo vídeo</h1>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-h3 text-text-secondary">
+                  Título<span className="text-accent"> *</span>
+                </span>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
+                  className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-h3 text-text-secondary">Pilar</span>
+                <select
+                  value={pilar}
+                  onChange={(e) => setPilar(e.target.value)}
+                  className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                >
+                  <option value="">Sin definir</option>
+                  {Object.entries(PILAR_LABEL).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
+
+          {estructuras.length > 0 && (
+            <label className="flex flex-col gap-1">
+              <span className="text-h3 text-text-secondary">Estructura (opcional)</span>
+              <select
+                value={estructuraId}
+                onChange={(e) => elegirEstructura(e.target.value)}
+                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              >
+                <option value="">Sin estructura (texto libre)</option>
+                {estructuras.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.nombre} ({e.duracion_segundos}s)
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
           <label className="flex flex-col gap-1">
             <span className="text-h3 text-text-secondary">
-              Título<span className="text-accent"> *</span>
+              Fecha de publicación<span className="text-accent"> *</span>
             </span>
             <input
-              type="text"
-              name="titulo"
+              type="date"
               required
-              autoFocus
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
               className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
             />
           </label>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Pilar</span>
-            <select
-              name="pilar"
-              value={pilar}
-              onChange={(e) => setPilar(e.target.value)}
-              className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-            >
-              <option value="">Sin definir</option>
-              {Object.entries(PILAR_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </>
-      )}
-
-      {estructuras.length > 0 && (
-        <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Estructura (opcional)</span>
-          <select
-            value={estructuraId}
-            onChange={(e) => elegirEstructura(e.target.value)}
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+          <button
+            type="button"
+            onClick={() => setPaso(2)}
+            disabled={!ideaId && !titulo.trim()}
+            className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40"
           >
-            <option value="">Sin estructura (texto libre)</option>
-            {estructuras.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.nombre} ({e.duracion_segundos}s)
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
+            Escribir guion
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <p className="text-h1">{titulo}</p>
+                <button
+                  type="button"
+                  onClick={() => setPaso(1)}
+                  aria-label="Editar título, pilar y estructura"
+                  className="p-2 -m-2 text-accent"
+                >
+                  <Pencil size={16} strokeWidth={1.5} />
+                </button>
+              </div>
+              {subtitulo && <p className="text-small text-text-secondary">{subtitulo}</p>}
+            </div>
 
-      {estructuraId ? (
+            <PuntuacionGrande resultado={resultadoGeneral} />
+          </div>
+
+          <Puntuacion resultado={resultadoGeneral} etiqueta="puntuación general del vídeo" ocultarResumen modal />
+
+          {estructuraId ? (
         <div className="flex flex-col gap-4">
           {estructuraActual && (
             <span
@@ -213,7 +284,7 @@ export function GuionForm({
           {escenas.map((escena, index) => (
             <div
               key={escena.clientId}
-              className="flex flex-col gap-2 rounded-md border border-border p-3"
+              className="flex flex-col gap-2 rounded-md border border-border"
             >
               <div className="flex items-center gap-2">
                 <input type="hidden" name="escena_tipo" value={escena.tipoEscena} />
@@ -248,9 +319,10 @@ export function GuionForm({
                 <button
                   type="button"
                   onClick={() => eliminarEscena(escena.clientId)}
-                  className="ml-auto text-small text-accent"
+                  aria-label="Eliminar escena"
+                  className="ml-auto flex items-center justify-center rounded-sm bg-badge-danger p-2 text-white"
                 >
-                  Eliminar
+                  <Trash2 size={14} strokeWidth={1.5} />
                 </button>
               </div>
 
@@ -271,6 +343,7 @@ export function GuionForm({
                       const textarea = textareaRefs.current[escena.clientId];
                       if (frase && textarea) {
                         textarea.value = frase.texto;
+                        setTextosPuntuacion((prev) => ({ ...prev, [escena.clientId]: frase.texto }));
                       }
                       e.target.value = "";
                     }}
@@ -304,6 +377,7 @@ export function GuionForm({
                 onResultado={(texto) => {
                   const textarea = textareaRefs.current[escena.clientId];
                   if (textarea) textarea.value = texto;
+                  setTextosPuntuacion((prev) => ({ ...prev, [escena.clientId]: texto }));
                 }}
               />
 
@@ -313,7 +387,16 @@ export function GuionForm({
                 ref={(el) => {
                   textareaRefs.current[escena.clientId] = el;
                 }}
+                onChange={(e) =>
+                  setTextosPuntuacion((prev) => ({ ...prev, [escena.clientId]: e.target.value }))
+                }
                 className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              />
+
+              <PuntuacionEscena
+                texto={textosPuntuacion[escena.clientId] ?? ""}
+                tipoEscena={escena.tipoEscena}
+                duracionSegundos={escena.duracion === "" ? null : escena.duracion}
               />
             </div>
           ))}
@@ -356,39 +439,28 @@ export function GuionForm({
             </button>
           </div>
         </div>
-      ) : (
-        <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">
-            Texto del guion<span className="text-accent"> *</span>
-          </span>
-          <textarea
-            name="texto"
-            required
-            rows={8}
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-          />
-        </label>
+          ) : (
+            <label className="flex flex-col gap-1">
+              <span className="text-h3 text-text-secondary">
+                Texto del guion<span className="text-accent"> *</span>
+              </span>
+              <textarea
+                name="texto"
+                required
+                rows={8}
+                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              />
+            </label>
+          )}
+
+          <SubmitButton
+            pendingLabel={ideaId ? "Convirtiendo…" : "Creando…"}
+            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
+          >
+            {ideaId ? "Convertir en guion" : "Crear vídeo"}
+          </SubmitButton>
+        </>
       )}
-
-      <label className="flex flex-col gap-1">
-        <span className="text-h3 text-text-secondary">
-          Fecha de publicación<span className="text-accent"> *</span>
-        </span>
-        <input
-          type="date"
-          name="fecha_publicacion"
-          required
-          defaultValue={fechaHoy}
-          className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-        />
-      </label>
-
-      <SubmitButton
-        pendingLabel={ideaId ? "Convirtiendo…" : "Creando…"}
-        className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
-      >
-        {ideaId ? "Convertir en guion" : "Crear vídeo"}
-      </SubmitButton>
     </form>
   );
 }

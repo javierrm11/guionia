@@ -25,8 +25,8 @@ export default function ConfiguracionPage() {
             type="submit"
             className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md bg-bg-primary p-4 hover:bg-accent-bg active:bg-accent-bg"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
-              <LogOut size={20} strokeWidth={1.5} className="text-accent" />
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-badge-danger">
+              <LogOut size={20} strokeWidth={1.5} className="text-white" />
             </span>
             <span className="text-h3 text-center text-text-primary">Cerrar sesión</span>
           </button>

@@ -1,13 +1,22 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Sidebar } from "@/components/Sidebar";
+import { Main } from "@/components/Main";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+/** Tipografía de énfasis (número grande de la cadencia, eyebrows en
+ *  mayúsculas, "¿Qué idea..."): ver Tipografía en CLAUDE.md. */
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -15,15 +24,20 @@ export const metadata: Metadata = {
   description: "Panel para centralizar la gestión de contenido de Guionia.",
 };
 
+/** Sin esto, algunos navegadores móviles pintan la barra de estado negra por
+ *  defecto en vez de heredar el fondo de la app. */
+export const viewport: Viewport = {
+  themeColor: "#F5F5F7",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${inter.variable} h-full antialiased`}>
+    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col text-text-primary lg:flex-row">
         <Sidebar />
         <div className="flex flex-1 flex-col lg:min-w-0">
           <TopBar />
-          {/* pb-28 deja hueco para la barra inferior flotante — no hace falta en escritorio, donde la navegación vive en el Sidebar */}
-          <main className="flex flex-1 flex-col pb-28 lg:pb-8">{children}</main>
+          <Main>{children}</Main>
         </div>
         <BottomNav />
       </body>

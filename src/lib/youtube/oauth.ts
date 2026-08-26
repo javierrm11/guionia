@@ -209,6 +209,126 @@ export async function obtenerEstadisticasVideos(
   return resultado;
 }
 
+export type VideoTendencia = {
+  videoId: string;
+  canalId: string;
+  titulo: string;
+  canal: string;
+  miniatura: string | null;
+  vistas: number;
+  publicadoEn: string;
+};
+
+/** Vídeos en tendencia ahora mismo en YouTube (chart público `mostPopular`), para inspirarte en lo que funciona. */
+export async function obtenerVideosTendencia(
+  accessToken: string,
+  regionCode = "ES",
+  maxResults = 20
+): Promise<VideoTendencia[]> {
+  const params = new URLSearchParams({
+    part: "snippet,statistics",
+    chart: "mostPopular",
+    regionCode,
+    maxResults: String(maxResults),
+  });
+
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudieron leer los vídeos en tendencia (${res.status})`);
+  }
+
+  const data = await res.json();
+  return (data.items ?? []).map(
+    (item: {
+      id: string;
+      snippet: {
+        title: string;
+        channelTitle: string;
+        channelId: string;
+        publishedAt: string;
+        thumbnails?: Record<string, { url: string }>;
+      };
+      statistics?: { viewCount?: string };
+    }) => ({
+      videoId: item.id,
+      canalId: item.snippet.channelId,
+      titulo: item.snippet.title,
+      canal: item.snippet.channelTitle,
+      miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
+      vistas: Number(item.statistics?.viewCount ?? 0),
+      publicadoEn: item.snippet.publishedAt,
+    })
+  );
+}
+
+/**
+ * Busca vídeos por tema (palabras clave), ordenados por vistas — para
+ * encontrar contenido similar al tuyo en vez de la tendencia general.
+ * `search.list` no devuelve estadísticas, así que se completan con una
+ * segunda llamada a `obtenerEstadisticasVideos`.
+ */
+export async function buscarVideosPorTema(
+  accessToken: string,
+  query: string,
+  regionCode = "ES",
+  maxResults = 20
+): Promise<VideoTendencia[]> {
+  const params = new URLSearchParams({
+    part: "snippet",
+    q: query,
+    type: "video",
+    order: "viewCount",
+    regionCode,
+    maxResults: String(maxResults),
+  });
+
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudo buscar vídeos por tema (${res.status})`);
+  }
+
+  const data = await res.json();
+  const items = (data.items ?? [])
+    .filter((item: { id?: { videoId?: string } }) => item.id?.videoId)
+    .map(
+      (item: {
+        id: { videoId: string };
+        snippet: {
+          title: string;
+          channelTitle: string;
+          channelId: string;
+          publishedAt: string;
+          thumbnails?: Record<string, { url: string }>;
+        };
+      }) => ({
+        videoId: item.id.videoId,
+        canalId: item.snippet.channelId,
+        titulo: item.snippet.title,
+        canal: item.snippet.channelTitle,
+        miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
+        publicadoEn: item.snippet.publishedAt,
+      })
+    );
+
+  if (items.length === 0) return [];
+
+  const stats = await obtenerEstadisticasVideos(
+    items.map((i: { videoId: string }) => i.videoId),
+    accessToken
+  );
+
+  return items.map((i: Omit<VideoTendencia, "vistas">) => ({
+    ...i,
+    vistas: stats[i.videoId]?.vistas ?? 0,
+  }));
+}
+
 export type PuntoRetencion = {
   /** Posición en el vídeo, de 0 (inicio) a 1 (final). */
   elapsedRatio: number;

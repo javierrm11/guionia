@@ -45,8 +45,8 @@ function TarjetaIdea({ idea }: { idea: Idea }) {
     >
       <div className="flex items-start gap-3">
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-          style={{ backgroundColor: tono, boxShadow: `0 0 16px -2px ${tono}` }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm"
+          style={{ backgroundColor: tono }}
         >
           <Icon size={16} strokeWidth={1.5} className="text-white" />
         </span>

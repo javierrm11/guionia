@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AiEscenaButton } from "@/components/AiEscenaButton";
+import { PuntuacionEscena } from "@/components/PuntuacionEscena";
 import type { TipoEscena } from "@/lib/contenido";
 import type { Plataforma } from "@/lib/plataformas";
 import type { EscenaContexto } from "@/lib/ai/gemini";
@@ -17,6 +18,7 @@ export function EscenaTextoEditor({
   pilar,
   otrasEscenas,
   guardarAction,
+  onTextoChange,
 }: {
   escenaId: string;
   redirectTo: string;
@@ -28,6 +30,7 @@ export function EscenaTextoEditor({
   pilar: string | null;
   otrasEscenas: EscenaContexto[];
   guardarAction: (formData: FormData) => void | Promise<void>;
+  onTextoChange?: (texto: string) => void;
 }) {
   const [texto, setTexto] = useState(textoInicial);
   const formRef = useRef<HTMLFormElement>(null);
@@ -41,6 +44,7 @@ export function EscenaTextoEditor({
         onResultado={(nuevoTexto) => {
           setTexto(nuevoTexto);
           ultimoGuardado.current = nuevoTexto;
+          onTextoChange?.(nuevoTexto);
           formRef.current?.requestSubmit();
         }}
       />
@@ -52,7 +56,10 @@ export function EscenaTextoEditor({
           name="texto"
           rows={3}
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            onTextoChange?.(e.target.value);
+          }}
           onBlur={() => {
             if (texto !== ultimoGuardado.current) {
               ultimoGuardado.current = texto;
@@ -61,6 +68,9 @@ export function EscenaTextoEditor({
           }}
           className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
         />
+
+        <PuntuacionEscena texto={texto} tipoEscena={tipoEscena} duracionSegundos={duracionSegundos} />
+
         <button
           type="submit"
           className="self-start rounded-sm border border-border px-3 py-1.5 text-small text-text-primary active:bg-bg-secondary"

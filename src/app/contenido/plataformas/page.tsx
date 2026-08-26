@@ -78,8 +78,8 @@ export default async function PlataformasPage() {
           <section key={plataforma} className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4">
             <Link href={`/contenido/${plataforma}`} className="flex items-center gap-3">
               <span
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
-                style={{ backgroundColor: tono, boxShadow: `0 0 20px -2px ${tono}` }}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                style={{ backgroundColor: tono }}
               >
                 <Icon size={20} strokeWidth={1.5} className="text-white" />
               </span>

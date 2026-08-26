@@ -33,8 +33,6 @@ export default async function NuevoVideoPage({
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
-      <h1 className="text-h1">Nuevo vídeo</h1>
-
       <GuionForm
         plataforma={plataforma}
         estructuras={estructuras ?? []}

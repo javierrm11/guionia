@@ -17,6 +17,10 @@ export default async function PublicadosPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+      <Link href="/contenido/tendencias" className="self-start text-small text-accent hover:underline">
+        Ver tendencias →
+      </Link>
+
       {publicados && publicados.length > 0 ? (
         <ul className="flex flex-col gap-2">
           {publicados.map((p) => {

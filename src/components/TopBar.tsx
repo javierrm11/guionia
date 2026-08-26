@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, TrendingUp } from "lucide-react";
 
 const RUTAS_AUTH = [
   "/login",
@@ -26,6 +27,9 @@ export function TopBar() {
     pathname === "/configuracion";
   const enBusqueda = pathname === "/contenido/buscar";
   const mostrarBusqueda = pathname === "/contenido" || enBusqueda;
+  /** `/contenido` tiene la banda `OndaCadencia` detrás de la cabecera, así
+   *  que el buscador y el icono de Tendencias van en blanco ahí. */
+  const sobreOnda = pathname === "/contenido";
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -35,7 +39,7 @@ export function TopBar() {
   if (enAuth) return null;
 
   return (
-    <div className="flex h-14 items-center gap-2 px-4">
+    <div className="relative z-10 flex h-14 items-center gap-2 px-4">
       {!enRaiz && (
         <button
           type="button"
@@ -53,7 +57,9 @@ export function TopBar() {
             <Search
               size={16}
               strokeWidth={1.5}
-              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-disabled"
+              className={`pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 ${
+                sobreOnda ? "text-white/85" : "text-text-disabled"
+              }`}
             />
             <input
               key={query}
@@ -61,12 +67,32 @@ export function TopBar() {
               name="q"
               defaultValue={query}
               placeholder="Buscar por título o etiqueta…"
-              className="w-full rounded-sm bg-bg-primary py-2 pr-3 pl-9 text-body focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              style={
+                {
+                  "--input-bg": "transparent",
+                  ...(sobreOnda ? { "--placeholder-color": "rgba(255,255,255,0.85)" } : {}),
+                } as React.CSSProperties
+              }
+              className={`w-full border-b bg-transparent py-2 pr-3 pl-9 text-body focus:outline-none ${
+                sobreOnda
+                  ? "border-white/40 text-white focus:border-white"
+                  : "border-border text-text-primary focus:border-accent"
+              }`}
             />
           </div>
         </form>
       ) : (
         <div className="flex-1" />
+      )}
+
+      {pathname === "/contenido" && (
+        <Link
+          href="/contenido/tendencias"
+          aria-label="Tendencias"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/85"
+        >
+          <TrendingUp size={20} strokeWidth={1.5} />
+        </Link>
       )}
     </div>
   );

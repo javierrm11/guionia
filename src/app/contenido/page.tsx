@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Lightbulb } from "lucide-react";
-import { AnilloProgreso } from "@/components/AnilloProgreso";
+import { GaugeCadencia } from "@/components/GaugeCadencia";
+import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
-import { CapturaRapidaForm } from "@/components/CapturaRapidaForm";
+import { CapturaFlotante } from "@/components/CapturaFlotante";
 import { createClient } from "@/lib/supabase/server";
 import {
   PLATAFORMA_ICON,
@@ -22,13 +23,6 @@ export const dynamic = "force-dynamic";
 function hrefVideo(plataforma: string, fechaPublicacion: string, id: string) {
   const [anio, mes, dia] = fechaPublicacion.split("-");
   return `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${id}`;
-}
-
-/** Número de semana del año (aproximado, solo para la etiqueta de cabecera). */
-function numeroSemana(fecha: Date) {
-  const inicioAno = new Date(fecha.getFullYear(), 0, 1);
-  const dias = Math.floor((fecha.getTime() - inicioAno.getTime()) / 86400000);
-  return Math.ceil((dias + inicioAno.getDay() + 1) / 7);
 }
 
 export default async function ContenidoPage() {
@@ -83,8 +77,7 @@ export default async function ContenidoPage() {
     getPiezasEnRiesgo(supabase, plataformasActivas, hoy),
   ]);
 
-  const paraGrabarHoy = enRiesgo.filter((p) => p.fecha_publicacion === hoy);
-  const atrasadasOProximas = enRiesgo.filter((p) => p.fecha_publicacion !== hoy);
+  const atrasadas = enRiesgo.filter((p) => p.fecha_publicacion < hoy);
 
   const objetivoSemana = progreso.reduce((suma, p) => suma + p.cantidad, 0);
   const hechasSemana = progreso.reduce((suma, p) => suma + p.hechas, 0);
@@ -93,127 +86,81 @@ export default async function ContenidoPage() {
   const progresoPorPlataforma = new Map(progreso.map((p) => [p.plataforma, p]));
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:gap-6 lg:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-h1">Control</h1>
-        <span className="text-caption rounded-full bg-neutral-bg px-2.5 py-1 text-text-secondary">
-          Semana {numeroSemana(new Date())}
+    <div className="relative flex flex-1 flex-col">
+      <div className="pointer-events-none absolute inset-x-0 z-0" style={{ top: -56 }}>
+        <OndaCadencia porcentaje={porcentajeCadencia} />
+      </div>
+
+      <div className="relative z-10 flex flex-1 flex-col p-4 pt-10 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+      <section className="flex flex-col items-center gap-1 pb-7">
+        <GaugeCadencia porcentaje={porcentajeCadencia} />
+        <span className="text-caption text-white/80">de la cadencia semanal</span>
+      </section>
+
+      <div className="border-b border-border py-6">
+        <span className="text-caption font-display text-text-secondary uppercase" style={{ letterSpacing: "0.06em" }}>
+          Plataformas
         </span>
+
+        <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-4">
+          {plataformasActivas.map((p) => {
+            const Icon = PLATAFORMA_ICON[p];
+            const tono = PLATAFORMA_TONO[p];
+            const prog = progresoPorPlataforma.get(p);
+
+            return (
+              <div key={p} className="flex items-center gap-2.5">
+                <span
+                  className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]"
+                  style={{ backgroundColor: tono }}
+                >
+                  <Icon size={14} strokeWidth={1.5} className="text-white" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-small font-semibold text-text-primary">
+                    {PLATAFORMA_LABEL[p]}
+                  </p>
+                  <p className="text-caption text-text-secondary">
+                    {prog ? `${prog.hechas} de ${prog.cantidad}` : "Sin cadencia"}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <section className="flex items-center gap-5 rounded-md bg-bg-primary p-5">
-        <AnilloProgreso hechas={hechasSemana} objetivo={objetivoSemana} size={96} grosor={9} />
-        <div className="flex flex-col gap-0.5">
-          <span className="text-h1 leading-none">{porcentajeCadencia}%</span>
-          <span className="text-caption text-text-secondary">de la cadencia semanal</span>
-        </div>
-      </section>
-
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
-      <section className="flex flex-col gap-0.5 rounded-md bg-bg-primary py-1">
-        <div className="flex items-center justify-between px-4 pt-2 pb-1">
-          <span className="text-caption text-text-secondary uppercase" style={{ letterSpacing: "0.06em" }}>
-            Plataformas
-          </span>
-          <span className="text-caption text-text-disabled">esta semana</span>
-        </div>
-
-        {plataformasActivas.map((p) => {
-          const Icon = PLATAFORMA_ICON[p];
-          const tono = PLATAFORMA_TONO[p];
-          const prog = progresoPorPlataforma.get(p);
-          const porcentaje = prog ? Math.min(100, (prog.hechas / Math.max(1, prog.cantidad)) * 100) : 0;
-
-          return (
-            <Link
-              key={p}
-              href={`/contenido/${p}`}
-              className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent-bg active:bg-accent-bg"
-            >
-              <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                style={{ backgroundColor: tono }}
-              >
-                <Icon size={16} strokeWidth={1.5} className="text-white" />
-              </span>
-              {prog ? (
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-body">{PLATAFORMA_LABEL[p]}</span>
-                    <span className="text-small text-text-secondary">
-                      {prog.hechas} de {prog.cantidad}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-neutral-bg">
-                    <div
-                      className="h-1.5 rounded-full bg-accent"
-                      style={{ width: `${porcentaje}%` }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-1 items-baseline justify-between gap-2">
-                  <span className="text-body">{PLATAFORMA_LABEL[p]}</span>
-                  <span className="text-caption text-text-disabled">Sin cadencia</span>
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </section>
-
-      <section className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-        <div className="flex items-center gap-2">
-          <span className="text-caption text-text-secondary uppercase" style={{ letterSpacing: "0.06em" }}>
-            Hoy
-          </span>
-          {enRiesgo.length > 0 && (
-            <span
-              className="text-caption rounded-full px-2 py-0.5"
-              style={{ backgroundColor: "var(--danger-bg)" }}
-            >
-              {enRiesgo.length}
+      {atrasadas.length > 0 && (
+        <section className="flex flex-col gap-3 border-b border-border py-6">
+          <div className="flex items-center gap-2">
+            <span className="text-caption font-display text-danger uppercase" style={{ letterSpacing: "0.06em" }}>
+              Atrasadas
             </span>
-          )}
-        </div>
-
-        {enRiesgo.length === 0 ? (
-          <p className="text-small text-text-secondary">Nada en riesgo por ahora.</p>
-        ) : (
-          <div className="flex flex-col">
-            {[...paraGrabarHoy, ...atrasadasOProximas].map((p, index, arr) => {
-              const atrasada = p.fecha_publicacion < hoy;
-              return (
-                <div key={p.id}>
-                  <Link
-                    href={hrefVideo(p.plataforma, p.fecha_publicacion, p.id)}
-                    className="flex min-h-10 items-center gap-2.5 hover:opacity-80"
-                  >
-                    <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: atrasada ? "var(--danger)" : "#FFFFFF" }}
-                    />
-                    <span className="flex-1 truncate text-body">{p.titulo}</span>
-                    <span
-                      className={`shrink-0 text-caption ${atrasada ? "text-danger" : "text-text-secondary"}`}
-                    >
-                      {p.fecha_publicacion === hoy
-                        ? "Grabar"
-                        : atrasada
-                          ? "Atrasada"
-                          : p.fecha_publicacion.slice(5)}
-                    </span>
-                  </Link>
-                  {index < arr.length - 1 && <div className="h-px bg-white/10" />}
-                </div>
-              );
-            })}
+            <span className="text-caption rounded-full bg-neutral-bg px-2 py-0.5 text-text-primary">
+              {atrasadas.length}
+            </span>
           </div>
-        )}
-      </section>
+
+          <div className="flex flex-col">
+            {atrasadas.map((p, index) => (
+              <Link
+                key={p.id}
+                href={hrefVideo(p.plataforma, p.fecha_publicacion, p.id)}
+                className={`flex min-h-10 items-center gap-2.5 hover:opacity-70 ${
+                  index > 0 ? "border-t border-border" : ""
+                }`}
+              >
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
+                <span className="flex-1 truncate text-body">{p.titulo}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       </div>
 
-      <CapturaRapidaForm plataformas={plataformasActivas as Plataforma[]} />
+      <CapturaFlotante plataformas={plataformasActivas as Plataforma[]} />
     </div>
   );
 }

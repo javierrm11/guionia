@@ -75,7 +75,7 @@ export function RetencionChart({ datos }: { datos: PuntoRetencion[] }) {
               x2={MARGIN_LEFT + W}
               y1={y(yMax * frac)}
               y2={y(yMax * frac)}
-              stroke="rgba(255,255,255,0.18)"
+              stroke="rgba(17,17,20,0.08)"
               strokeWidth={1}
             />
             <text
@@ -103,7 +103,7 @@ export function RetencionChart({ datos }: { datos: PuntoRetencion[] }) {
           </text>
         ))}
 
-        <path d={area} fill="rgba(194,28,121,0.12)" />
+        <path d={area} fill="rgba(108,92,224,0.12)" />
         <path d={linea} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
 
         <circle
@@ -111,7 +111,7 @@ export function RetencionChart({ datos }: { datos: PuntoRetencion[] }) {
           cy={y(ultimoPunto.audienceWatchRatio)}
           r={4}
           fill="var(--accent)"
-          stroke="rgba(255,255,255,0.9)"
+          stroke="var(--bg-primary)"
           strokeWidth={2}
         />
         <text
@@ -132,7 +132,7 @@ export function RetencionChart({ datos }: { datos: PuntoRetencion[] }) {
               x2={x(hover.elapsedRatio)}
               y1={0}
               y2={H}
-              stroke="rgba(255,255,255,0.4)"
+              stroke="rgba(17,17,20,0.15)"
               strokeWidth={1}
             />
             <circle
@@ -140,7 +140,7 @@ export function RetencionChart({ datos }: { datos: PuntoRetencion[] }) {
               cy={y(hover.audienceWatchRatio)}
               r={4}
               fill="var(--accent)"
-              stroke="rgba(255,255,255,0.9)"
+              stroke="var(--bg-primary)"
               strokeWidth={2}
             />
           </>

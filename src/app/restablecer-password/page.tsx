@@ -8,7 +8,7 @@ export default async function RestablecerPasswordPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-6 p-6 lg:mx-auto lg:w-full lg:max-w-sm">
+    <div className="flex flex-1 flex-col justify-center gap-6 p-6 md:mx-auto md:w-full md:max-w-sm">
       <h1 className="text-h1 text-center">Nueva contraseña</h1>
 
       <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-6">

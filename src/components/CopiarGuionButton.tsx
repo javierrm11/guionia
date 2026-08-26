@@ -20,7 +20,7 @@ export function CopiarGuionButton({ texto }: { texto: string }) {
     <button
       type="button"
       onClick={copiar}
-      className="flex items-center gap-2 self-start rounded-sm border border-border px-3 py-1.5 text-small text-text-primary active:bg-bg-secondary"
+      className="flex items-center gap-2 rounded-sm bg-bg-primary px-4 py-2 text-body text-text-primary active:bg-bg-secondary"
     >
       {copiado ? (
         <Check size={14} strokeWidth={1.5} className="text-success" />
