@@ -102,7 +102,7 @@ export default async function PlataformasPage() {
               </div>
             ) : (
               <Link
-                href="/configuracion/control-semanal"
+                href="/configuracion/cadencia"
                 className="text-small text-accent self-start hover:underline"
               >
                 Definir cadencia →

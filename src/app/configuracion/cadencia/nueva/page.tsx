@@ -1,5 +1,5 @@
 import { PLATAFORMAS, PLATAFORMA_LABEL } from "@/lib/plataformas";
-import { crearCadencia } from "../../actions";
+import { crearCadencia } from "../actions";
 
 export default function NuevaCadenciaPage() {
   return (

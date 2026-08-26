@@ -1,4 +1,12 @@
-import { CalendarClock, Clapperboard, Lightbulb, LogOut, MessageSquare, Video } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  Clapperboard,
+  Lightbulb,
+  LogOut,
+  MessageSquare,
+  Video,
+} from "lucide-react";
 import { Tile } from "@/components/Tile";
 import { logoutAction } from "../login/actions";
 
@@ -7,11 +15,8 @@ export default function ConfiguracionPage() {
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <Tile href="/configuracion/plataformas" label="Plataformas" icon={Video} />
-        <Tile
-          href="/configuracion/control-semanal"
-          label="Control semanal"
-          icon={CalendarClock}
-        />
+        <Tile href="/configuracion/cadencia" label="Cadencia fija" icon={CalendarClock} />
+        <Tile href="/configuracion/plantilla" label="Plantilla semanal" icon={CalendarDays} />
         <Tile
           href="/configuracion/estructuras"
           label="Estructuras de guion"

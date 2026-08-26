@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronRight, Settings } from "lucide-react";
 import { CuentaLoader } from "@/components/CuentaLoader";
 import { CuentaSection } from "@/components/CuentaSection";
+import { CuentaTiktokSection } from "@/components/CuentaTiktokSection";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,10 @@ export default function CuentaPage() {
 
       <Suspense fallback={<CuentaLoader />}>
         <CuentaSection />
+      </Suspense>
+
+      <Suspense fallback={<CuentaLoader />}>
+        <CuentaTiktokSection />
       </Suspense>
 
       <Link

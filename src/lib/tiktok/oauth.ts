@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "crypto";
 
-const SCOPES = ["user.info.basic", "video.list"].join(",");
+const SCOPES = ["user.info.basic", "user.info.stats", "video.list"].join(",");
 
 function clientKey() {
   const key = process.env.TIKTOK_CLIENT_KEY;
@@ -93,13 +93,20 @@ export type CuentaTiktok = {
   openId: string;
   displayName: string;
   avatarUrl: string | null;
+  seguidores: number;
+  siguiendo: number;
+  likesTotales: number;
+  videos: number;
 };
 
+const CAMPOS_CUENTA =
+  "open_id,display_name,avatar_url,follower_count,following_count,likes_count,video_count";
+
+/** Requiere el scope `user.info.stats` además de `user.info.basic` para los contadores. */
 export async function obtenerCuentaPropia(accessToken: string): Promise<CuentaTiktok> {
-  const res = await fetch(
-    "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url",
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
+  const res = await fetch(`https://open.tiktokapis.com/v2/user/info/?fields=${CAMPOS_CUENTA}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
 
   if (!res.ok) {
     throw new Error(`No se pudo leer la cuenta de TikTok (${res.status})`);
@@ -113,6 +120,10 @@ export async function obtenerCuentaPropia(accessToken: string): Promise<CuentaTi
     openId: user.open_id,
     displayName: user.display_name,
     avatarUrl: user.avatar_url ?? null,
+    seguidores: Number(user.follower_count ?? 0),
+    siguiendo: Number(user.following_count ?? 0),
+    likesTotales: Number(user.likes_count ?? 0),
+    videos: Number(user.video_count ?? 0),
   };
 }
 

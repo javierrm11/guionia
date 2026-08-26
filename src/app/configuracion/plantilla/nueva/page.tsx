@@ -1,5 +1,5 @@
 import { DIA_SEMANA_LABEL, PLATAFORMAS, PLATAFORMA_LABEL } from "@/lib/plataformas";
-import { crearPlantilla } from "../../actions";
+import { crearPlantilla } from "../actions";
 
 export default function NuevaPlantillaPage() {
   return (

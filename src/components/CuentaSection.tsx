@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerAccessTokenValido } from "@/lib/youtube/conexion";
 import {
@@ -8,39 +7,10 @@ import {
   obtenerEstadisticasCanal,
   type MetricasPeriodo,
 } from "@/lib/youtube/oauth";
+import { StatMes } from "@/components/StatMesComparativa";
 
 function formatoNumero(n: number) {
   return n.toLocaleString("es-ES");
-}
-
-function Delta({ actual, anterior }: { actual: number; anterior: number }) {
-  if (anterior === 0) return null;
-  const cambio = ((actual - anterior) / anterior) * 100;
-  const sube = cambio >= 0;
-  return (
-    <span className={`flex items-center gap-0.5 text-caption ${sube ? "text-success" : "text-danger"}`}>
-      {sube ? <ArrowUp size={12} strokeWidth={2} /> : <ArrowDown size={12} strokeWidth={2} />}
-      {Math.abs(Math.round(cambio))}%
-    </span>
-  );
-}
-
-function StatMes({
-  etiqueta,
-  actual,
-  anterior,
-}: {
-  etiqueta: string;
-  actual: number;
-  anterior: number | null;
-}) {
-  return (
-    <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-      <span className="text-caption text-text-secondary">{etiqueta}</span>
-      <span className="text-h2">{formatoNumero(actual)}</span>
-      {anterior != null && <Delta actual={actual} anterior={anterior} />}
-    </div>
-  );
 }
 
 export async function CuentaSection() {
@@ -87,7 +57,7 @@ export async function CuentaSection() {
     return (
       <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
-          No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
+          No se pudieron cargar las estadísticas de YouTube ahora mismo. Inténtalo de nuevo más tarde.
         </p>
       </div>
     );
