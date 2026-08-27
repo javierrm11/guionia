@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { obtenerAccessTokenValido } from "@/lib/youtube/conexion";
 import {
   obtenerCanalPropio,
-  obtenerComparativaMensual,
-  obtenerEstadisticasCanal,
+  obtenerComparativaPeriodo,
   obtenerFuentesTrafico,
   obtenerVideosDestacados,
   type FuenteTrafico,
@@ -12,18 +11,13 @@ import {
   type VideoDestacado,
 } from "@/lib/youtube/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
+import { calcularLimitesRango, type RangoEstadisticas } from "@/lib/contenido";
 
 function formatoNumero(n: number) {
   return n.toLocaleString("es-ES");
 }
 
-function formatoDuracion(segundos: number) {
-  const min = Math.floor(segundos / 60);
-  const seg = Math.round(segundos % 60);
-  return `${min}:${String(seg).padStart(2, "0")}`;
-}
-
-export async function CuentaSection() {
+export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -48,26 +42,45 @@ export async function CuentaSection() {
     );
   }
 
+  const limites = calcularLimitesRango(rango);
+
   let canal;
-  let generales;
   let comparativa: { actual: MetricasPeriodo; anterior: MetricasPeriodo | null } | null = null;
   let destacados: VideoDestacado[] = [];
   let fuentesTrafico: FuenteTrafico[] = [];
   let error = false;
 
+  // Vídeos publicados en el periodo: no es una métrica de la Analytics API —
+  // se cuenta de tu propia base de datos, igual que hace TikTok.
+  const contarVideos = async (desde: string, hasta: string) => {
+    const { count } = await supabase
+      .from("piezas_contenido")
+      .select("id", { count: "exact", head: true })
+      .eq("plataforma", "youtube")
+      .eq("estado", "publicado")
+      .gte("fecha_publicacion", desde)
+      .lte("fecha_publicacion", hasta);
+    return count ?? 0;
+  };
+
   try {
-    [canal, generales] = await Promise.all([
-      obtenerCanalPropio(accessToken),
-      obtenerEstadisticasCanal(accessToken),
-    ]);
-    comparativa = await obtenerComparativaMensual(accessToken).catch(() => null);
+    canal = await obtenerCanalPropio(accessToken);
+    comparativa = await obtenerComparativaPeriodo(accessToken, limites).catch(() => null);
     destacados = await obtenerVideosDestacados(accessToken).catch(() => []);
-    fuentesTrafico = await obtenerFuentesTrafico(accessToken).catch(() => []);
+    fuentesTrafico = await obtenerFuentesTrafico(accessToken, limites.actualDesde, limites.actualHasta).catch(
+      () => []
+    );
   } catch {
     error = true;
   }
 
-  if (error || !canal || !generales) {
+  const videosActual = await contarVideos(limites.actualDesde, limites.actualHasta).catch(() => 0);
+  const videosAnterior =
+    limites.anteriorDesde && limites.anteriorHasta
+      ? await contarVideos(limites.anteriorDesde, limites.anteriorHasta).catch(() => null)
+      : null;
+
+  if (error || !canal) {
     return (
       <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
@@ -95,82 +108,15 @@ export async function CuentaSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Suscriptores</span>
-          <span className="text-h2">{formatoNumero(generales.suscriptores)}</span>
-        </div>
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Vistas totales</span>
-          <span className="text-h2">{formatoNumero(generales.vistasTotales)}</span>
-        </div>
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Vídeos</span>
-          <span className="text-h2">{formatoNumero(generales.videos)}</span>
-        </div>
-      </div>
-
-      {destacados.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <span
-            className="text-caption font-display text-text-secondary uppercase"
-            style={{ letterSpacing: "0.06em" }}
-          >
-            Mejores vídeos
-          </span>
-          <div className="flex flex-col gap-2">
-            {destacados.map((video) => (
-              <a
-                key={video.videoId}
-                href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-md bg-bg-primary p-2.5 hover:bg-accent-bg active:bg-accent-bg"
-              >
-                {video.miniatura ? (
-                  <Image
-                    src={video.miniatura}
-                    alt=""
-                    width={96}
-                    height={54}
-                    className="h-[54px] w-24 shrink-0 rounded-sm object-cover"
-                  />
-                ) : (
-                  <div className="h-[54px] w-24 shrink-0 rounded-sm bg-bg-secondary" />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-small font-medium text-text-primary">
-                    {video.titulo}
-                  </p>
-                  <p className="mt-0.5 text-caption text-text-secondary">
-                    {formatoNumero(video.vistas)} vistas · {formatoNumero(video.comentarios)}{" "}
-                    comentarios · {Math.round(video.retencionMedia)}% retención ·{" "}
-                    {formatoDuracion(video.duracionMediaSegundos)} de media
-                    {video.ctrImpresiones != null &&
-                      ` · ${Math.round(video.ctrImpresiones * 100)}% CTR miniatura`}
-                  </p>
-                  <p className="mt-1 text-caption text-text-disabled">{video.motivo}</p>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
       {comparativa && (
         <div className="flex flex-col gap-3">
-          <span
-            className="text-caption font-display text-text-secondary uppercase"
-            style={{ letterSpacing: "0.06em" }}
-          >
-            Este mes, respecto al anterior
-          </span>
           <div className="grid grid-cols-2 gap-3">
             <StatMes
               etiqueta="Vistas"
               actual={comparativa.actual.vistas}
               anterior={comparativa.anterior?.vistas ?? null}
             />
+            <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
             <StatMes
               etiqueta="Comentarios"
               actual={comparativa.actual.comentarios}
@@ -202,13 +148,52 @@ export async function CuentaSection() {
         </div>
       )}
 
+      {destacados.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span
+            className="text-caption font-display text-text-secondary uppercase"
+            style={{ letterSpacing: "0.06em" }}
+          >
+            Mejores vídeos
+          </span>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8">
+            {destacados.map((video) => (
+              <a
+                key={video.videoId}
+                href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
+              >
+                {video.miniatura && (
+                  <Image src={video.miniatura} alt="" fill sizes="128px" className="object-cover" />
+                )}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.15) 55%, transparent)",
+                  }}
+                />
+                <div className="relative z-10 flex flex-col gap-0.5 p-2">
+                  <p className="line-clamp-2 text-caption font-medium text-white">{video.titulo}</p>
+                  <p className="truncate text-caption text-white/70">
+                    {formatoNumero(video.vistas)} vistas · {Math.round(video.retencionMedia)}%
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       {fuentesTrafico.length > 0 && (
         <div className="flex flex-col gap-3">
           <span
             className="text-caption font-display text-text-secondary uppercase"
             style={{ letterSpacing: "0.06em" }}
           >
-            De dónde vienen tus vistas (este mes)
+            De dónde vienen tus vistas
           </span>
           <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4">
             {fuentesTrafico.map((fuente) => (

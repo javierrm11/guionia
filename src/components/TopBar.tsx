@@ -19,6 +19,10 @@ const RUTAS_AUTH = [
 const TITULOS: Record<string, string> = {
   "/contenido/ideas": "Ideas",
   "/contenido/plataformas": "Plataformas",
+  "/contenido/publicados": "Publicados",
+  "/configuracion/estructuras": "Estructuras",
+  "/configuracion/hooks": "Hooks",
+  "/configuracion/ctas": "CTAs",
 };
 
 /** Con la barra inferior encargándose de Inicio / Plataformas / Ideas / Cuenta,

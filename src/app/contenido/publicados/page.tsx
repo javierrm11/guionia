@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
+import { PLATAFORMA_ICON, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 import { pad2 } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
@@ -22,22 +23,28 @@ export default async function PublicadosPage() {
       </Link>
 
       {publicados && publicados.length > 0 ? (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {publicados.map((p) => {
+            const plataforma = p.plataforma as Plataforma;
+            const Icon = PLATAFORMA_ICON[plataforma];
+            const tono = PLATAFORMA_TONO[plataforma];
             const [anio, mes, dia] = (p.fecha_publicacion as string).split("-");
-            const href = `/contenido/${p.plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${p.id}`;
+            const href = `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${p.id}`;
 
             return (
-              <li
-                key={p.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-border p-3"
-              >
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <Link href={href} className="truncate text-accent hover:underline">
+              <li key={p.id} className="flex items-center gap-3 rounded-md bg-bg-primary p-3">
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
+                  style={{ backgroundColor: tono }}
+                >
+                  <Icon size={16} strokeWidth={1.5} className="text-white" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <Link href={href} className="truncate text-body text-text-primary hover:underline">
                     {p.titulo}
                   </Link>
                   <span className="text-caption text-text-secondary">
-                    {PLATAFORMA_LABEL[p.plataforma as Plataforma]} · {p.fecha_publicacion}
+                    {PLATAFORMA_LABEL[plataforma]} · {p.fecha_publicacion}
                   </span>
                 </div>
                 {p.url_publicado && (
@@ -45,7 +52,7 @@ export default async function PublicadosPage() {
                     href={p.url_publicado}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 text-text-secondary"
+                    className="shrink-0 p-2 -m-2 text-text-secondary"
                   >
                     <ExternalLink size={16} strokeWidth={1.5} />
                   </a>

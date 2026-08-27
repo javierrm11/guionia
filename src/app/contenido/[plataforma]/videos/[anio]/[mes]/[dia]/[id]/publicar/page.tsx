@@ -39,7 +39,7 @@ export default async function PublicarPage({
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <p className="text-h2">{guion.titulo}</p>
 
-      <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-4">
+      <div className="flex flex-col gap-4 rounded-md bg-bg-primary p-4">
         {escenas && escenas.length > 0 ? (
           escenas.map((escena) => (
             <div key={escena.id} className="flex flex-col gap-1">
@@ -56,7 +56,7 @@ export default async function PublicarPage({
 
       <form
         action={publicarConMetadatos}
-        className="flex flex-col gap-3 rounded-md border border-border p-3"
+        className="flex flex-col gap-3 rounded-md bg-bg-primary p-4"
       >
         <input type="hidden" name="id" value={guion.id} />
         <input type="hidden" name="plataforma" value={plataforma} />

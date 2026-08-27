@@ -103,34 +103,6 @@ export async function obtenerCanalPropio(accessToken: string): Promise<CanalYout
   };
 }
 
-export type EstadisticasCanal = {
-  suscriptores: number;
-  vistasTotales: number;
-  videos: number;
-};
-
-/** Totales acumulados del canal (no por rango de fechas) — suscriptores, vistas y vídeos de siempre. */
-export async function obtenerEstadisticasCanal(accessToken: string): Promise<EstadisticasCanal> {
-  const res = await fetch(
-    "https://www.googleapis.com/youtube/v3/channels?part=statistics&mine=true",
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
-
-  if (!res.ok) {
-    throw new Error(`No se pudieron leer las estadísticas del canal (${res.status})`);
-  }
-
-  const data = await res.json();
-  const stats = data.items?.[0]?.statistics;
-  if (!stats) throw new Error("La cuenta de Google no tiene ningún canal de YouTube");
-
-  return {
-    suscriptores: Number(stats.subscriberCount ?? 0),
-    vistasTotales: Number(stats.viewCount ?? 0),
-    videos: Number(stats.videoCount ?? 0),
-  };
-}
-
 export type MetricasPeriodo = {
   vistas: number;
   comentarios: number;
@@ -140,28 +112,18 @@ export type MetricasPeriodo = {
   minutosVistos: number;
 };
 
-/** Fecha ISO (YYYY-MM-DD) del primer día de un mes, `desplaze` meses respecto al actual (0 = este mes). */
-function primerDiaDeMes(desplaze: number): string {
-  const fecha = new Date();
-  fecha.setDate(1);
-  fecha.setMonth(fecha.getMonth() + desplaze);
-  return fecha.toISOString().slice(0, 10);
-}
+const METRICAS_PERIODO = "views,comments,likes,subscribersGained,subscribersLost,estimatedMinutesWatched";
 
-/**
- * Compara el mes en curso con el mes anterior: vistas, comentarios, likes,
- * suscriptores ganados/perdidos y minutos vistos. Una sola llamada a la
- * Analytics API con `dimensions=month` sobre el rango que cubre ambos meses.
- */
-export async function obtenerComparativaMensual(
-  accessToken: string
-): Promise<{ actual: MetricasPeriodo; anterior: MetricasPeriodo | null }> {
+async function pedirMetricasPeriodo(
+  accessToken: string,
+  desde: string,
+  hasta: string
+): Promise<MetricasPeriodo> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
-    startDate: primerDiaDeMes(-1),
-    endDate: new Date().toISOString().slice(0, 10),
-    metrics: "views,comments,likes,subscribersGained,subscribersLost,estimatedMinutesWatched",
-    dimensions: "month",
+    startDate: desde,
+    endDate: hasta,
+    metrics: METRICAS_PERIODO,
   });
 
   const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
@@ -169,31 +131,40 @@ export async function obtenerComparativaMensual(
   });
 
   if (!res.ok) {
-    throw new Error(`No se pudo leer la comparativa mensual (${res.status})`);
+    throw new Error(`No se pudo leer las métricas del periodo (${res.status})`);
   }
 
   const data = await res.json();
-  const filas: [string, number, number, number, number, number, number][] = data.rows ?? [];
-
-  const aMetricas = (
-    fila?: [string, number, number, number, number, number, number]
-  ): MetricasPeriodo => ({
-    vistas: fila?.[1] ?? 0,
-    comentarios: fila?.[2] ?? 0,
-    likes: fila?.[3] ?? 0,
-    suscriptoresGanados: fila?.[4] ?? 0,
-    suscriptoresPerdidos: fila?.[5] ?? 0,
-    minutosVistos: fila?.[6] ?? 0,
-  });
-
-  // Las filas vienen ordenadas por mes ascendente: la última es el mes en curso.
-  const filaActual = filas[filas.length - 1];
-  const filaAnterior = filas.length > 1 ? filas[filas.length - 2] : undefined;
+  const fila: [number, number, number, number, number, number] | undefined = data.rows?.[0];
 
   return {
-    actual: aMetricas(filaActual),
-    anterior: filaAnterior ? aMetricas(filaAnterior) : null,
+    vistas: fila?.[0] ?? 0,
+    comentarios: fila?.[1] ?? 0,
+    likes: fila?.[2] ?? 0,
+    suscriptoresGanados: fila?.[3] ?? 0,
+    suscriptoresPerdidos: fila?.[4] ?? 0,
+    minutosVistos: fila?.[5] ?? 0,
   };
+}
+
+/**
+ * Compara un periodo con el anterior: vistas, comentarios, likes,
+ * suscriptores ganados/perdidos y minutos vistos. Dos llamadas agregadas
+ * (sin `dimensions`) en vez de una con `dimensions=month`, para admitir
+ * cualquier rango — no solo mes natural.
+ */
+export async function obtenerComparativaPeriodo(
+  accessToken: string,
+  limites: { actualDesde: string; actualHasta: string; anteriorDesde: string | null; anteriorHasta: string | null }
+): Promise<{ actual: MetricasPeriodo; anterior: MetricasPeriodo | null }> {
+  const [actual, anterior] = await Promise.all([
+    pedirMetricasPeriodo(accessToken, limites.actualDesde, limites.actualHasta),
+    limites.anteriorDesde && limites.anteriorHasta
+      ? pedirMetricasPeriodo(accessToken, limites.anteriorDesde, limites.anteriorHasta)
+      : Promise.resolve(null),
+  ]);
+
+  return { actual, anterior };
 }
 
 export type EstadisticasVideo = {
@@ -312,11 +283,18 @@ export type VideoTendencia = {
   publicadoEn: string;
 };
 
-/** Vídeos en tendencia ahora mismo en YouTube (chart público `mostPopular`), para inspirarte en lo que funciona. */
+/**
+ * Vídeos en tendencia ahora mismo en YouTube (chart público `mostPopular`),
+ * para inspirarte en lo que funciona. Con `categoryId` filtra el chart a esa
+ * categoría (p. ej. "Educación", "Howto & Style") en vez del general — sigue
+ * siendo el chart público de YouTube, así que casi siempre tiene resultados,
+ * a diferencia de buscar por palabras clave de tus títulos.
+ */
 export async function obtenerVideosTendencia(
   accessToken: string,
   regionCode = "ES",
-  maxResults = 20
+  maxResults = 20,
+  categoryId?: string
 ): Promise<VideoTendencia[]> {
   const params = new URLSearchParams({
     part: "snippet,statistics",
@@ -324,6 +302,7 @@ export async function obtenerVideosTendencia(
     regionCode,
     maxResults: String(maxResults),
   });
+  if (categoryId) params.set("videoCategoryId", categoryId);
 
   const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -355,6 +334,38 @@ export async function obtenerVideosTendencia(
       publicadoEn: item.snippet.publishedAt,
     })
   );
+}
+
+/**
+ * Categoría de YouTube (`snippet.categoryId`) más repetida entre estos
+ * vídeos — para filtrar el chart de tendencias por temática afín a la tuya
+ * en vez de por palabras clave de título (mucho más frágil). `null` si
+ * no hay vídeos o ninguno tiene categoría.
+ */
+export async function obtenerCategoriaMasFrecuente(
+  videoIds: string[],
+  accessToken: string
+): Promise<string | null> {
+  if (videoIds.length === 0) return null;
+
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds.join(",")}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudo leer la categoría de tus vídeos (${res.status})`);
+  }
+
+  const data = await res.json();
+  const conteo = new Map<string, number>();
+  for (const item of data.items ?? []) {
+    const categoryId = item.snippet?.categoryId;
+    if (categoryId) conteo.set(categoryId, (conteo.get(categoryId) ?? 0) + 1);
+  }
+
+  if (conteo.size === 0) return null;
+  return [...conteo.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
 export type VideoDestacado = {
@@ -562,17 +573,20 @@ export type FuenteTrafico = {
 };
 
 /**
- * De dónde vienen las vistas del último mes (búsqueda, sugeridos, externo...)
- * — para saber si te está moviendo el algoritmo o dependes de otra cosa.
+ * De dónde vienen las vistas en el rango dado (búsqueda, sugeridos,
+ * externo...) — para saber si te está moviendo el algoritmo o dependes de
+ * otra cosa.
  */
 export async function obtenerFuentesTrafico(
   accessToken: string,
+  desde: string,
+  hasta: string,
   limite = 6
 ): Promise<FuenteTrafico[]> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
-    startDate: primerDiaDeMes(-1),
-    endDate: new Date().toISOString().slice(0, 10),
+    startDate: desde,
+    endDate: hasta,
     metrics: "views",
     dimensions: "insightTrafficSourceType",
     sort: "-views",

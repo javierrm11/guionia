@@ -52,37 +52,24 @@ export default async function DiaPage({
       </Link>
 
       {guiones && guiones.length > 0 ? (
-        <div className="overflow-hidden rounded-md border border-border">
-          <table className="w-full border-collapse text-body">
-            <thead>
-              <tr className="bg-bg-secondary">
-                <th className="text-h3 px-3 py-2 text-left">#</th>
-                <th className="text-h3 px-3 py-2 text-left">Título</th>
-                <th className="text-h3 px-3 py-2 text-left">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {guiones.map((guion) => (
-                <tr key={guion.id} className="border-t border-border hover:bg-bg-secondary">
-                  <td className="px-3 py-2 text-text-secondary">{guion.numero ?? "—"}</td>
-                  <td className="px-3 py-2">
-                    <Link
-                      href={`/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`}
-                      className="text-accent hover:underline"
-                    >
-                      {guion.titulo}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>
-                      {ESTADO_PIEZA_LABEL[guion.estado]}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="flex flex-col gap-2.5">
+          {guiones.map((guion) => (
+            <li key={guion.id}>
+              <Link
+                href={`/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`}
+                className="flex items-center gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+              >
+                {guion.numero != null && (
+                  <span className="shrink-0 text-caption text-text-disabled">#{guion.numero}</span>
+                )}
+                <span className="min-w-0 flex-1 truncate text-body text-text-primary">
+                  {guion.titulo}
+                </span>
+                <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>{ESTADO_PIEZA_LABEL[guion.estado]}</Badge>
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : (
         <p className="text-small text-text-disabled">No hay guiones para este día.</p>
       )}

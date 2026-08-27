@@ -18,59 +18,43 @@ export default async function EstructurasPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <Link
-        href="/configuracion/estructuras/nueva"
-        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
-      >
-        + Nueva estructura
-      </Link>
+      <div className="flex justify-end">
+        <Link
+          href="/configuracion/estructuras/nueva"
+          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover"
+        >
+          + Añadir
+        </Link>
+      </div>
 
       {estructuras && estructuras.length > 0 ? (
-        <div className="overflow-x-auto rounded-md border border-border">
-          <table className="w-full border-collapse text-body">
-            <thead>
-              <tr className="bg-bg-secondary">
-                <th className="text-h3 px-3 py-2 text-left">Nombre</th>
-                <th className="text-h3 px-3 py-2 text-left">Plataforma</th>
-                <th className="text-h3 px-3 py-2 text-left">Duración</th>
-                <th className="text-h3 px-3 py-2 text-left">Escenas</th>
-                <th className="text-h3 px-3 py-2 text-left"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {estructuras.map((e) => {
-                const numEscenas = e.estructura_escenas?.[0]?.count ?? 0;
-                return (
-                <tr key={e.id} className="border-t border-border hover:bg-bg-secondary">
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/configuracion/estructuras/${e.id}`}
-                        className="text-accent hover:underline"
-                      >
-                        {e.nombre}
-                      </Link>
-                      {numEscenas === 0 && <Badge tone="warning">Incompleta</Badge>}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 text-text-secondary">
-                    {PLATAFORMA_LABEL[e.plataforma as Plataforma]}
-                  </td>
-                  <td className="px-3 py-2 text-text-secondary">{e.duracion_segundos}s</td>
-                  <td className="px-3 py-2 text-text-secondary">{numEscenas}</td>
-                  <td className="px-3 py-2 text-right">
-                    <form action={duplicarEstructura}>
-                      <input type="hidden" name="id" value={e.id} />
-                      <SubmitButton pendingLabel="Duplicando…" className="p-2 -m-2 text-small text-accent">
-                        Duplicar
-                      </SubmitButton>
-                    </form>
-                  </td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
+          {estructuras.map((e) => {
+            const numEscenas = e.estructura_escenas?.[0]?.count ?? 0;
+            return (
+              <div key={e.id} className="flex flex-col gap-2 rounded-md bg-bg-primary p-3.5">
+                <div className="flex items-start justify-between gap-2">
+                  <Link
+                    href={`/configuracion/estructuras/${e.id}`}
+                    className="flex items-center gap-2 text-h3 text-text-primary hover:underline"
+                  >
+                    {e.nombre}
+                    {numEscenas === 0 && <Badge tone="warning">Incompleta</Badge>}
+                  </Link>
+                  <form action={duplicarEstructura}>
+                    <input type="hidden" name="id" value={e.id} />
+                    <SubmitButton pendingLabel="Duplicando…" className="p-2 -m-2 text-small text-accent">
+                      Duplicar
+                    </SubmitButton>
+                  </form>
+                </div>
+                <p className="text-caption text-text-secondary">
+                  {PLATAFORMA_LABEL[e.plataforma as Plataforma]} · {e.duracion_segundos}s · {numEscenas}{" "}
+                  {numEscenas === 1 ? "escena" : "escenas"}
+                </p>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <p className="text-small text-text-disabled">Todavía no hay estructuras guardadas.</p>

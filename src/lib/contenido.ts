@@ -1,6 +1,71 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BadgeTone } from "@/components/Badge";
-import { addDaysISO, type Plataforma } from "@/lib/plataformas";
+import { addDaysISO, todayISO, type Plataforma } from "@/lib/plataformas";
+
+export const RANGOS_ESTADISTICAS = ["siempre", "hoy", "semana", "mes", "anio"] as const;
+export type RangoEstadisticas = (typeof RANGOS_ESTADISTICAS)[number];
+
+export function isRangoEstadisticas(value: string | undefined): value is RangoEstadisticas {
+  return !!value && (RANGOS_ESTADISTICAS as readonly string[]).includes(value);
+}
+
+export const RANGO_ESTADISTICAS_LABEL: Record<RangoEstadisticas, string> = {
+  siempre: "Desde siempre",
+  hoy: "Últimas 24 horas",
+  semana: "Última semana",
+  mes: "Último mes",
+  anio: "Último año",
+};
+
+export type LimitesRango = {
+  actualDesde: string;
+  actualHasta: string;
+  /** `null` en "siempre" — no hay periodo anterior con el que comparar. */
+  anteriorDesde: string | null;
+  anteriorHasta: string | null;
+};
+
+/**
+ * Límites de fecha para un rango de estadísticas, en ventanas móviles (no
+ * mes/año natural) — "últimas 24 horas" es en realidad hoy vs. ayer, porque
+ * las APIs de analítica (YouTube) no dan más resolución que por día.
+ */
+export function calcularLimitesRango(rango: RangoEstadisticas): LimitesRango {
+  const hoy = todayISO();
+
+  switch (rango) {
+    case "hoy":
+      return {
+        actualDesde: hoy,
+        actualHasta: hoy,
+        anteriorDesde: addDaysISO(hoy, -1),
+        anteriorHasta: addDaysISO(hoy, -1),
+      };
+    case "semana":
+      return {
+        actualDesde: addDaysISO(hoy, -6),
+        actualHasta: hoy,
+        anteriorDesde: addDaysISO(hoy, -13),
+        anteriorHasta: addDaysISO(hoy, -7),
+      };
+    case "mes":
+      return {
+        actualDesde: addDaysISO(hoy, -29),
+        actualHasta: hoy,
+        anteriorDesde: addDaysISO(hoy, -59),
+        anteriorHasta: addDaysISO(hoy, -30),
+      };
+    case "anio":
+      return {
+        actualDesde: addDaysISO(hoy, -364),
+        actualHasta: hoy,
+        anteriorDesde: addDaysISO(hoy, -729),
+        anteriorHasta: addDaysISO(hoy, -365),
+      };
+    case "siempre":
+      return { actualDesde: "2005-02-01", actualHasta: hoy, anteriorDesde: null, anteriorHasta: null };
+  }
+}
 
 export const PILAR_LABEL: Record<string, string> = {
   educativo: "Educativo",

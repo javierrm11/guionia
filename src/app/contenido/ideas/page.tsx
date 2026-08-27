@@ -110,10 +110,20 @@ export default async function IdeasGlobalPage({
           {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
           {olvidadas > 0 && ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
         </p>
-        {descartadas.length === 0 && activas.length > 0 && (
-          <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2.5 py-1">
-            Sin descartar
-          </span>
+        {filtro ? (
+          <Link
+            href={`/contenido/${filtro}/ideas/nueva`}
+            className="text-caption text-accent"
+          >
+            + Nueva idea
+          </Link>
+        ) : (
+          descartadas.length === 0 &&
+          activas.length > 0 && (
+            <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2.5 py-1">
+              Sin descartar
+            </span>
+          )
         )}
       </div>
 

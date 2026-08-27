@@ -97,7 +97,7 @@ export function GuionEscenas({
           const texto = textos[escena.id] ?? "";
 
           return (
-            <div key={escena.id} className="flex flex-col gap-2 rounded-md border border-border p-3">
+            <div key={escena.id} className="flex flex-col gap-2 rounded-md bg-bg-primary p-3.5">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col gap-0.5">
                   <form action={moverEscenaGuion}>
@@ -230,7 +230,7 @@ export function GuionEscenas({
         {agregando ? (
           <form
             action={agregarEscenaGuion}
-            className="flex flex-col gap-3 rounded-md border border-border p-3"
+            className="flex flex-col gap-3 rounded-md bg-bg-primary p-3.5"
           >
             <input type="hidden" name="pieza_id" value={piezaId} />
             <input type="hidden" name="redirectTo" value={rutaActual} />

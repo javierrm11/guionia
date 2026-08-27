@@ -4,20 +4,32 @@ import { ChevronRight, Settings } from "lucide-react";
 import { CuentaLoader } from "@/components/CuentaLoader";
 import { CuentaSection } from "@/components/CuentaSection";
 import { CuentaTiktokSection } from "@/components/CuentaTiktokSection";
+import { SelectorRango } from "@/components/SelectorRango";
+import { isRangoEstadisticas, type RangoEstadisticas } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
 
-export default function CuentaPage() {
+export default async function CuentaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ rango?: string }>;
+}) {
+  const { rango: rangoParam } = await searchParams;
+  const rango: RangoEstadisticas = isRangoEstadisticas(rangoParam) ? rangoParam : "mes";
+
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
-      <h1 className="text-h1">Cuenta</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-h1">Cuenta</h1>
+        <SelectorRango rango={rango} />
+      </div>
 
-      <Suspense fallback={<CuentaLoader />}>
-        <CuentaSection />
+      <Suspense key={`youtube-${rango}`} fallback={<CuentaLoader />}>
+        <CuentaSection rango={rango} />
       </Suspense>
 
-      <Suspense fallback={<CuentaLoader />}>
-        <CuentaTiktokSection />
+      <Suspense key={`tiktok-${rango}`} fallback={<CuentaLoader />}>
+        <CuentaTiktokSection rango={rango} />
       </Suspense>
 
       <Link

@@ -58,7 +58,7 @@ export default async function BuscarPage({
       {consulta.length === 0 ? (
         <p className="text-small text-text-disabled">Escribe algo para buscar.</p>
       ) : resultados && resultados.length > 0 ? (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {resultados.map((r) => {
             const esIdea = (ESTADOS_IDEA as readonly string[]).includes(r.estado);
             const href = esIdea
@@ -68,19 +68,19 @@ export default async function BuscarPage({
                 : `/contenido/${r.plataforma}/ideas/${r.id}`;
 
             return (
-              <li
-                key={r.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-border p-3"
-              >
-                <Link href={href} className="truncate text-accent hover:underline">
-                  {r.titulo}
+              <li key={r.id}>
+                <Link
+                  href={href}
+                  className="flex items-center justify-between gap-2 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+                >
+                  <span className="truncate text-body text-text-primary">{r.titulo}</span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-caption text-text-secondary">
+                      {PLATAFORMA_LABEL[r.plataforma as Plataforma]}
+                    </span>
+                    <Badge tone={ESTADO_PIEZA_TONE[r.estado]}>{ESTADO_PIEZA_LABEL[r.estado]}</Badge>
+                  </div>
                 </Link>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-caption text-text-secondary">
-                    {PLATAFORMA_LABEL[r.plataforma as Plataforma]}
-                  </span>
-                  <Badge tone={ESTADO_PIEZA_TONE[r.estado]}>{ESTADO_PIEZA_LABEL[r.estado]}</Badge>
-                </div>
               </li>
             );
           })}

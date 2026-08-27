@@ -7,17 +7,10 @@ import {
   obtenerEstadisticasVideos,
 } from "@/lib/tiktok/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
+import { calcularLimitesRango, type RangoEstadisticas } from "@/lib/contenido";
 
 function formatoNumero(n: number) {
   return n.toLocaleString("es-ES");
-}
-
-/** Fecha ISO (YYYY-MM-DD) del primer día de un mes, `desplaze` meses respecto al actual (0 = este mes). */
-function inicioDeMes(desplaze: number): string {
-  const fecha = new Date();
-  fecha.setDate(1);
-  fecha.setMonth(fecha.getMonth() + desplaze);
-  return fecha.toISOString().slice(0, 10);
 }
 
 function chunk<T>(items: T[], tamano: number): T[][] {
@@ -26,7 +19,7 @@ function chunk<T>(items: T[], tamano: number): T[][] {
   return grupos;
 }
 
-export async function CuentaTiktokSection() {
+export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -69,9 +62,10 @@ export async function CuentaTiktokSection() {
   const estadisticasCuenta = await obtenerEstadisticasCuentaTiktok(accessToken).catch(() => null);
 
   // TikTok no tiene una API de analítica agregada — sumamos las estadísticas
-  // (ya disponibles por vídeo) de tus propios vídeos publicados este mes y el anterior.
-  const inicioAnterior = inicioDeMes(-1);
-  const inicioActual = inicioDeMes(0);
+  // (ya disponibles por vídeo, totales de por vida) de tus propios vídeos
+  // publicados dentro de cada periodo. No es un dato de la API, es un cálculo local.
+  const limites = calcularLimitesRango(rango);
+  const desdeConsulta = limites.anteriorDesde ?? limites.actualDesde;
 
   const { data: piezas } = await supabase
     .from("piezas_contenido")
@@ -79,7 +73,7 @@ export async function CuentaTiktokSection() {
     .eq("plataforma", "tiktok")
     .eq("estado", "publicado")
     .not("tiktok_video_id", "is", null)
-    .gte("fecha_publicacion", inicioAnterior);
+    .gte("fecha_publicacion", desdeConsulta);
 
   const lista = piezas ?? [];
   const statsPorId = new Map<string, { vistas: number; likes: number; comentarios: number }>();
@@ -96,15 +90,15 @@ export async function CuentaTiktokSection() {
         }
       }
     } catch {
-      // Sin agregado del mes si falla — las estadísticas de cuenta se muestran igual.
+      // Sin agregado del periodo si falla — las estadísticas de cuenta se muestran igual.
     }
   }
 
-  const acumular = (desde: string, hasta?: string) =>
+  const acumular = (desde: string, hasta: string) =>
     lista.reduce(
       (total, p) => {
         const fecha = p.fecha_publicacion as string;
-        if (fecha < desde || (hasta && fecha >= hasta)) return total;
+        if (fecha < desde || fecha > hasta) return total;
         const s = statsPorId.get(p.tiktok_video_id as string);
         if (!s) return total;
         return {
@@ -116,9 +110,24 @@ export async function CuentaTiktokSection() {
       { vistas: 0, likes: 0, comentarios: 0 }
     );
 
-  const actual = acumular(inicioActual);
-  const anterior = acumular(inicioAnterior, inicioActual);
+  const actual = acumular(limites.actualDesde, limites.actualHasta);
+  const anterior =
+    limites.anteriorDesde && limites.anteriorHasta
+      ? acumular(limites.anteriorDesde, limites.anteriorHasta)
+      : null;
   const hayComparativa = statsPorId.size > 0;
+
+  const contarVideos = (desde: string, hasta: string) =>
+    lista.filter((p) => {
+      const fecha = p.fecha_publicacion as string;
+      return fecha >= desde && fecha <= hasta;
+    }).length;
+
+  const videosActual = contarVideos(limites.actualDesde, limites.actualHasta);
+  const videosAnterior =
+    limites.anteriorDesde && limites.anteriorHasta
+      ? contarVideos(limites.anteriorDesde, limites.anteriorHasta)
+      : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -137,6 +146,25 @@ export async function CuentaTiktokSection() {
           <p className="text-caption text-text-secondary">Cuenta de TikTok</p>
         </div>
       </div>
+
+      {hayComparativa && (
+        <div className="flex flex-col gap-3">
+          <p className="text-caption text-text-disabled">
+            Suma de tus vídeos publicados en cada periodo — TikTok no da un total de cuenta por
+            fechas.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <StatMes etiqueta="Vistas" actual={actual.vistas} anterior={anterior?.vistas ?? null} />
+            <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
+            <StatMes
+              etiqueta="Comentarios"
+              actual={actual.comentarios}
+              anterior={anterior?.comentarios ?? null}
+            />
+            <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
+          </div>
+        </div>
+      )}
 
       {estadisticasCuenta ? (
         <div className="grid grid-cols-3 gap-3">
@@ -158,25 +186,6 @@ export async function CuentaTiktokSection() {
           No se pudieron leer seguidores/likes/vídeos — el permiso de estadísticas puede estar
           todavía pendiente de aprobación en TikTok.
         </p>
-      )}
-
-      {hayComparativa && (
-        <div className="flex flex-col gap-3">
-          <span
-            className="text-caption font-display text-text-secondary uppercase"
-            style={{ letterSpacing: "0.06em" }}
-          >
-            Este mes, respecto al anterior
-          </span>
-          <p className="text-caption text-text-disabled">
-            Suma de tus vídeos publicados en cada mes — TikTok no da un total de cuenta por fechas.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <StatMes etiqueta="Vistas" actual={actual.vistas} anterior={anterior.vistas} />
-            <StatMes etiqueta="Comentarios" actual={actual.comentarios} anterior={anterior.comentarios} />
-            <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior.likes} />
-          </div>
-        </div>
       )}
     </div>
   );

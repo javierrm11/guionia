@@ -20,17 +20,19 @@ export default async function CtasPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <Link
-        href="/configuracion/ctas/nuevo"
-        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
-      >
-        + Nuevo CTA
-      </Link>
+      <div className="flex justify-end">
+        <Link
+          href="/configuracion/ctas/nuevo"
+          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover"
+        >
+          + Añadir
+        </Link>
+      </div>
 
       {ctas && ctas.length > 0 ? (
-        <ul className="flex flex-col gap-2 lg:grid lg:grid-cols-2">
+        <ul className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
           {ctas.map((c) => (
-            <li key={c.id} className="flex flex-col gap-1 rounded-md border border-border p-3">
+            <li key={c.id} className="flex flex-col gap-1 rounded-md bg-bg-primary p-3.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-caption text-text-secondary">
                   {PLATAFORMA_LABEL[c.plataforma as Plataforma]}
