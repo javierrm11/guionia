@@ -276,6 +276,7 @@ export async function obtenerEstadisticasVideos(
 export type VideoTendencia = {
   videoId: string;
   canalId: string;
+  categoryId: string | null;
   titulo: string;
   canal: string;
   miniatura: string | null;
@@ -320,6 +321,7 @@ export async function obtenerVideosTendencia(
         title: string;
         channelTitle: string;
         channelId: string;
+        categoryId?: string;
         publishedAt: string;
         thumbnails?: Record<string, { url: string }>;
       };
@@ -327,6 +329,7 @@ export async function obtenerVideosTendencia(
     }) => ({
       videoId: item.id,
       canalId: item.snippet.channelId,
+      categoryId: item.snippet.categoryId ?? null,
       titulo: item.snippet.title,
       canal: item.snippet.channelTitle,
       miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,

@@ -8,6 +8,14 @@ import {
   type VideoTendencia,
 } from "@/lib/youtube/oauth";
 
+/** categoryId de YouTube para "Música" — domina el chart general de tendencias
+ *  (mostPopular) en España, así que se excluye del fallback sin categoría
+ *  propia (cuentas nuevas, sin vídeos todavía) para que no parezca que la
+ *  app solo enseña vídeos musicales. Cuando sí hay categoría propia
+ *  detectada, se respeta tal cual aunque sea música. */
+const CATEGORIA_MUSICA = "10";
+const LIMITE_TENDENCIA = 20;
+
 /**
  * Vídeos en tendencia de tu misma categoría de YouTube (Educación, Howto &
  * Style...) — lógica compartida entre `/contenido/tendencias` (lista
@@ -31,9 +39,14 @@ export async function obtenerVideosParaTi(
     // Sin vídeos propios identificables: se sigue con la tendencia general.
   }
 
-  let videos = categoryId ? await obtenerVideosTendencia(accessToken, "ES", 20, categoryId) : [];
+  let videos = categoryId
+    ? await obtenerVideosTendencia(accessToken, "ES", LIMITE_TENDENCIA, categoryId)
+    : [];
   if (videos.length === 0) {
-    videos = await obtenerVideosTendencia(accessToken);
+    // Sin categoría propia (cuenta nueva): se piden más de la cuenta para
+    // poder descartar música y aun así llegar al límite deseado.
+    const generales = await obtenerVideosTendencia(accessToken, "ES", LIMITE_TENDENCIA * 2);
+    videos = generales.filter((v) => v.categoryId !== CATEGORIA_MUSICA).slice(0, LIMITE_TENDENCIA);
   }
 
   try {

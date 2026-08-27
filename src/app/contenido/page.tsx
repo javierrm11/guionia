@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChevronRight, Flame, Lightbulb, Plus } from "lucide-react";
+import { ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { GaugeCadencia } from "@/components/GaugeCadencia";
 import { OndaCadencia } from "@/components/OndaCadencia";
@@ -8,6 +8,7 @@ import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
 import { CapturaFlotante } from "@/components/CapturaFlotante";
 import { TendenciasCarrusel } from "@/components/TendenciasCarrusel";
+import { Tile } from "@/components/Tile";
 import { createClient } from "@/lib/supabase/server";
 import {
   PLATAFORMA_ICON,
@@ -98,15 +99,11 @@ export default async function ContenidoPage() {
 
   return (
     <div className="relative flex flex-1 flex-col">
-      {hayCadencia && (
-        <div className="pointer-events-none absolute inset-x-0 z-0" style={{ top: -56 }}>
-          <OndaCadencia porcentaje={porcentajeCadencia} />
-        </div>
-      )}
+      <div className="pointer-events-none absolute inset-x-0 z-0" style={{ top: -56 }}>
+        <OndaCadencia porcentaje={porcentajeCadencia} />
+      </div>
 
-      <div
-        className={`relative z-10 flex flex-1 flex-col p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8 ${hayCadencia ? "pt-4" : ""}`}
-      >
+      <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       {hayCadencia ? (
         <section className="flex flex-col items-center gap-1 pb-7">
           <span
@@ -123,18 +120,37 @@ export default async function ContenidoPage() {
           <span className="text-caption text-white/80">de la cadencia semanal</span>
         </section>
       ) : (
-        <Link
-          href="/configuracion/cadencia"
-          className="mb-6 flex items-center justify-between rounded-md bg-bg-primary p-4"
-        >
-          <div className="flex flex-col gap-0.5">
-            <span className="text-h3">Define tu cadencia semanal</span>
-            <span className="text-caption text-text-secondary">
-              Así sabremos cuánto tienes que publicar cada semana
-            </span>
+        <>
+          <p className="pt-2 pb-6 text-center font-display text-3xl leading-tight font-semibold text-white">
+            Bienvenido a Guionia
+          </p>
+          <Link
+            href="/configuracion/cadencia"
+            className="mb-6 flex items-center justify-between rounded-md bg-bg-primary p-4"
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="text-h3">Define tu cadencia semanal</span>
+              <span className="text-caption text-text-secondary">
+                Así sabremos cuánto tienes que publicar cada semana
+              </span>
+            </div>
+            <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
+          </Link>
+
+          <div className="mb-6 grid grid-cols-3 gap-3">
+            <Tile
+              href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
+              label="Nuevo vídeo"
+              icon={Video}
+            />
+            <Tile
+              href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
+              label="Nueva idea"
+              icon={Lightbulb}
+            />
+            <Tile href="/configuracion/plataformas" label="Conectar cuentas" icon={Link2} />
           </div>
-          <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
-        </Link>
+        </>
       )}
 
       {(paraHoy.length > 0 || plantillaHoy.length > 0) && (
@@ -230,6 +246,26 @@ export default async function ContenidoPage() {
           })}
         </div>
       </div>
+
+      {!hayCadencia && paraHoy.length === 0 && plantillaHoy.length === 0 && ultimasIdeas.length === 0 && (
+        <section className="flex flex-col items-center gap-3 py-10 text-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
+            <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
+          </span>
+          <div className="flex flex-col gap-1">
+            <p className="text-h3">Aún no tienes nada por aquí</p>
+            <p className="text-small text-text-secondary">
+              Crea tu primera idea o vídeo para empezar.
+            </p>
+          </div>
+          <Link
+            href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
+            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          >
+            Nueva idea
+          </Link>
+        </section>
+      )}
 
       <Suspense fallback={null}>
         <TendenciasCarrusel />
