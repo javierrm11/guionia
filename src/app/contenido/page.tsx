@@ -138,7 +138,7 @@ export default async function ContenidoPage() {
       )}
 
       {(paraHoy.length > 0 || plantillaHoy.length > 0) && (
-        <section className="flex flex-col gap-3 border-b border-border py-6">
+        <section className="flex flex-col gap-3 pt-6 pb-3">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-accent px-3 py-1 text-small font-semibold text-white">
               Hoy
@@ -202,12 +202,8 @@ export default async function ContenidoPage() {
         </section>
       )}
 
-      <div className="border-b border-border py-6">
-        <span className="text-caption font-display text-text-secondary uppercase" style={{ letterSpacing: "0.06em" }}>
-          Plataformas
-        </span>
-
-        <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-4">
+      <div className="border-b border-border pt-3 pb-6">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4">
           {plataformasActivas.map((p) => {
             const Icon = PLATAFORMA_ICON[p];
             const tono = PLATAFORMA_TONO[p];
