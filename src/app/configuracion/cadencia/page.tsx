@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import { PLATAFORMA_ICON, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { eliminarCadencia } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const PERIODO_LABEL: Record<string, string> = {
+  semana: "por semana",
+  mes: "por mes",
+};
 
 export default async function CadenciaPage() {
   const supabase = await createClient();
@@ -28,39 +34,49 @@ export default async function CadenciaPage() {
         </div>
 
         {cadencia && cadencia.length > 0 ? (
-          <div className="overflow-x-auto rounded-md border border-border">
-            <table className="w-full border-collapse text-body">
-              <thead>
-                <tr className="bg-bg-secondary">
-                  <th className="text-h3 px-3 py-2 text-left">Plataforma</th>
-                  <th className="text-h3 px-3 py-2 text-left">Cantidad</th>
-                  <th className="text-h3 px-3 py-2 text-left">Periodo</th>
-                  <th className="text-h3 px-3 py-2 text-left">Nota</th>
-                  <th className="text-h3 px-3 py-2 text-left"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {cadencia.map((c) => (
-                  <tr key={c.id} className="border-t border-border hover:bg-bg-secondary">
-                    <td className="px-3 py-2">{PLATAFORMA_LABEL[c.plataforma as Plataforma]}</td>
-                    <td className="px-3 py-2">{c.cantidad}</td>
-                    <td className="px-3 py-2 text-text-secondary">{c.periodo}</td>
-                    <td className="px-3 py-2 text-text-secondary">{c.nota ?? "—"}</td>
-                    <td className="px-3 py-2 text-right">
-                      <form action={eliminarCadencia}>
-                        <input type="hidden" name="id" value={c.id} />
-                        <ConfirmButton
-                          message="¿Eliminar esta cadencia?"
-                          className="p-2 -m-2 text-small text-accent"
-                        >
-                          Eliminar
-                        </ConfirmButton>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2">
+            {cadencia.map((c) => {
+              const plataforma = c.plataforma as Plataforma;
+              const Icon = PLATAFORMA_ICON[plataforma];
+              const tono = PLATAFORMA_TONO[plataforma];
+
+              return (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-3.5 rounded-md bg-bg-primary p-4"
+                >
+                  <span
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                    style={{ backgroundColor: tono }}
+                  >
+                    <Icon size={20} strokeWidth={1.5} className="text-white" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-caption text-text-secondary">
+                      {PLATAFORMA_LABEL[plataforma]}
+                    </p>
+                    <p className="text-h2">
+                      {c.cantidad}{" "}
+                      <span className="text-small font-normal text-text-secondary">
+                        {PERIODO_LABEL[c.periodo] ?? c.periodo}
+                      </span>
+                    </p>
+                    {c.nota && (
+                      <p className="mt-0.5 truncate text-caption text-text-disabled">{c.nota}</p>
+                    )}
+                  </div>
+                  <form action={eliminarCadencia}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <ConfirmButton
+                      message="¿Eliminar esta cadencia?"
+                      className="p-2 -m-2 shrink-0 text-small text-accent"
+                    >
+                      Eliminar
+                    </ConfirmButton>
+                  </form>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p className="text-small text-text-disabled">Todavía no hay cadencia definida.</p>

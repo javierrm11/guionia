@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { Clock, Lightbulb } from "lucide-react";
-import { Badge } from "@/components/Badge";
+import { ChevronRight, Clock, Lightbulb } from "lucide-react";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { createClient } from "@/lib/supabase/server";
 import { PLATAFORMA_ICON, PLATAFORMA_LABEL, isPlataforma, type Plataforma } from "@/lib/plataformas";
-import { ESTADOS_IDEA, ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, PILAR_LABEL } from "@/lib/contenido";
+import { ESTADOS_IDEA, PILAR_LABEL } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +27,15 @@ function TarjetaIdea({ idea }: { idea: Idea }) {
   const Icon = PLATAFORMA_ICON[plataforma];
   const tono = PLATAFORMA_TONO[plataforma];
   const dias = diasDesde(idea.created_at);
-  const olvidada = dias >= DIAS_OLVIDO;
+  const olvidada = idea.estado === "idea" && dias >= DIAS_OLVIDO;
+  const descartada = idea.estado === "descartada";
 
   return (
     <Link
       href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-      className="flex flex-col gap-3 rounded-md bg-bg-primary p-3.5 hover:bg-accent-bg active:bg-accent-bg"
+      className={`flex flex-col gap-3 rounded-md bg-bg-primary p-3.5 hover:bg-accent-bg active:bg-accent-bg ${
+        descartada ? "opacity-70 hover:opacity-100" : ""
+      }`}
       style={
         olvidada
           ? {
@@ -50,18 +52,23 @@ function TarjetaIdea({ idea }: { idea: Idea }) {
         >
           <Icon size={16} strokeWidth={1.5} className="text-white" />
         </span>
-        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-h2">{idea.titulo}</span>
-          <span className="text-caption text-text-secondary">
-            {PLATAFORMA_LABEL[plataforma]}
-            {" · "}
-            {idea.pilar ? PILAR_LABEL[idea.pilar] : "Sin pilar"}
-            {!olvidada && ` · hace ${dias} ${dias === 1 ? "día" : "días"}`}
+        <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span className="text-h2 truncate">{idea.titulo}</span>
+          <span className="flex flex-wrap items-center gap-1.5">
+            <span className="text-caption text-text-secondary">{PLATAFORMA_LABEL[plataforma]}</span>
+            {idea.pilar && (
+              <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2 py-0.5">
+                {PILAR_LABEL[idea.pilar]}
+              </span>
+            )}
+            {!olvidada && (
+              <span className="text-caption text-text-disabled">
+                hace {dias} {dias === 1 ? "día" : "días"}
+              </span>
+            )}
           </span>
         </span>
-        <span className="shrink-0">
-          <Badge tone={ESTADO_PIEZA_TONE[idea.estado]}>{ESTADO_PIEZA_LABEL[idea.estado]}</Badge>
-        </span>
+        <ChevronRight size={16} strokeWidth={1.5} className="mt-1 shrink-0 text-text-disabled" />
       </div>
 
       {olvidada && (
@@ -97,15 +104,12 @@ export default async function IdeasGlobalPage({
   const olvidadas = activas.filter((i) => diasDesde(i.created_at) >= DIAS_OLVIDO).length;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+    <div className="flex flex-1 flex-col gap-5 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <div className="flex items-end justify-between gap-3 px-1">
-        <div className="flex flex-col gap-0.5">
-          <h1 className="text-h1">Ideas</h1>
-          <p className="text-caption text-text-secondary">
-            {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
-            {olvidadas > 0 && ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
-          </p>
-        </div>
+        <p className="text-caption text-text-secondary">
+          {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
+          {olvidadas > 0 && ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
+        </p>
         {descartadas.length === 0 && activas.length > 0 && (
           <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2.5 py-1">
             Sin descartar
@@ -145,7 +149,7 @@ export default async function IdeasGlobalPage({
         <section className="flex flex-col gap-2.5">
           <div className="flex items-baseline gap-2 px-1">
             <h2
-              className="text-h3 text-text-secondary uppercase"
+              className="text-caption font-display text-text-secondary uppercase"
               style={{ letterSpacing: "0.06em" }}
             >
               Activas
@@ -164,34 +168,18 @@ export default async function IdeasGlobalPage({
         <section className="flex flex-col gap-2.5">
           <div className="flex items-baseline gap-2 px-1">
             <h2
-              className="text-h3 text-text-disabled uppercase"
+              className="text-caption font-display text-text-disabled uppercase"
               style={{ letterSpacing: "0.06em" }}
             >
               Descartadas
             </h2>
             <span className="text-caption text-text-disabled">{descartadas.length}</span>
           </div>
-          {descartadas.map((idea) => (
-            <Link
-              key={idea.id}
-              href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-              className="flex min-h-11 items-center gap-3 rounded-md bg-bg-primary px-3.5 py-2.5 opacity-70 hover:opacity-100 active:bg-accent-bg"
-            >
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-h3 truncate">{idea.titulo}</span>
-                <span className="text-caption text-text-secondary">
-                  {PLATAFORMA_LABEL[idea.plataforma as Plataforma]} · hace{" "}
-                  {diasDesde(idea.created_at)} días
-                </span>
-              </span>
-              <span className="shrink-0">
-                <Badge tone={ESTADO_PIEZA_TONE[idea.estado]}>
-                  {ESTADO_PIEZA_LABEL[idea.estado]}
-                </Badge>
-              </span>
-            </Link>
-          ))}
+          <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
+            {descartadas.map((idea) => (
+              <TarjetaIdea key={idea.id} idea={idea} />
+            ))}
+          </div>
         </section>
       )}
 

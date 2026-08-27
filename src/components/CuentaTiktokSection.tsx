@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerAccessTokenValido } from "@/lib/tiktok/conexion";
-import { obtenerCuentaPropia, obtenerEstadisticasVideos } from "@/lib/tiktok/oauth";
+import {
+  obtenerCuentaPropia,
+  obtenerEstadisticasCuentaTiktok,
+  obtenerEstadisticasVideos,
+} from "@/lib/tiktok/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
 
 function formatoNumero(n: number) {
@@ -48,23 +52,21 @@ export async function CuentaTiktokSection() {
   }
 
   let cuenta;
-  let error = false;
   try {
     cuenta = await obtenerCuentaPropia(accessToken);
   } catch {
-    error = true;
-  }
-
-  if (error || !cuenta) {
     return (
       <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
-          No se pudieron cargar las estadísticas de TikTok ahora mismo. Si acabas de dar permiso de
-          estadísticas, reconéctala desde Ajustes → Plataformas.
+          No se pudieron cargar las estadísticas de TikTok ahora mismo. Inténtalo de nuevo más tarde.
         </p>
       </div>
     );
   }
+
+  // Aparte de la cuenta básica: requiere el scope `user.info.stats`, que puede
+  // no estar activo/aprobado todavía — si falla, seguimos mostrando el resto.
+  const estadisticasCuenta = await obtenerEstadisticasCuentaTiktok(accessToken).catch(() => null);
 
   // TikTok no tiene una API de analítica agregada — sumamos las estadísticas
   // (ya disponibles por vídeo) de tus propios vídeos publicados este mes y el anterior.
@@ -136,20 +138,27 @@ export async function CuentaTiktokSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Seguidores</span>
-          <span className="text-h2">{formatoNumero(cuenta.seguidores)}</span>
+      {estadisticasCuenta ? (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
+            <span className="text-caption text-text-secondary">Seguidores</span>
+            <span className="text-h2">{formatoNumero(estadisticasCuenta.seguidores)}</span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
+            <span className="text-caption text-text-secondary">Likes totales</span>
+            <span className="text-h2">{formatoNumero(estadisticasCuenta.likesTotales)}</span>
+          </div>
+          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
+            <span className="text-caption text-text-secondary">Vídeos</span>
+            <span className="text-h2">{formatoNumero(estadisticasCuenta.videos)}</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Likes totales</span>
-          <span className="text-h2">{formatoNumero(cuenta.likesTotales)}</span>
-        </div>
-        <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-          <span className="text-caption text-text-secondary">Vídeos</span>
-          <span className="text-h2">{formatoNumero(cuenta.videos)}</span>
-        </div>
-      </div>
+      ) : (
+        <p className="text-small text-text-disabled">
+          No se pudieron leer seguidores/likes/vídeos — el permiso de estadísticas puede estar
+          todavía pendiente de aprobación en TikTok.
+        </p>
+      )}
 
       {hayComparativa && (
         <div className="flex flex-col gap-3">

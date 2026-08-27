@@ -5,12 +5,22 @@ import {
   obtenerCanalPropio,
   obtenerComparativaMensual,
   obtenerEstadisticasCanal,
+  obtenerFuentesTrafico,
+  obtenerVideosDestacados,
+  type FuenteTrafico,
   type MetricasPeriodo,
+  type VideoDestacado,
 } from "@/lib/youtube/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
 
 function formatoNumero(n: number) {
   return n.toLocaleString("es-ES");
+}
+
+function formatoDuracion(segundos: number) {
+  const min = Math.floor(segundos / 60);
+  const seg = Math.round(segundos % 60);
+  return `${min}:${String(seg).padStart(2, "0")}`;
 }
 
 export async function CuentaSection() {
@@ -41,6 +51,8 @@ export async function CuentaSection() {
   let canal;
   let generales;
   let comparativa: { actual: MetricasPeriodo; anterior: MetricasPeriodo | null } | null = null;
+  let destacados: VideoDestacado[] = [];
+  let fuentesTrafico: FuenteTrafico[] = [];
   let error = false;
 
   try {
@@ -49,6 +61,8 @@ export async function CuentaSection() {
       obtenerEstadisticasCanal(accessToken),
     ]);
     comparativa = await obtenerComparativaMensual(accessToken).catch(() => null);
+    destacados = await obtenerVideosDestacados(accessToken).catch(() => []);
+    fuentesTrafico = await obtenerFuentesTrafico(accessToken).catch(() => []);
   } catch {
     error = true;
   }
@@ -96,6 +110,53 @@ export async function CuentaSection() {
         </div>
       </div>
 
+      {destacados.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span
+            className="text-caption font-display text-text-secondary uppercase"
+            style={{ letterSpacing: "0.06em" }}
+          >
+            Mejores vídeos
+          </span>
+          <div className="flex flex-col gap-2">
+            {destacados.map((video) => (
+              <a
+                key={video.videoId}
+                href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-md bg-bg-primary p-2.5 hover:bg-accent-bg active:bg-accent-bg"
+              >
+                {video.miniatura ? (
+                  <Image
+                    src={video.miniatura}
+                    alt=""
+                    width={96}
+                    height={54}
+                    className="h-[54px] w-24 shrink-0 rounded-sm object-cover"
+                  />
+                ) : (
+                  <div className="h-[54px] w-24 shrink-0 rounded-sm bg-bg-secondary" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-small font-medium text-text-primary">
+                    {video.titulo}
+                  </p>
+                  <p className="mt-0.5 text-caption text-text-secondary">
+                    {formatoNumero(video.vistas)} vistas · {formatoNumero(video.comentarios)}{" "}
+                    comentarios · {Math.round(video.retencionMedia)}% retención ·{" "}
+                    {formatoDuracion(video.duracionMediaSegundos)} de media
+                    {video.ctrImpresiones != null &&
+                      ` · ${Math.round(video.ctrImpresiones * 100)}% CTR miniatura`}
+                  </p>
+                  <p className="mt-1 text-caption text-text-disabled">{video.motivo}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       {comparativa && (
         <div className="flex flex-col gap-3">
           <span
@@ -121,10 +182,49 @@ export async function CuentaSection() {
               anterior={comparativa.anterior?.likes ?? null}
             />
             <StatMes
-              etiqueta="Suscriptores ganados"
-              actual={comparativa.actual.suscriptoresGanados}
-              anterior={comparativa.anterior?.suscriptoresGanados ?? null}
+              etiqueta="Suscriptores (neto)"
+              actual={comparativa.actual.suscriptoresGanados - comparativa.actual.suscriptoresPerdidos}
+              anterior={
+                comparativa.anterior
+                  ? comparativa.anterior.suscriptoresGanados - comparativa.anterior.suscriptoresPerdidos
+                  : null
+              }
             />
+            <StatMes
+              etiqueta="Tiempo de visualización"
+              actual={Math.round(comparativa.actual.minutosVistos / 60)}
+              anterior={
+                comparativa.anterior ? Math.round(comparativa.anterior.minutosVistos / 60) : null
+              }
+              sufijo=" h"
+            />
+          </div>
+        </div>
+      )}
+
+      {fuentesTrafico.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span
+            className="text-caption font-display text-text-secondary uppercase"
+            style={{ letterSpacing: "0.06em" }}
+          >
+            De dónde vienen tus vistas (este mes)
+          </span>
+          <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4">
+            {fuentesTrafico.map((fuente) => (
+              <div key={fuente.fuente} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between text-small">
+                  <span className="text-text-primary">{fuente.etiqueta}</span>
+                  <span className="text-text-secondary">{fuente.porcentaje}%</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-neutral-bg">
+                  <div
+                    className="h-1.5 rounded-full bg-accent"
+                    style={{ width: `${fuente.porcentaje}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

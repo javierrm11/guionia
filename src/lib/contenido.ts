@@ -117,6 +117,48 @@ export async function getProgresoCadenciaSemanal(
   );
 }
 
+/**
+ * Semanas consecutivas (hacia atrás desde la semana anterior a la actual,
+ * que puede estar todavía en curso) cumpliendo el objetivo semanal total.
+ * Una sola consulta trayendo las fechas del rango completo y agrupando en
+ * memoria, en vez de una consulta por semana.
+ */
+export async function getRachaSemanas(
+  supabase: SupabaseClient,
+  cadenciaSemanal: CadenciaSemanalRow[],
+  semanaActualInicio: string,
+  maxSemanas = 12
+): Promise<number> {
+  const objetivoTotal = cadenciaSemanal.reduce((suma, c) => suma + c.cantidad, 0);
+  if (objetivoTotal === 0) return 0;
+
+  const plataformas = [...new Set(cadenciaSemanal.map((c) => c.plataforma))];
+  const inicioRango = addDaysISO(semanaActualInicio, -7 * maxSemanas);
+  const finRango = addDaysISO(semanaActualInicio, -1);
+
+  const { data } = await supabase
+    .from("piezas_contenido")
+    .select("fecha_publicacion")
+    .in("plataforma", plataformas)
+    .eq("estado", "publicado")
+    .gte("fecha_publicacion", inicioRango)
+    .lte("fecha_publicacion", finRango);
+
+  const fechas = (data ?? []).map((r) => r.fecha_publicacion as string);
+
+  let racha = 0;
+  let inicioSemana = addDaysISO(semanaActualInicio, -7);
+  for (let i = 0; i < maxSemanas; i++) {
+    const finSemana = addDaysISO(inicioSemana, 6);
+    const hechas = fechas.filter((f) => f >= inicioSemana && f <= finSemana).length;
+    if (hechas < objetivoTotal) break;
+    racha += 1;
+    inicioSemana = addDaysISO(inicioSemana, -7);
+  }
+
+  return racha;
+}
+
 export type PiezaPendiente = {
   id: string;
   titulo: string;
@@ -170,6 +212,31 @@ export async function getEtiquetasPopulares(
     .map(([etiqueta]) => etiqueta);
 }
 
+export type IdeaReciente = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma;
+};
+
+/** Las últimas ideas guardadas (sin descartar) — para no perderlas de vista en el dashboard. */
+export async function getUltimasIdeas(
+  supabase: SupabaseClient,
+  plataformas: Plataforma[],
+  limite = 4
+): Promise<IdeaReciente[]> {
+  if (plataformas.length === 0) return [];
+
+  const { data } = await supabase
+    .from("piezas_contenido")
+    .select("id, titulo, plataforma")
+    .in("plataforma", plataformas)
+    .eq("estado", "idea")
+    .order("created_at", { ascending: false })
+    .limit(limite);
+
+  return data ?? [];
+}
+
 export type PiezaRiesgo = {
   id: string;
   titulo: string;
@@ -199,6 +266,56 @@ export async function getPiezasEnRiesgo(
     .not("fecha_publicacion", "is", null)
     .lte("fecha_publicacion", limite)
     .order("fecha_publicacion", { ascending: true });
+
+  return data ?? [];
+}
+
+export type PiezaHoy = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma;
+  estado: string;
+  fecha_publicacion: string;
+};
+
+/**
+ * Piezas con fecha de publicación hoy que todavía no están publicadas —
+ * cualquier estado del pipeline (guion escrito, grabado o editado), no solo
+ * "pendiente de grabar" como `getPiezasEnRiesgo`. Es la cola real del día.
+ */
+export async function getPiezasParaHoy(
+  supabase: SupabaseClient,
+  plataformas: Plataforma[],
+  hoyISO: string
+): Promise<PiezaHoy[]> {
+  if (plataformas.length === 0) return [];
+
+  const { data } = await supabase
+    .from("piezas_contenido")
+    .select("id, titulo, plataforma, estado, fecha_publicacion")
+    .in("plataforma", plataformas)
+    .in("estado", ["guion_escrito", "grabado", "editado"])
+    .eq("fecha_publicacion", hoyISO)
+    .order("plataforma");
+
+  return data ?? [];
+}
+
+export type EntradaPlantilla = {
+  id: string;
+  plataforma: Plataforma | null;
+  nota: string;
+};
+
+/** Entradas de la plantilla semanal (referencia manual) para un día de la semana (1 = lunes ... 7 = domingo). */
+export async function getPlantillaDelDia(
+  supabase: SupabaseClient,
+  diaSemana: number
+): Promise<EntradaPlantilla[]> {
+  const { data } = await supabase
+    .from("plantilla_semanal")
+    .select("id, plataforma, nota")
+    .eq("dia_semana", diaSemana);
 
   return data ?? [];
 }

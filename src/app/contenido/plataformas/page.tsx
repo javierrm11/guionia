@@ -56,13 +56,6 @@ export default async function PlataformasPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <div className="flex flex-col gap-0.5 px-1">
-        <h1 className="text-h1">Plataformas</h1>
-        <p className="text-caption text-text-secondary">
-          Cadencia y carga de trabajo de esta semana
-        </p>
-      </div>
-
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
       {plataformasActivas.map((plataforma) => {
         const Icon = PLATAFORMA_ICON[plataforma];

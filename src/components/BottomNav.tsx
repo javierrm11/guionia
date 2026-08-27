@@ -2,15 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ITEMS_NAV, RUTAS_AUTH, esRutaActiva } from "@/lib/navegacion";
+import { ITEMS_NAV, RUTAS_AUTH, esRutaActiva, type ItemNav } from "@/lib/navegacion";
+import { NuevoGuionFab } from "@/components/NuevoGuionFab";
+
+function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      aria-current={activo ? "page" : undefined}
+      className="flex flex-col items-center gap-1 px-3.5 py-1.5"
+    >
+      <Icon size={20} strokeWidth={1.5} className={activo ? "text-text-primary" : "text-text-disabled"} />
+      <span className={`text-caption ${activo ? "text-text-primary" : "text-text-disabled"}`}>
+        {item.label}
+      </span>
+    </Link>
+  );
+}
 
 /** Barra de navegación inferior — franja fija a todo el ancho, sin flotar ni
  *  sombra (solo borde superior), solo hasta tablet — en escritorio (`lg:`)
  *  la navegación vive en `Sidebar`. El ítem activo se distingue por color de
- *  icono/texto (--text-primary vs. --text-disabled), sin fondo. */
+ *  icono/texto (--text-primary vs. --text-disabled), sin fondo. El botón "+"
+ *  de crear guion va en el centro, partiendo la lista en dos mitades. */
 export function BottomNav() {
   const pathname = usePathname();
   if (RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta))) return null;
+
+  const mitad = Math.ceil(ITEMS_NAV.length / 2);
 
   return (
     <nav
@@ -18,26 +38,15 @@ export function BottomNav() {
       style={{ boxShadow: "none" }}
     >
       <div className="flex w-full max-w-[600px] items-center justify-around">
-        {ITEMS_NAV.map(({ href, label, icon: Icon, prefijo }) => {
-          const esActivo = esRutaActiva(pathname, prefijo);
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={esActivo ? "page" : undefined}
-              className="flex flex-col items-center gap-1 px-3.5 py-1.5"
-            >
-              <Icon
-                size={20}
-                strokeWidth={1.5}
-                className={esActivo ? "text-text-primary" : "text-text-disabled"}
-              />
-              <span className={`text-caption ${esActivo ? "text-text-primary" : "text-text-disabled"}`}>
-                {label}
-              </span>
-            </Link>
-          );
-        })}
+        {ITEMS_NAV.slice(0, mitad).map((item) => (
+          <ItemBottomNav key={item.href} item={item} activo={esRutaActiva(pathname, item.prefijo)} />
+        ))}
+
+        <NuevoGuionFab />
+
+        {ITEMS_NAV.slice(mitad).map((item) => (
+          <ItemBottomNav key={item.href} item={item} activo={esRutaActiva(pathname, item.prefijo)} />
+        ))}
       </div>
     </nav>
   );

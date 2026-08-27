@@ -21,15 +21,21 @@ export function StatMes({
   etiqueta,
   actual,
   anterior,
+  sufijo = "",
 }: {
   etiqueta: string;
   actual: number;
   anterior: number | null;
+  /** Añadido tras el número, p. ej. " h" para tiempo de visualización. */
+  sufijo?: string;
 }) {
   return (
     <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
       <span className="text-caption text-text-secondary">{etiqueta}</span>
-      <span className="text-h2">{formatoNumero(actual)}</span>
+      <span className="text-h2">
+        {formatoNumero(actual)}
+        {sufijo}
+      </span>
       {anterior != null && <Delta actual={actual} anterior={anterior} />}
     </div>
   );

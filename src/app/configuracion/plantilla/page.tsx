@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { DIA_SEMANA_LABEL, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import { PLATAFORMA_ICON, DIA_SEMANA_LABEL, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { eliminarPlantilla } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const DIA_ABREV = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
 
 export default async function PlantillaPage() {
   const supabase = await createClient();
@@ -13,6 +17,11 @@ export default async function PlantillaPage() {
     .from("plantilla_semanal")
     .select("*")
     .order("dia_semana");
+
+  const porDia = new Map<number, typeof plantilla>();
+  for (const p of plantilla ?? []) {
+    porDia.set(p.dia_semana, [...(porDia.get(p.dia_semana) ?? []), p]);
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
@@ -30,46 +39,75 @@ export default async function PlantillaPage() {
           Solo como referencia manual — no genera recordatorios ni aparece en el dashboard.
         </p>
 
-        {plantilla && plantilla.length > 0 ? (
-          <div className="overflow-x-auto rounded-md border border-border">
-            <table className="w-full border-collapse text-body">
-              <thead>
-                <tr className="bg-bg-secondary">
-                  <th className="text-h3 px-3 py-2 text-left">Día</th>
-                  <th className="text-h3 px-3 py-2 text-left">Plataforma</th>
-                  <th className="text-h3 px-3 py-2 text-left">Nota</th>
-                  <th className="text-h3 px-3 py-2 text-left"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {plantilla.map((p) => (
-                  <tr key={p.id} className="border-t border-border hover:bg-bg-secondary">
-                    <td className="px-3 py-2">{DIA_SEMANA_LABEL[p.dia_semana - 1]}</td>
-                    <td className="px-3 py-2 text-text-secondary">
-                      {p.plataforma ? PLATAFORMA_LABEL[p.plataforma as Plataforma] : "—"}
-                    </td>
-                    <td className="px-3 py-2 text-text-secondary">{p.nota}</td>
-                    <td className="px-3 py-2 text-right">
-                      <form action={eliminarPlantilla}>
-                        <input type="hidden" name="id" value={p.id} />
-                        <ConfirmButton
-                          message="¿Eliminar esta entrada de la plantilla?"
-                          className="p-2 -m-2 text-small text-accent"
-                        >
-                          Eliminar
-                        </ConfirmButton>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="text-small text-text-disabled">
-            Todavía no hay plantilla semanal definida.
-          </p>
-        )}
+        <div className="flex flex-col">
+          {DIA_SEMANA_LABEL.map((label, index) => {
+            const dia = index + 1;
+            const entradas = porDia.get(dia) ?? [];
+            const esUltimo = index === DIA_SEMANA_LABEL.length - 1;
+
+            return (
+              <div key={dia} className="flex gap-3.5">
+                <div className="flex w-11 shrink-0 flex-col items-center">
+                  <span className="text-caption text-text-secondary">{DIA_ABREV[index]}</span>
+                  <span
+                    className={`mt-1.5 flex h-2.5 w-2.5 rounded-full ${
+                      entradas.length > 0 ? "bg-accent" : "bg-border"
+                    }`}
+                  />
+                  {!esUltimo && <span className="mt-1 w-px flex-1 bg-border" />}
+                </div>
+                <div className="min-w-0 flex-1 pb-4">
+                  {entradas.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {entradas.map((entrada) => {
+                        const plataforma = entrada.plataforma as Plataforma | null;
+                        const Icon = plataforma ? PLATAFORMA_ICON[plataforma] : FileText;
+                        const tono = plataforma ? PLATAFORMA_TONO[plataforma] : "var(--neutral)";
+
+                        return (
+                          <div
+                            key={entrada.id}
+                            className="flex items-center gap-3 rounded-md bg-bg-primary p-3"
+                          >
+                            <span
+                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"
+                              style={{ backgroundColor: tono }}
+                            >
+                              <Icon size={14} strokeWidth={1.5} className="text-white" />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-small font-medium text-text-primary">
+                                {entrada.nota}
+                              </p>
+                              {plataforma && (
+                                <p className="text-caption text-text-secondary">
+                                  {PLATAFORMA_LABEL[plataforma]}
+                                </p>
+                              )}
+                            </div>
+                            <form action={eliminarPlantilla}>
+                              <input type="hidden" name="id" value={entrada.id} />
+                              <ConfirmButton
+                                message="¿Eliminar esta entrada de la plantilla?"
+                                className="p-2 -m-2 text-small text-accent"
+                              >
+                                Eliminar
+                              </ConfirmButton>
+                            </form>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex min-h-11 items-center">
+                      <span className="text-small text-text-disabled">Sin nota</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );

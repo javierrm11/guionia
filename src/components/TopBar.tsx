@@ -14,6 +14,13 @@ const RUTAS_AUTH = [
   "/legal",
 ];
 
+/** Rutas con flecha de volver que además llevan su título aquí mismo, junto
+ *  a la flecha, en vez de repetirlo como `<h1>` dentro de la página. */
+const TITULOS: Record<string, string> = {
+  "/contenido/ideas": "Ideas",
+  "/contenido/plataformas": "Plataformas",
+};
+
 /** Con la barra inferior encargándose de Inicio / Plataformas / Ideas / Cuenta,
  *  la barra superior se queda solo con el buscador (en las raíces y en
  *  /contenido/buscar) y el botón de volver en el resto de pantallas —
@@ -22,10 +29,7 @@ export function TopBar() {
   const pathname = usePathname();
   const router = useRouter();
   const enAuth = RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
-  const enRaiz =
-    pathname === "/contenido" ||
-    pathname === "/contenido/plataformas" ||
-    pathname === "/contenido/cuenta";
+  const enRaiz = pathname === "/contenido" || pathname === "/contenido/cuenta";
   const enBusqueda = pathname === "/contenido/buscar";
   const mostrarBusqueda = pathname === "/contenido" || enBusqueda;
   /** `/contenido` tiene la banda `OndaCadencia` detrás de la cabecera, así
@@ -37,7 +41,11 @@ export function TopBar() {
     setQuery(new URLSearchParams(window.location.search).get("q") ?? "");
   }, [pathname]);
 
-  if (enAuth) return null;
+  // En una raíz sin buscador (Cuenta) no hay nada que mostrar aquí — no dejar
+  // la barra vacía, que el título de la página quede arriba.
+  const vacia = enRaiz && !mostrarBusqueda;
+
+  if (enAuth || vacia) return null;
 
   return (
     <div className="relative z-10 flex h-14 items-center gap-2 px-4">
@@ -51,6 +59,8 @@ export function TopBar() {
           <ArrowLeft size={20} strokeWidth={1.5} />
         </button>
       )}
+
+      {TITULOS[pathname] && <h1 className="pl-2 text-h1">{TITULOS[pathname]}</h1>}
 
       {mostrarBusqueda ? (
         <form action="/contenido/buscar" className="flex-1">

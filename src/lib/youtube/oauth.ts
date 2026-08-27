@@ -136,6 +136,8 @@ export type MetricasPeriodo = {
   comentarios: number;
   likes: number;
   suscriptoresGanados: number;
+  suscriptoresPerdidos: number;
+  minutosVistos: number;
 };
 
 /** Fecha ISO (YYYY-MM-DD) del primer día de un mes, `desplaze` meses respecto al actual (0 = este mes). */
@@ -147,9 +149,9 @@ function primerDiaDeMes(desplaze: number): string {
 }
 
 /**
- * Compara el mes en curso con el mes anterior: vistas, comentarios, likes y
- * suscriptores ganados. Una sola llamada a la Analytics API con
- * `dimensions=month` sobre el rango que cubre ambos meses.
+ * Compara el mes en curso con el mes anterior: vistas, comentarios, likes,
+ * suscriptores ganados/perdidos y minutos vistos. Una sola llamada a la
+ * Analytics API con `dimensions=month` sobre el rango que cubre ambos meses.
  */
 export async function obtenerComparativaMensual(
   accessToken: string
@@ -158,7 +160,7 @@ export async function obtenerComparativaMensual(
     ids: "channel==MINE",
     startDate: primerDiaDeMes(-1),
     endDate: new Date().toISOString().slice(0, 10),
-    metrics: "views,comments,likes,subscribersGained",
+    metrics: "views,comments,likes,subscribersGained,subscribersLost,estimatedMinutesWatched",
     dimensions: "month",
   });
 
@@ -171,13 +173,17 @@ export async function obtenerComparativaMensual(
   }
 
   const data = await res.json();
-  const filas: [string, number, number, number, number][] = data.rows ?? [];
+  const filas: [string, number, number, number, number, number, number][] = data.rows ?? [];
 
-  const aMetricas = (fila?: [string, number, number, number, number]): MetricasPeriodo => ({
+  const aMetricas = (
+    fila?: [string, number, number, number, number, number, number]
+  ): MetricasPeriodo => ({
     vistas: fila?.[1] ?? 0,
     comentarios: fila?.[2] ?? 0,
     likes: fila?.[3] ?? 0,
     suscriptoresGanados: fila?.[4] ?? 0,
+    suscriptoresPerdidos: fila?.[5] ?? 0,
+    minutosVistos: fila?.[6] ?? 0,
   });
 
   // Las filas vienen ordenadas por mes ascendente: la última es el mes en curso.
@@ -351,68 +357,246 @@ export async function obtenerVideosTendencia(
   );
 }
 
+export type VideoDestacado = {
+  videoId: string;
+  titulo: string;
+  miniatura: string | null;
+  vistas: number;
+  comentarios: number;
+  retencionMedia: number;
+  duracionMediaSegundos: number;
+  impresiones: number | null;
+  ctrImpresiones: number | null;
+  motivo: string;
+};
+
 /**
- * Busca vídeos por tema (palabras clave), ordenados por vistas — para
- * encontrar contenido similar al tuyo en vez de la tendencia general.
- * `search.list` no devuelve estadísticas, así que se completan con una
- * segunda llamada a `obtenerEstadisticasVideos`.
+ * Impresiones y CTR de miniatura de un vídeo concreto. Aparte del informe
+ * principal de "Mejores vídeos" porque, con `dimensions=video`, el filtro
+ * `video==` de la Analytics API solo admite un único id — no se puede pedir
+ * para varios vídeos a la vez. Se pide sin `dimensions` (un total agregado
+ * del vídeo) y en paralelo, uno por vídeo. Devuelve `null` si falla o no hay
+ * datos (por ejemplo, si el vídeo es demasiado antiguo para tener impresiones
+ * registradas) — nunca rompe el resto de "Mejores vídeos".
  */
-export async function buscarVideosPorTema(
-  accessToken: string,
-  query: string,
-  regionCode = "ES",
-  maxResults = 20
-): Promise<VideoTendencia[]> {
+async function obtenerImpresionesVideo(
+  videoId: string,
+  accessToken: string
+): Promise<{ impresiones: number; ctr: number } | null> {
   const params = new URLSearchParams({
-    part: "snippet",
-    q: query,
-    type: "video",
-    order: "viewCount",
-    regionCode,
-    maxResults: String(maxResults),
+    ids: "channel==MINE",
+    startDate: "2005-02-01",
+    endDate: new Date().toISOString().slice(0, 10),
+    metrics: "impressions,impressionsClickThroughRate",
+    filters: `video==${videoId}`,
   });
 
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`, {
+  try {
+    const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const fila: [number, number] | undefined = data.rows?.[0];
+    if (!fila) return null;
+    return { impresiones: fila[0], ctr: fila[1] };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Explicación en una frase de por qué un vídeo destaca, comparando sus
+ * métricas contra la media del propio canal (sin IA — solo reglas sobre los
+ * números que ya tenemos). Elige la señal más marcada, y añade una segunda
+ * si también está por encima de lo normal.
+ */
+function construirMotivo(
+  video: { vistas: number; comentarios: number; retencionMedia: number },
+  medias: { vistas: number; comentarios: number; retencionMedia: number }
+): string {
+  const ratioVistas = medias.vistas > 0 ? video.vistas / medias.vistas : 1;
+  const ratioComentarios = medias.comentarios > 0 ? video.comentarios / medias.comentarios : 1;
+  const ratioRetencion = medias.retencionMedia > 0 ? video.retencionMedia / medias.retencionMedia : 1;
+
+  const senales = [
+    {
+      ratio: ratioRetencion,
+      texto: `retiene mucho más que tu media (${Math.round(video.retencionMedia)}% vs. ${Math.round(medias.retencionMedia)}%)`,
+    },
+    {
+      ratio: ratioComentarios,
+      texto: `genera muchos más comentarios de lo habitual (x${ratioComentarios.toFixed(1)})`,
+    },
+    { ratio: ratioVistas, texto: `arrasa en vistas frente a tu media (x${ratioVistas.toFixed(1)})` },
+  ]
+    .filter((s) => s.ratio >= 1.15)
+    .sort((a, b) => b.ratio - a.ratio)
+    .slice(0, 2);
+
+  if (senales.length === 0) {
+    return "Por encima de tu media, sin un motivo que destaque claramente sobre el resto.";
+  }
+
+  const frase = senales.map((s) => s.texto).join(" y ");
+  return frase.charAt(0).toUpperCase() + frase.slice(1) + ".";
+}
+
+/**
+ * Los vídeos que mejor han funcionado del canal — vistas, comentarios y
+ * retención media (`averageViewPercentage`) combinados en una puntuación,
+ * no solo el más visto. Primero se piden por `views` (hasta `candidatos`,
+ * un único informe con las tres métricas ya agregadas por vídeo) y se
+ * reordenan localmente; luego se completan título y miniatura aparte, ya
+ * que la Analytics API no las devuelve.
+ */
+export async function obtenerVideosDestacados(
+  accessToken: string,
+  limite = 5,
+  candidatos = 25
+): Promise<VideoDestacado[]> {
+  const params = new URLSearchParams({
+    ids: "channel==MINE",
+    startDate: "2005-02-01",
+    endDate: new Date().toISOString().slice(0, 10),
+    metrics: "views,comments,averageViewPercentage,averageViewDuration",
+    dimensions: "video",
+    sort: "-views",
+    maxResults: String(candidatos),
+  });
+
+  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!res.ok) {
-    throw new Error(`No se pudo buscar vídeos por tema (${res.status})`);
+    throw new Error(`No se pudieron leer los vídeos destacados (${res.status})`);
   }
 
   const data = await res.json();
-  const items = (data.items ?? [])
-    .filter((item: { id?: { videoId?: string } }) => item.id?.videoId)
-    .map(
-      (item: {
-        id: { videoId: string };
-        snippet: {
-          title: string;
-          channelTitle: string;
-          channelId: string;
-          publishedAt: string;
-          thumbnails?: Record<string, { url: string }>;
-        };
-      }) => ({
-        videoId: item.id.videoId,
-        canalId: item.snippet.channelId,
-        titulo: item.snippet.title,
-        canal: item.snippet.channelTitle,
-        miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
-        publicadoEn: item.snippet.publishedAt,
-      })
-    );
+  const filas: [string, number, number, number, number][] = data.rows ?? [];
+  if (filas.length === 0) return [];
 
-  if (items.length === 0) return [];
+  const maxVistas = Math.max(...filas.map((f) => f[1]), 1);
+  const maxComentarios = Math.max(...filas.map((f) => f[2]), 1);
+  const medias = {
+    vistas: filas.reduce((s, f) => s + f[1], 0) / filas.length,
+    comentarios: filas.reduce((s, f) => s + f[2], 0) / filas.length,
+    retencionMedia: filas.reduce((s, f) => s + f[3], 0) / filas.length,
+  };
 
-  const stats = await obtenerEstadisticasVideos(
-    items.map((i: { videoId: string }) => i.videoId),
-    accessToken
+  const conPuntuacion = filas
+    .map((f) => ({
+      videoId: f[0],
+      vistas: f[1],
+      comentarios: f[2],
+      retencionMedia: f[3],
+      duracionMediaSegundos: f[4],
+      puntuacion: (f[1] / maxVistas) * 0.4 + (f[2] / maxComentarios) * 0.3 + (f[3] / 100) * 0.3,
+    }))
+    .sort((a, b) => b.puntuacion - a.puntuacion)
+    .slice(0, limite);
+
+  const impresiones = await Promise.all(
+    conPuntuacion.map((v) => obtenerImpresionesVideo(v.videoId, accessToken))
   );
 
-  return items.map((i: Omit<VideoTendencia, "vistas">) => ({
-    ...i,
-    vistas: stats[i.videoId]?.vistas ?? 0,
+  const idsRes = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${conPuntuacion.map((v) => v.videoId).join(",")}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!idsRes.ok) {
+    throw new Error(`No se pudieron leer los datos de los vídeos destacados (${idsRes.status})`);
+  }
+  const idsData = await idsRes.json();
+  const snippetPorId = new Map<string, { titulo: string; miniatura: string | null }>(
+    (idsData.items ?? []).map((item: { id: string; snippet: { title: string; thumbnails?: Record<string, { url: string }> } }) => [
+      item.id,
+      {
+        titulo: item.snippet.title,
+        miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
+      },
+    ])
+  );
+
+  return conPuntuacion.map((v, indice) => ({
+    videoId: v.videoId,
+    vistas: v.vistas,
+    comentarios: v.comentarios,
+    retencionMedia: v.retencionMedia,
+    duracionMediaSegundos: v.duracionMediaSegundos,
+    impresiones: impresiones[indice]?.impresiones ?? null,
+    ctrImpresiones: impresiones[indice]?.ctr ?? null,
+    titulo: snippetPorId.get(v.videoId)?.titulo ?? "(sin título)",
+    miniatura: snippetPorId.get(v.videoId)?.miniatura ?? null,
+    motivo: construirMotivo(v, medias),
+  }));
+}
+
+const FUENTE_TRAFICO_LABEL: Record<string, string> = {
+  YT_SEARCH: "Búsqueda de YouTube",
+  SUGGESTED_VIDEO: "Vídeos sugeridos",
+  RELATED_VIDEO: "Vídeos relacionados",
+  BROWSE: "Explorar/Inicio",
+  SHORTS: "Feed de Shorts",
+  PLAYLIST: "Listas de reproducción",
+  EXTERNAL: "Enlaces externos",
+  EXT_URL: "Enlaces externos",
+  NOTIFICATION: "Notificaciones",
+  SUBSCRIBER: "Página de suscripciones",
+  CHANNEL: "Página del canal",
+  YT_CHANNEL: "Página del canal",
+  NO_LINK_OTHER: "Directo / otros",
+  NO_LINK_EMBEDDED: "Vídeos incrustados",
+  END_SCREEN: "Pantallas finales",
+  ANNOTATION: "Anotaciones",
+  HASHTAGS: "Hashtags",
+  SOUND_PAGE: "Página de audio",
+};
+
+export type FuenteTrafico = {
+  fuente: string;
+  etiqueta: string;
+  vistas: number;
+  porcentaje: number;
+};
+
+/**
+ * De dónde vienen las vistas del último mes (búsqueda, sugeridos, externo...)
+ * — para saber si te está moviendo el algoritmo o dependes de otra cosa.
+ */
+export async function obtenerFuentesTrafico(
+  accessToken: string,
+  limite = 6
+): Promise<FuenteTrafico[]> {
+  const params = new URLSearchParams({
+    ids: "channel==MINE",
+    startDate: primerDiaDeMes(-1),
+    endDate: new Date().toISOString().slice(0, 10),
+    metrics: "views",
+    dimensions: "insightTrafficSourceType",
+    sort: "-views",
+    maxResults: String(limite),
+  });
+
+  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`No se pudieron leer las fuentes de tráfico (${res.status})`);
+  }
+
+  const data = await res.json();
+  const filas: [string, number][] = data.rows ?? [];
+  const totalVistas = filas.reduce((s, f) => s + f[1], 0);
+  if (totalVistas === 0) return [];
+
+  return filas.map(([fuente, vistas]) => ({
+    fuente,
+    etiqueta: FUENTE_TRAFICO_LABEL[fuente] ?? fuente,
+    vistas,
+    porcentaje: Math.round((vistas / totalVistas) * 100),
   }));
 }
 

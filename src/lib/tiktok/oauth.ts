@@ -93,20 +93,18 @@ export type CuentaTiktok = {
   openId: string;
   displayName: string;
   avatarUrl: string | null;
-  seguidores: number;
-  siguiendo: number;
-  likesTotales: number;
-  videos: number;
 };
 
-const CAMPOS_CUENTA =
-  "open_id,display_name,avatar_url,follower_count,following_count,likes_count,video_count";
-
-/** Requiere el scope `user.info.stats` además de `user.info.basic` para los contadores. */
+/**
+ * Solo `user.info.basic` — es la que usa el flujo de conexión (`/api/tiktok/callback`).
+ * Deliberadamente no pide campos de `user.info.stats`: si ese scope aún no está
+ * aprobado/activo en el portal de TikTok, no debe tirar abajo la conexión entera.
+ */
 export async function obtenerCuentaPropia(accessToken: string): Promise<CuentaTiktok> {
-  const res = await fetch(`https://open.tiktokapis.com/v2/user/info/?fields=${CAMPOS_CUENTA}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
 
   if (!res.ok) {
     throw new Error(`No se pudo leer la cuenta de TikTok (${res.status})`);
@@ -120,6 +118,34 @@ export async function obtenerCuentaPropia(accessToken: string): Promise<CuentaTi
     openId: user.open_id,
     displayName: user.display_name,
     avatarUrl: user.avatar_url ?? null,
+  };
+}
+
+export type EstadisticasCuentaTiktok = {
+  seguidores: number;
+  siguiendo: number;
+  likesTotales: number;
+  videos: number;
+};
+
+/** Requiere el scope `user.info.stats` — se pide aparte de `obtenerCuentaPropia` a propósito. */
+export async function obtenerEstadisticasCuentaTiktok(
+  accessToken: string
+): Promise<EstadisticasCuentaTiktok> {
+  const res = await fetch(
+    "https://open.tiktokapis.com/v2/user/info/?fields=follower_count,following_count,likes_count,video_count",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudieron leer las estadísticas de la cuenta de TikTok (${res.status})`);
+  }
+
+  const data = await res.json();
+  const user = data.data?.user;
+  if (!user) throw new Error("No se pudo leer la información de la cuenta de TikTok");
+
+  return {
     seguidores: Number(user.follower_count ?? 0),
     siguiendo: Number(user.following_count ?? 0),
     likesTotales: Number(user.likes_count ?? 0),
