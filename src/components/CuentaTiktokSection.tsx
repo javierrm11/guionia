@@ -44,9 +44,8 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     );
   }
 
-  let cuenta;
   try {
-    cuenta = await obtenerCuentaPropia(accessToken);
+    await obtenerCuentaPropia(accessToken);
   } catch {
     return (
       <div className="rounded-md bg-bg-primary p-4">
