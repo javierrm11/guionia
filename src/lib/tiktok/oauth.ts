@@ -219,6 +219,7 @@ export type EstadisticasVideoTiktok = {
   likes: number;
   comentarios: number;
   compartidos: number;
+  miniatura: string | null;
 };
 
 export async function obtenerEstadisticasVideos(
@@ -228,7 +229,7 @@ export async function obtenerEstadisticasVideos(
   if (videoIds.length === 0) return {};
 
   const res = await fetch(
-    "https://open.tiktokapis.com/v2/video/query/?fields=id,view_count,like_count,comment_count,share_count",
+    "https://open.tiktokapis.com/v2/video/query/?fields=id,view_count,like_count,comment_count,share_count,cover_image_url",
     {
       method: "POST",
       headers: {
@@ -251,6 +252,7 @@ export async function obtenerEstadisticasVideos(
       likes: Number(v.like_count ?? 0),
       comentarios: Number(v.comment_count ?? 0),
       compartidos: Number(v.share_count ?? 0),
+      miniatura: v.cover_image_url ?? null,
     };
   }
   return resultado;

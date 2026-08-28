@@ -69,14 +69,17 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   const { data: piezas } = await supabase
     .from("piezas_contenido")
-    .select("tiktok_video_id, fecha_publicacion")
+    .select("tiktok_video_id, fecha_publicacion, titulo, url_publicado")
     .eq("plataforma", "tiktok")
     .eq("estado", "publicado")
     .not("tiktok_video_id", "is", null)
     .gte("fecha_publicacion", desdeConsulta);
 
   const lista = piezas ?? [];
-  const statsPorId = new Map<string, { vistas: number; likes: number; comentarios: number }>();
+  const statsPorId = new Map<
+    string,
+    { vistas: number; likes: number; comentarios: number; miniatura: string | null }
+  >();
 
   if (lista.length > 0) {
     try {
@@ -86,13 +89,29 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
       );
       for (const r of resultados) {
         for (const [id, s] of Object.entries(r)) {
-          statsPorId.set(id, { vistas: s.vistas, likes: s.likes, comentarios: s.comentarios });
+          statsPorId.set(id, {
+            vistas: s.vistas,
+            likes: s.likes,
+            comentarios: s.comentarios,
+            miniatura: s.miniatura,
+          });
         }
       }
     } catch {
       // Sin agregado del periodo si falla — las estadísticas de cuenta se muestran igual.
     }
   }
+
+  const destacados = lista
+    .map((p) => ({
+      videoId: p.tiktok_video_id as string,
+      titulo: p.titulo,
+      url: p.url_publicado,
+      stats: statsPorId.get(p.tiktok_video_id as string),
+    }))
+    .filter((v): v is typeof v & { stats: NonNullable<typeof v.stats> } => v.stats != null)
+    .sort((a, b) => b.stats.vistas - a.stats.vistas)
+    .slice(0, 10);
 
   const acumular = (desde: string, hasta: string) =>
     lista.reduce(
@@ -162,6 +181,53 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
               anterior={anterior?.comentarios ?? null}
             />
             <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
+          </div>
+        </div>
+      )}
+
+      {destacados.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span
+            className="text-caption font-display text-text-secondary uppercase"
+            style={{ letterSpacing: "0.06em" }}
+          >
+            Mejores vídeos
+          </span>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8">
+            {destacados.map((video) => (
+              <a
+                key={video.videoId}
+                href={video.url ?? `https://www.tiktok.com/video/${video.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
+              >
+                {video.stats.miniatura && (
+                  <Image
+                    src={video.stats.miniatura}
+                    alt=""
+                    fill
+                    sizes="128px"
+                    className="object-cover"
+                  />
+                )}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.15) 55%, transparent)",
+                  }}
+                />
+                <div className="relative z-10 flex flex-col gap-0.5 p-2">
+                  <p className="line-clamp-2 text-caption font-medium text-white">
+                    {video.titulo}
+                  </p>
+                  <p className="truncate text-caption text-white/70">
+                    {formatoNumero(video.stats.vistas)} vistas
+                  </p>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       )}
