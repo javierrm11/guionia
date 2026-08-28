@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { activarPlataformaConectada } from "@/lib/contenido";
 import { intercambiarCodigo, obtenerCanalPropio } from "@/lib/youtube/oauth";
 
 export async function GET(request: NextRequest) {
@@ -48,12 +49,15 @@ export async function GET(request: NextRequest) {
     );
 
     if (error) throw new Error(error.message);
+
+    const { eraPrimera } = await activarPlataformaConectada(supabase, "youtube");
+    const destinoFinal = eraPrimera ? new URL("/contenido/bienvenida", request.url) : destinoOk;
+
+    const response = NextResponse.redirect(destinoFinal);
+    response.cookies.delete("youtube_oauth_state");
+    return response;
   } catch (error) {
     console.error("Error conectando YouTube:", error);
     return NextResponse.redirect(destinoError);
   }
-
-  const response = NextResponse.redirect(destinoOk);
-  response.cookies.delete("youtube_oauth_state");
-  return response;
 }

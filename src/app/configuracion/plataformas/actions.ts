@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
+import { desactivarPlataforma } from "@/lib/contenido";
 import { obtenerAccessTokenValido } from "@/lib/youtube/conexion";
 import { obtenerVideosDelCanal } from "@/lib/youtube/oauth";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoTiktok } from "@/lib/tiktok/conexion";
@@ -57,7 +58,10 @@ export async function desconectarYoutube() {
   const { error } = await supabase.from("youtube_conexiones").delete().eq("user_id", user.id);
   if (error) throw new Error(error.message);
 
+  await desactivarPlataforma(supabase, "youtube");
+
   revalidatePath("/configuracion/plataformas");
+  revalidatePath("/contenido");
 }
 
 export async function sincronizarYoutube() {
@@ -131,7 +135,10 @@ export async function desconectarTiktok() {
   const { error } = await supabase.from("tiktok_conexiones").delete().eq("user_id", user.id);
   if (error) throw new Error(error.message);
 
+  await desactivarPlataforma(supabase, "tiktok");
+
   revalidatePath("/configuracion/plataformas");
+  revalidatePath("/contenido");
 }
 
 export async function sincronizarTiktok() {

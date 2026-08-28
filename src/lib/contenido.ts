@@ -120,6 +120,31 @@ export function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
+/**
+ * Marca `plataforma` como activa al conectarla por OAuth (YouTube/TikTok) —
+ * conectar = activar, ya no hay un paso manual aparte en Configuración.
+ * Devuelve si era la primera plataforma activa de la cuenta, para decidir si
+ * toca mandar a `/contenido/bienvenida` (la pregunta de cadencia/plantilla).
+ */
+export async function activarPlataformaConectada(
+  supabase: SupabaseClient,
+  plataforma: Plataforma
+): Promise<{ eraPrimera: boolean }> {
+  const { data: actuales } = await supabase.from("plataformas_activas").select("plataforma");
+  const eraPrimera = (actuales ?? []).length === 0;
+
+  if (!(actuales ?? []).some((r) => r.plataforma === plataforma)) {
+    await supabase.from("plataformas_activas").insert({ plataforma });
+  }
+
+  return { eraPrimera };
+}
+
+/** Al desconectar una cuenta, se desactiva también la plataforma correspondiente. */
+export async function desactivarPlataforma(supabase: SupabaseClient, plataforma: Plataforma) {
+  await supabase.from("plataformas_activas").delete().eq("plataforma", plataforma);
+}
+
 /** Estados que todavía viven en el banco de ideas (sin fecha, sección "Ideas"). */
 export const ESTADOS_IDEA = ["idea", "descartada"] as const;
 

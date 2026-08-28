@@ -1,35 +1,42 @@
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
-  diasEnMes,
+  DIA_SEMANA_LABEL,
+  PLATAFORMA_ICON,
+  addDaysISO,
   isPlataforma,
-  primerDiaSemanaMes,
+  todayISO,
   type Plataforma,
 } from "@/lib/plataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
-import { ESTADOS_VIDEO, MES_LABEL, pad2 } from "@/lib/contenido";
+import { Badge } from "@/components/Badge";
+import { ESTADOS_VIDEO, ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, MES_LABEL } from "@/lib/contenido";
 
-const DIAS_CABECERA = ["L", "M", "X", "J", "V", "S", "D"];
+type Tarea = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma | null;
+  /** `null` = solo planificado en la plantilla, todavía sin pieza real. */
+  estado: string | null;
+};
 
-/** Día de la semana (1 = lunes ... 7 = domingo) de una fecha concreta del mes. */
-function diaSemanaDe(anio: number, mes: number, dia: number) {
-  const jsDay = new Date(anio, mes - 1, dia).getDay();
-  return jsDay === 0 ? 7 : jsDay;
+function formatearRangoSemana(inicio: string, fin: string) {
+  const [, mesInicio, diaInicio] = inicio.split("-").map(Number);
+  const [, mesFin, diaFin] = fin.split("-").map(Number);
+  if (mesInicio === mesFin) return `${diaInicio}–${diaFin} ${MES_LABEL[mesInicio - 1]}`;
+  return `${diaInicio} ${MES_LABEL[mesInicio - 1].slice(0, 3)} – ${diaFin} ${MES_LABEL[mesFin - 1].slice(0, 3)}`;
 }
 
 export async function CalendarioPlataformas({
   plataformasActivas,
-  anio,
-  mes,
+  semanaInicio,
 }: {
   plataformasActivas: Plataforma[];
-  anio: number;
-  mes: number;
+  semanaInicio: string;
 }) {
-  const totalDias = diasEnMes(anio, mes);
-  const inicioMes = `${anio}-${pad2(mes)}-01`;
-  const finMes = `${anio}-${pad2(mes)}-${pad2(totalDias)}`;
+  const dias = Array.from({ length: 7 }, (_, i) => addDaysISO(semanaInicio, i));
+  const semanaFin = dias[6];
 
   const supabase = await createClient();
 
@@ -38,132 +45,135 @@ export async function CalendarioPlataformas({
       ? await Promise.all([
           supabase
             .from("piezas_contenido")
-            .select("plataforma, estado, fecha_publicacion")
+            .select("id, titulo, plataforma, estado, fecha_publicacion")
             .in("plataforma", plataformasActivas)
             .in("estado", ESTADOS_VIDEO)
-            .gte("fecha_publicacion", inicioMes)
-            .lte("fecha_publicacion", finMes),
-          supabase.from("plantilla_semanal").select("dia_semana, plataforma"),
+            .gte("fecha_publicacion", semanaInicio)
+            .lte("fecha_publicacion", semanaFin),
+          supabase.from("plantilla_semanal").select("id, dia_semana, plataforma, nota"),
         ])
       : [{ data: [] }, { data: [] }];
 
-  const porDia = new Map<number, { plataforma: string; estado: string }[]>();
+  const piezasPorFecha = new Map<
+    string,
+    { id: string; titulo: string; plataforma: string; estado: string }[]
+  >();
   for (const p of piezas ?? []) {
-    const dia = Number(p.fecha_publicacion.slice(8, 10));
-    const lista = porDia.get(dia) ?? [];
-    lista.push({ plataforma: p.plataforma, estado: p.estado });
-    porDia.set(dia, lista);
+    const lista = piezasPorFecha.get(p.fecha_publicacion) ?? [];
+    lista.push(p);
+    piezasPorFecha.set(p.fecha_publicacion, lista);
   }
 
-  const plantillaPorDiaSemana = new Map<number, Plataforma[]>();
+  const plantillaPorDiaSemana = new Map<
+    number,
+    { id: string; plataforma: Plataforma | null; nota: string }[]
+  >();
   for (const entrada of plantilla ?? []) {
-    if (typeof entrada.plataforma !== "string" || !isPlataforma(entrada.plataforma)) continue;
     const lista = plantillaPorDiaSemana.get(entrada.dia_semana) ?? [];
-    lista.push(entrada.plataforma);
+    lista.push({
+      id: entrada.id,
+      plataforma:
+        typeof entrada.plataforma === "string" && isPlataforma(entrada.plataforma)
+          ? entrada.plataforma
+          : null,
+      nota: entrada.nota,
+    });
     plantillaPorDiaSemana.set(entrada.dia_semana, lista);
   }
 
-  const offset = primerDiaSemanaMes(anio, mes) - 1;
-  const celdas: (number | null)[] = [
-    ...Array(offset).fill(null),
-    ...Array.from({ length: totalDias }, (_, i) => i + 1),
-  ];
-
-  const mesAnterior = mes === 1 ? { anio: anio - 1, mes: 12 } : { anio, mes: mes - 1 };
-  const mesSiguiente = mes === 12 ? { anio: anio + 1, mes: 1 } : { anio, mes: mes + 1 };
-
-  const hoy = new Date();
-  const esHoy = (dia: number) =>
-    hoy.getFullYear() === anio && hoy.getMonth() + 1 === mes && hoy.getDate() === dia;
+  const hoy = todayISO();
+  const semanaAnterior = addDaysISO(semanaInicio, -7);
+  const semanaSiguiente = addDaysISO(semanaInicio, 7);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <Link
-          href={`/contenido/plataformas?vista=calendario&anio=${mesAnterior.anio}&mes=${pad2(mesAnterior.mes)}`}
+          href={`/contenido/plataformas?vista=calendario&semana=${semanaAnterior}`}
           className="text-text-secondary"
         >
           <ChevronLeft size={20} strokeWidth={1.5} />
         </Link>
-        <h2 className="text-h2">
-          {MES_LABEL[mes - 1]} {anio}
-        </h2>
+        <h2 className="text-h2">{formatearRangoSemana(semanaInicio, semanaFin)}</h2>
         <Link
-          href={`/contenido/plataformas?vista=calendario&anio=${mesSiguiente.anio}&mes=${pad2(mesSiguiente.mes)}`}
+          href={`/contenido/plataformas?vista=calendario&semana=${semanaSiguiente}`}
           className="text-text-secondary"
         >
           <ChevronRight size={20} strokeWidth={1.5} />
         </Link>
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
-        {DIAS_CABECERA.map((d) => (
-          <div key={d} className="text-caption text-center text-text-secondary">
-            {d}
-          </div>
-        ))}
+      {dias.map((fecha, index) => {
+        const diaSemana = index + 1;
+        const piezasDia = piezasPorFecha.get(fecha) ?? [];
+        const plataformasReales = new Set(piezasDia.map((p) => p.plataforma));
+        const plantillaDia = (plantillaPorDiaSemana.get(diaSemana) ?? []).filter(
+          (e) => !e.plataforma || !plataformasReales.has(e.plataforma)
+        );
 
-        {celdas.map((dia, index) => {
-          if (dia === null) return <div key={`vacio-${index}`} />;
+        const tareas: Tarea[] = [
+          ...piezasDia.map((p) => ({
+            id: p.id,
+            titulo: p.titulo,
+            plataforma: p.plataforma as Plataforma,
+            estado: p.estado as string | null,
+          })),
+          ...plantillaDia.map((e) => ({
+            id: e.id,
+            titulo: e.nota,
+            plataforma: e.plataforma,
+            estado: null,
+          })),
+        ];
 
-          const piezasDia = porDia.get(dia) ?? [];
-          const plataformasReales = [...new Set(piezasDia.map((p) => p.plataforma))];
-          const plataformasPlan = [
-            ...new Set(plantillaPorDiaSemana.get(diaSemanaDe(anio, mes, dia)) ?? []),
-          ];
-          const plataformasSoloPlan = plataformasPlan.filter(
-            (p) => !plataformasReales.includes(p)
-          );
+        const [, mesNum, diaNum] = fecha.split("-").map(Number);
 
-          const cumplido =
-            plataformasPlan.length > 0
-              ? plataformasPlan.every((p) =>
-                  piezasDia.some((pieza) => pieza.plataforma === p && pieza.estado === "publicado")
-                )
-              : piezasDia.length > 0 && piezasDia.every((p) => p.estado === "publicado");
-
-          return (
-            <div
-              key={dia}
-              className={`relative flex min-h-14 flex-col items-center gap-1 rounded-sm border p-1 lg:min-h-20 ${
-                esHoy(dia) ? "border-accent bg-accent-bg" : "border-border"
-              }`}
-            >
-              <span className="text-caption text-text-secondary">{dia}</span>
-
-              {(plataformasReales.length > 0 || plataformasSoloPlan.length > 0) && (
-                <div className="flex flex-wrap items-center justify-center gap-1">
-                  {plataformasReales.map((p) => (
-                    <span
-                      key={`real-${p}`}
-                      className="h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: PLATAFORMA_TONO[p as Plataforma] }}
-                    />
-                  ))}
-                  {plataformasSoloPlan.map((p) => (
-                    <span
-                      key={`plan-${p}`}
-                      className="h-1.5 w-1.5 rounded-full border"
-                      style={{ borderColor: PLATAFORMA_TONO[p] }}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {cumplido && (
-                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-success">
-                  <Check size={10} strokeWidth={3} className="text-white" />
-                </span>
-              )}
+        return (
+          <div key={fecha} className="flex flex-col gap-2">
+            <div className="flex items-baseline gap-2 px-1">
+              <span className="text-h3">{DIA_SEMANA_LABEL[index]}</span>
+              <span className="text-caption text-text-secondary">
+                {diaNum} de {MES_LABEL[mesNum - 1]}
+              </span>
+              {fecha === hoy && <span className="text-caption text-accent">Hoy</span>}
             </div>
-          );
-        })}
-      </div>
 
-      <p className="text-caption text-text-disabled">
-        Punto relleno: contenido real ese día. Punto hueco: plataforma planificada en tu plantilla
-        semanal para ese día pero sin publicar todavía. Tick verde: se cumplió el plan de ese día.
-      </p>
+            {tareas.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {tareas.map((t) => {
+                  const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
+                  const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
+                  const pendiente = t.estado === null;
+
+                  return (
+                    <div
+                      key={t.id}
+                      className={`flex items-center gap-3 rounded-md bg-bg-primary p-3 ${
+                        pendiente ? "opacity-70" : ""
+                      }`}
+                    >
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm"
+                        style={{ backgroundColor: tono }}
+                      >
+                        <Icon size={16} strokeWidth={1.5} className="text-white" />
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-body">{t.titulo}</span>
+                      {t.estado && (
+                        <Badge tone={ESTADO_PIEZA_TONE[t.estado]}>
+                          {ESTADO_PIEZA_LABEL[t.estado]}
+                        </Badge>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="px-1 text-caption text-text-disabled">Sin tareas</p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

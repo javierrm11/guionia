@@ -32,7 +32,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Aplica el tema guardado antes del primer pintado, para que no
+            parpadee en claro un instante al cargar en modo oscuro. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('guionia-tema')==='oscuro'){document.documentElement.classList.add('dark')}}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col text-text-primary lg:flex-row">
         <Sidebar />
         <div className="flex flex-1 flex-col lg:min-w-0">

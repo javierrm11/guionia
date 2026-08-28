@@ -1,17 +1,9 @@
 import Image from "next/image";
-import { Clapperboard, Music } from "lucide-react";
-import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
+import { Briefcase, Camera, Clapperboard, Music } from "lucide-react";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
-import { isPlataforma } from "@/lib/plataformas";
-import {
-  desconectarTiktok,
-  desconectarYoutube,
-  guardarPlataformasActivas,
-  sincronizarTiktok,
-  sincronizarYoutube,
-} from "./actions";
+import { desconectarTiktok, desconectarYoutube, sincronizarTiktok, sincronizarYoutube } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +17,6 @@ export default async function PlataformasPage({
     tiktok_conectado?: string;
     tiktok_error?: string;
     tiktok_importados?: string;
-    plataformas_error?: string;
   }>;
 }) {
   const {
@@ -35,12 +26,8 @@ export default async function PlataformasPage({
     tiktok_conectado,
     tiktok_error,
     tiktok_importados,
-    plataformas_error,
   } = await searchParams;
   const supabase = await createClient();
-
-  const { data } = await supabase.from("plataformas_activas").select("plataforma");
-  const activas = (data ?? []).map((r) => r.plataforma).filter(isPlataforma);
 
   const {
     data: { user },
@@ -64,14 +51,9 @@ export default async function PlataformasPage({
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
-      <PlataformasActivasForm activas={activas} action={guardarPlataformasActivas} />
-      {plataformas_error && (
-        <p className="text-small text-danger">Marca al menos una plataforma para continuar.</p>
-      )}
+      <h1 className="text-h1">Cuentas conectadas</h1>
 
       <section className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-        <h2 className="text-h2">Cuentas conectadas</h2>
-
         {youtube_conectado && (
           <p className="text-small text-success">Cuenta de YouTube conectada.</p>
         )}
@@ -227,6 +209,30 @@ export default async function PlataformasPage({
               Conectar
             </a>
           )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+              <Camera size={18} strokeWidth={1.5} className="text-accent" />
+            </span>
+            <div className="flex flex-col">
+              <span className="text-body text-text-primary">Instagram</span>
+              <span className="text-caption text-text-secondary">Próximamente</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+              <Briefcase size={18} strokeWidth={1.5} className="text-accent" />
+            </span>
+            <div className="flex flex-col">
+              <span className="text-body text-text-primary">LinkedIn</span>
+              <span className="text-caption text-text-secondary">Próximamente</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>

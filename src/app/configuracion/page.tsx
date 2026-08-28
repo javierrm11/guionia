@@ -8,6 +8,7 @@ import {
   Video,
 } from "lucide-react";
 import { Tile } from "@/components/Tile";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { logoutAction } from "../login/actions";
 
 export default function ConfiguracionPage() {
@@ -37,6 +38,8 @@ export default function ConfiguracionPage() {
           </button>
         </form>
       </div>
+
+      <ThemeToggle />
     </div>
   );
 }

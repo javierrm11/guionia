@@ -57,6 +57,47 @@
   --radius-md: 20px;
 }
 
+/* Modo oscuro — activado a mano (clase en <html>, ver ThemeToggle.tsx), no
+   por prefers-color-scheme. Mismos tokens que :root, mismo criterio de
+   diseño (tarjetas se distinguen del fondo, esta vez por ser un punto más
+   claras además de la sombra — en oscuro la sombra sola apenas se nota) y
+   mismo contraste objetivo (~4.5:1 texto normal sobre --bg-primary). */
+.dark {
+  --bg-page: #1c1c1f;
+  --bg-primary: #38383f;
+  --bg-secondary: #38383f;
+  --card-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.24),
+    0 6px 16px rgba(0, 0, 0, 0.28);
+  --border: #46464e;
+  --text-primary: #f2f2f4;
+  --text-secondary: #a5a5ad;
+  --text-disabled: #6b6b72;
+
+  --accent: #8b7cf6;
+  --accent-hover: #a094fa;
+  --accent-bg: rgba(139, 124, 246, 0.18);
+  --link: #8b7cf6;
+
+  --ai: #5b8dff;
+  --ai-hover: #7ba3ff;
+
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.14);
+  --warning: #f0ad4e;
+  --warning-bg: rgba(240, 173, 78, 0.14);
+  --neutral: #a8a8b0;
+  --neutral-bg: rgba(168, 168, 176, 0.12);
+  --danger: #f1665c;
+  --danger-bg: rgba(241, 102, 92, 0.14);
+
+  --badge-success: #1f9d70;
+  --badge-warning: #c8912a;
+  --badge-warning-text: #1c1206;
+  --badge-danger: #c9564c;
+  --badge-neutral: #7c8591;
+}
+
 @theme inline {
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);

@@ -16,7 +16,6 @@ import {
   getPendientesDePublicar,
   getPiezasEnRiesgo,
   getProgresoCadenciaSemanal,
-  pad2,
 } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
@@ -24,14 +23,15 @@ export const dynamic = "force-dynamic";
 export default async function PlataformasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ vista?: string; anio?: string; mes?: string }>;
+  searchParams: Promise<{ vista?: string; semana?: string }>;
 }) {
-  const { vista, anio: anioParam, mes: mesParam } = await searchParams;
+  const { vista, semana: semanaParam } = await searchParams;
   const enCalendario = vista === "calendario";
 
-  const hoyFecha = new Date();
-  const anio = Number(anioParam) || hoyFecha.getFullYear();
-  const mes = Number(mesParam) || hoyFecha.getMonth() + 1;
+  const semanaCalendario =
+    semanaParam && /^\d{4}-\d{2}-\d{2}$/.test(semanaParam)
+      ? semanaParam
+      : getMondayISO(new Date());
 
   const supabase = await createClient();
 
@@ -79,7 +79,7 @@ export default async function PlataformasPage({
           Plataformas
         </Link>
         <Link
-          href={`/contenido/plataformas?vista=calendario&anio=${anio}&mes=${pad2(mes)}`}
+          href={`/contenido/plataformas?vista=calendario&semana=${semanaCalendario}`}
           className={`text-caption rounded-full px-3 py-1.5 ${
             enCalendario ? "bg-accent text-white" : "bg-neutral-bg text-text-secondary"
           }`}
@@ -89,7 +89,10 @@ export default async function PlataformasPage({
       </div>
 
       {enCalendario ? (
-        <CalendarioPlataformas plataformasActivas={plataformasActivas} anio={anio} mes={mes} />
+        <CalendarioPlataformas
+          plataformasActivas={plataformasActivas}
+          semanaInicio={semanaCalendario}
+        />
       ) : (
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
       {plataformasActivas.map((plataforma) => {

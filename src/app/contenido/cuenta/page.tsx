@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Clapperboard, Music, Settings } from "lucide-react";
+import { Clapperboard, Music, Settings } from "lucide-react";
 import { CuentaLoader } from "@/components/CuentaLoader";
 import { CuentaSection } from "@/components/CuentaSection";
 import { CuentaTiktokSection } from "@/components/CuentaTiktokSection";
@@ -45,10 +45,16 @@ export default async function CuentaPage({
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-h1">Cuenta</h1>
-        <SelectorRango rango={rango} />
+        <Link
+          href="/configuracion"
+          aria-label="Ajustes"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-text-secondary hover:bg-bg-primary"
+        >
+          <Settings size={20} strokeWidth={1.5} />
+        </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-wrap gap-3">
         <Link
           href={`/contenido/cuenta?rango=${rango}&cuenta=youtube`}
           className={`flex items-center gap-2.5 rounded-md p-3 ${
@@ -104,20 +110,13 @@ export default async function CuentaPage({
         </Link>
       </div>
 
-      <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
-        {cuenta === "youtube" ? <CuentaSection rango={rango} /> : <CuentaTiktokSection rango={rango} />}
-      </Suspense>
+      <div className="flex flex-col gap-2">
+        <SelectorRango rango={rango} />
 
-      <Link
-        href="/configuracion"
-        className="flex items-center justify-between rounded-md bg-bg-primary p-4"
-      >
-        <span className="flex items-center gap-2.5 text-body text-text-primary">
-          <Settings size={18} strokeWidth={1.5} />
-          Ajustes
-        </span>
-        <ChevronRight size={16} strokeWidth={2} className="text-text-disabled" />
-      </Link>
+        <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
+          {cuenta === "youtube" ? <CuentaSection rango={rango} /> : <CuentaTiktokSection rango={rango} />}
+        </Suspense>
+      </div>
     </div>
   );
 }
