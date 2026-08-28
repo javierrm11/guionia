@@ -77,7 +77,13 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
   const lista = piezas ?? [];
   const statsPorId = new Map<
     string,
-    { vistas: number; likes: number; comentarios: number; miniatura: string | null }
+    {
+      vistas: number;
+      likes: number;
+      comentarios: number;
+      compartidos: number;
+      miniatura: string | null;
+    }
   >();
 
   if (lista.length > 0) {
@@ -92,6 +98,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
             vistas: s.vistas,
             likes: s.likes,
             comentarios: s.comentarios,
+            compartidos: s.compartidos,
             miniatura: s.miniatura,
           });
         }
@@ -123,9 +130,10 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
           vistas: total.vistas + s.vistas,
           likes: total.likes + s.likes,
           comentarios: total.comentarios + s.comentarios,
+          compartidos: total.compartidos + s.compartidos,
         };
       },
-      { vistas: 0, likes: 0, comentarios: 0 }
+      { vistas: 0, likes: 0, comentarios: 0, compartidos: 0 }
     );
 
   const actual = acumular(limites.actualDesde, limites.actualHasta);
@@ -172,6 +180,11 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
                   anterior={anterior?.comentarios ?? null}
                 />
                 <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
+                <StatMes
+                  etiqueta="Compartidos"
+                  actual={actual.compartidos}
+                  anterior={anterior?.compartidos ?? null}
+                />
               </>
             )}
             {estadisticasCuenta && (
