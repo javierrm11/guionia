@@ -92,22 +92,6 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        {canal.thumbnailUrl && (
-          <Image
-            src={canal.thumbnailUrl}
-            alt=""
-            width={44}
-            height={44}
-            className="shrink-0 rounded-full"
-          />
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-h3">{canal.titulo}</p>
-          <p className="text-caption text-text-secondary">Canal de YouTube</p>
-        </div>
-      </div>
-
       {comparativa && (
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">

@@ -150,22 +150,6 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        {cuenta.avatarUrl && (
-          <Image
-            src={cuenta.avatarUrl}
-            alt=""
-            width={44}
-            height={44}
-            className="shrink-0 rounded-full"
-          />
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-h3">{cuenta.displayName}</p>
-          <p className="text-caption text-text-secondary">Cuenta de TikTok</p>
-        </div>
-      </div>
-
       {hayComparativa && (
         <div className="flex flex-col gap-3">
           <p className="text-caption text-text-disabled">
