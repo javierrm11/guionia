@@ -149,21 +149,34 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   return (
     <div className="flex flex-col gap-6">
-      {hayComparativa && (
+      {(hayComparativa || estadisticasCuenta) && (
         <div className="flex flex-col gap-3">
-          <p className="text-caption text-text-disabled">
-            Suma de tus vídeos publicados en cada periodo — TikTok no da un total de cuenta por
-            fechas.
-          </p>
+          {hayComparativa && (
+            <p className="text-caption text-text-disabled">
+              Suma de tus vídeos publicados en cada periodo — TikTok no da un total de cuenta por
+              fechas.
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-3">
-            <StatMes etiqueta="Vistas" actual={actual.vistas} anterior={anterior?.vistas ?? null} />
-            <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
-            <StatMes
-              etiqueta="Comentarios"
-              actual={actual.comentarios}
-              anterior={anterior?.comentarios ?? null}
-            />
-            <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
+            {hayComparativa && (
+              <>
+                <StatMes
+                  etiqueta="Vistas"
+                  actual={actual.vistas}
+                  anterior={anterior?.vistas ?? null}
+                />
+                <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
+                <StatMes
+                  etiqueta="Comentarios"
+                  actual={actual.comentarios}
+                  anterior={anterior?.comentarios ?? null}
+                />
+                <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
+              </>
+            )}
+            {estadisticasCuenta && (
+              <StatMes etiqueta="Seguidores" actual={estadisticasCuenta.seguidores} anterior={null} />
+            )}
           </div>
         </div>
       )}
@@ -213,28 +226,6 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
             ))}
           </div>
         </div>
-      )}
-
-      {estadisticasCuenta ? (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-            <span className="text-caption text-text-secondary">Seguidores</span>
-            <span className="text-h2">{formatoNumero(estadisticasCuenta.seguidores)}</span>
-          </div>
-          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-            <span className="text-caption text-text-secondary">Likes totales</span>
-            <span className="text-h2">{formatoNumero(estadisticasCuenta.likesTotales)}</span>
-          </div>
-          <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
-            <span className="text-caption text-text-secondary">Vídeos</span>
-            <span className="text-h2">{formatoNumero(estadisticasCuenta.videos)}</span>
-          </div>
-        </div>
-      ) : (
-        <p className="text-small text-text-disabled">
-          No se pudieron leer seguidores/likes/vídeos — el permiso de estadísticas puede estar
-          todavía pendiente de aprobación en TikTok.
-        </p>
       )}
     </div>
   );
