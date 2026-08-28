@@ -2,23 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { isPlataforma } from "@/lib/plataformas";
+import { diasEnMes, isPlataforma, primerDiaSemanaMes } from "@/lib/plataformas";
 import { ESTADOS_VIDEO, MES_LABEL, pad2 } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
 
 const DIAS_CABECERA = ["L", "M", "X", "J", "V", "S", "D"];
 const DIAS_RIESGO = 2;
-
-function diasEnMes(anio: number, mes: number) {
-  return new Date(anio, mes, 0).getDate();
-}
-
-/** Día de la semana del día 1 del mes: 1 = lunes ... 7 = domingo. */
-function primerDiaSemana(anio: number, mes: number) {
-  const jsDay = new Date(anio, mes - 1, 1).getDay(); // 0 = domingo
-  return jsDay === 0 ? 7 : jsDay;
-}
 
 export default async function CalendarioPage({
   params,
@@ -55,7 +45,7 @@ export default async function CalendarioPage({
     porDia.set(dia, lista);
   }
 
-  const offset = primerDiaSemana(anio, mes) - 1;
+  const offset = primerDiaSemanaMes(anio, mes) - 1;
   const celdas: (number | null)[] = [
     ...Array(offset).fill(null),
     ...Array.from({ length: totalDias }, (_, i) => i + 1),

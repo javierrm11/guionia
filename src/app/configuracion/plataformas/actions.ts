@@ -24,6 +24,7 @@ export async function guardarPlataformasActivas(formData: FormData) {
   const { data: actuales } = await supabase.from("plataformas_activas").select("plataforma");
   const actualesSet = new Set((actuales ?? []).map((r) => r.plataforma));
   const nuevasSet = new Set(seleccionadas);
+  const esPrimeraVez = actualesSet.size === 0;
 
   const aBorrar = [...actualesSet].filter((p) => !nuevasSet.has(p));
   const aInsertar = [...nuevasSet].filter((p) => !actualesSet.has(p));
@@ -39,7 +40,11 @@ export async function guardarPlataformasActivas(formData: FormData) {
 
   revalidatePath("/contenido");
   revalidatePath("/configuracion/plataformas");
-  redirect("/contenido");
+
+  // Primera vez que se activa alguna plataforma: pedir la cadencia semanal de
+  // cada una para generar cadencia + plantilla automáticamente. En una edición
+  // posterior (ya había plataformas activas) se va directo a Control.
+  redirect(esPrimeraVez ? "/contenido/bienvenida" : "/contenido");
 }
 
 export async function desconectarYoutube() {

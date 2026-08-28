@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Check, ChevronRight } from "lucide-react";
+import { CalendarioPlataformas } from "@/components/CalendarioPlataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -15,11 +16,23 @@ import {
   getPendientesDePublicar,
   getPiezasEnRiesgo,
   getProgresoCadenciaSemanal,
+  pad2,
 } from "@/lib/contenido";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlataformasPage() {
+export default async function PlataformasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ vista?: string; anio?: string; mes?: string }>;
+}) {
+  const { vista, anio: anioParam, mes: mesParam } = await searchParams;
+  const enCalendario = vista === "calendario";
+
+  const hoyFecha = new Date();
+  const anio = Number(anioParam) || hoyFecha.getFullYear();
+  const mes = Number(mesParam) || hoyFecha.getMonth() + 1;
+
   const supabase = await createClient();
 
   const { data: plataformasActivasData } = await supabase
@@ -56,6 +69,28 @@ export default async function PlataformasPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+      <div className="flex gap-2">
+        <Link
+          href="/contenido/plataformas"
+          className={`text-caption rounded-full px-3 py-1.5 ${
+            enCalendario ? "bg-neutral-bg text-text-secondary" : "bg-accent text-white"
+          }`}
+        >
+          Plataformas
+        </Link>
+        <Link
+          href={`/contenido/plataformas?vista=calendario&anio=${anio}&mes=${pad2(mes)}`}
+          className={`text-caption rounded-full px-3 py-1.5 ${
+            enCalendario ? "bg-accent text-white" : "bg-neutral-bg text-text-secondary"
+          }`}
+        >
+          Calendario
+        </Link>
+      </div>
+
+      {enCalendario ? (
+        <CalendarioPlataformas plataformasActivas={plataformasActivas} anio={anio} mes={mes} />
+      ) : (
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
       {plataformasActivas.map((plataforma) => {
         const Icon = PLATAFORMA_ICON[plataforma];
@@ -137,6 +172,7 @@ export default async function PlataformasPage() {
         );
       })}
       </div>
+      )}
     </div>
   );
 }

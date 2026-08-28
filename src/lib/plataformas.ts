@@ -31,6 +31,8 @@ export const DIA_SEMANA_LABEL = [
   "Domingo",
 ];
 
+export const DIA_SEMANA_ABREV = ["LU", "MA", "MI", "JU", "VI", "SA", "DO"];
+
 function formatISO(year: number, month: number, day: number) {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
@@ -62,4 +64,15 @@ export function addDaysISO(iso: string, dias: number) {
   const [year, month, day] = iso.split("-").map(Number);
   const d = new Date(year, month - 1, day + dias);
   return formatISO(d.getFullYear(), d.getMonth() + 1, d.getDate());
+}
+
+/** Nº de días de un mes (`mes` en 1-12). */
+export function diasEnMes(anio: number, mes: number) {
+  return new Date(anio, mes, 0).getDate();
+}
+
+/** Día de la semana del día 1 del mes: 1 = lunes ... 7 = domingo. */
+export function primerDiaSemanaMes(anio: number, mes: number) {
+  const jsDay = new Date(anio, mes - 1, 1).getDay(); // 0 = domingo
+  return jsDay === 0 ? 7 : jsDay;
 }
