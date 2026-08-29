@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "crypto";
 
-const SCOPES = ["user.info.basic", "user.info.stats", "video.list"].join(",");
+const SCOPES = ["user.info.basic", "user.info.stats", "video.list", "video.publish"].join(",");
 
 function clientKey() {
   const key = process.env.TIKTOK_CLIENT_KEY;
@@ -256,4 +256,87 @@ export async function obtenerEstadisticasVideos(
     };
   }
   return resultado;
+}
+
+export type MetadatosSubidaTiktok = {
+  /** `post_info.title` — el mismo campo que ya usa la app como "Descripción (con hashtags)". */
+  titulo: string;
+  videoSize: number;
+  chunkSize: number;
+  totalChunkCount: number;
+};
+
+/**
+ * Abre una sesión de subida por trozos (Content Posting API, Direct Post).
+ * Publicado siempre como `SELF_ONLY` — mientras esta app no pase la
+ * auditoría de contenido de TikTok, no hay forma de publicar en público.
+ */
+export async function iniciarSubidaVideo(
+  accessToken: string,
+  metadata: MetadatosSubidaTiktok
+): Promise<{ publishId: string; uploadUrl: string }> {
+  const res = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+    body: JSON.stringify({
+      post_info: {
+        title: metadata.titulo,
+        privacy_level: "SELF_ONLY",
+      },
+      source_info: {
+        source: "FILE_UPLOAD",
+        video_size: metadata.videoSize,
+        chunk_size: metadata.chunkSize,
+        total_chunk_count: metadata.totalChunkCount,
+      },
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.error?.code !== "ok") {
+    throw new Error(`No se pudo iniciar la subida a TikTok (${data.error?.message ?? res.status})`);
+  }
+
+  return { publishId: data.data.publish_id, uploadUrl: data.data.upload_url };
+}
+
+export type EstadoPublicacionTiktok = {
+  status:
+    | "PROCESSING_UPLOAD"
+    | "PROCESSING_DOWNLOAD"
+    | "SEND_TO_USER_INBOX"
+    | "PUBLISH_COMPLETE"
+    | "FAILED";
+  failReason: string | null;
+};
+
+/** La publicación en TikTok es asíncrona — hay que consultar este estado
+ *  (polling) hasta que llegue a `PUBLISH_COMPLETE` o `FAILED`. */
+export async function consultarEstadoPublicacion(
+  accessToken: string,
+  publishId: string
+): Promise<EstadoPublicacionTiktok> {
+  const res = await fetch("https://open.tiktokapis.com/v2/post/publish/status/fetch/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+    body: JSON.stringify({ publish_id: publishId }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || data.error?.code !== "ok") {
+    throw new Error(
+      `No se pudo consultar el estado de la publicación (${data.error?.message ?? res.status})`
+    );
+  }
+
+  return {
+    status: data.data.status,
+    failReason: data.data.fail_reason ?? null,
+  };
 }
