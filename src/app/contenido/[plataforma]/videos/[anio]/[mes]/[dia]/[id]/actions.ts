@@ -137,24 +137,6 @@ export async function guardarVideoSubido(
   redirect(redirectTo);
 }
 
-/** Tras subir el vídeo a TikTok (subida por trozos, ver `SubirVideoTiktok.tsx`)
- *  y confirmar `PUBLISH_COMPLETE`. A diferencia de YouTube, TikTok no
- *  devuelve un id de vídeo aquí (el post es privado mientras la app no esté
- *  auditada) — la URL se enlaza después a mano con `guardarUrlPublicado`. */
-export async function marcarPublicadoTiktok(id: string, redirectTo: string) {
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("piezas_contenido")
-    .update({ estado: "publicado" })
-    .eq("id", id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath(redirectTo);
-  redirect(redirectTo);
-}
-
 export async function guardarTextoEscena(formData: FormData) {
   const supabase = await createClient();
 

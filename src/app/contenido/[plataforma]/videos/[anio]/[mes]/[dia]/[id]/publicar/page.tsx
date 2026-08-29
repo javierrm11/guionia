@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import { SubmitButton } from "@/components/SubmitButton";
-import { SubirVideoTiktok } from "@/components/SubirVideoTiktok";
 import { SubirVideoYoutube } from "@/components/SubirVideoYoutube";
 import { publicarConMetadatos } from "../actions";
 
@@ -83,30 +82,6 @@ export default async function PublicarPage({
                 type="hidden"
                 name="etiquetas_publicacion"
                 value={guion.etiquetas_publicacion ?? ""}
-              />
-              <SubmitButton
-                pendingLabel="Marcando…"
-                className="rounded-sm bg-neutral-bg px-4 py-2 text-body text-text-primary active:bg-border disabled:opacity-60"
-              >
-                Marcar como publicado
-              </SubmitButton>
-            </form>
-          }
-        />
-      ) : plataforma === "tiktok" ? (
-        <SubirVideoTiktok
-          id={guion.id}
-          redirectTo={rutaActual}
-          tituloInicial={guion.descripcion_publicacion ?? ""}
-          botonManual={
-            <form action={publicarConMetadatos}>
-              <input type="hidden" name="id" value={guion.id} />
-              <input type="hidden" name="plataforma" value={plataforma} />
-              <input type="hidden" name="redirectTo" value={rutaActual} />
-              <input
-                type="hidden"
-                name="descripcion_publicacion"
-                value={guion.descripcion_publicacion ?? ""}
               />
               <SubmitButton
                 pendingLabel="Marcando…"
