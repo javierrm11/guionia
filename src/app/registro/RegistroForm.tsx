@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { SubmitButton } from "@/components/SubmitButton";
 import { registroAction } from "./actions";
 
@@ -18,14 +19,12 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
       {step === "email" ? (
         <>
           <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">
-              Email<span className="text-accent"> *</span>
-            </span>
+            <span className="px-1 text-caption text-text-secondary">Email</span>
             <div className="relative">
               <Mail
                 size={16}
                 strokeWidth={1.5}
-                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-disabled"
+                className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-text-disabled"
               />
               <input
                 type="email"
@@ -41,7 +40,8 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
                     continuar();
                   }
                 }}
-                className="w-full rounded-sm border border-border bg-bg-primary py-2 pr-3 pl-9 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                style={{ "--input-bg": "var(--neutral-bg)" } as React.CSSProperties}
+                className="w-full rounded-full border-0 py-3 pr-4 pl-10 text-body focus:ring-2 focus:ring-accent-bg focus:outline-none"
               />
             </div>
           </label>
@@ -49,7 +49,7 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
           <button
             type="button"
             onClick={continuar}
-            className="rounded-sm bg-accent px-4 py-3 text-body text-white active:bg-accent-hover"
+            className="rounded-full bg-accent px-4 py-3 text-body text-white active:bg-accent-hover"
           >
             Continuar
           </button>
@@ -58,7 +58,7 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
         <>
           <input type="hidden" name="email" value={email} />
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 px-1">
             <span className="flex items-center gap-2 text-body text-text-secondary">
               <Mail size={16} strokeWidth={1.5} className="text-text-disabled" />
               {email}
@@ -72,50 +72,12 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
             </button>
           </div>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">
-              Contraseña<span className="text-accent"> *</span>
-            </span>
-            <div className="relative">
-              <Lock
-                size={16}
-                strokeWidth={1.5}
-                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-disabled"
-              />
-              <input
-                type="password"
-                name="password"
-                required
-                autoFocus
-                minLength={6}
-                className="w-full rounded-sm border border-border bg-bg-primary py-2 pr-3 pl-9 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-              />
-            </div>
-          </label>
-
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">
-              Confirmar contraseña<span className="text-accent"> *</span>
-            </span>
-            <div className="relative">
-              <Lock
-                size={16}
-                strokeWidth={1.5}
-                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-disabled"
-              />
-              <input
-                type="password"
-                name="confirmar_password"
-                required
-                minLength={6}
-                className="w-full rounded-sm border border-border bg-bg-primary py-2 pr-3 pl-9 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-              />
-            </div>
-          </label>
+          <PasswordInput name="password" autoFocus minLength={6} />
+          <PasswordInput name="confirmar_password" label="Confirmar contraseña" minLength={6} />
 
           <SubmitButton
             pendingLabel="Creando cuenta…"
-            className="rounded-sm bg-accent px-4 py-3 text-body text-white active:bg-accent-hover disabled:opacity-60"
+            className="rounded-full bg-accent px-4 py-3 text-body text-white active:bg-accent-hover disabled:opacity-60"
           >
             Crear cuenta
           </SubmitButton>
