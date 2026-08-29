@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { AuthShell } from "@/components/AuthShell";
+import { EnviandoOverlay } from "@/components/EnviandoOverlay";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { PasswordInput } from "@/components/PasswordInput";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -57,6 +58,8 @@ export default async function LoginPage({
         >
           Entrar
         </SubmitButton>
+
+        <EnviandoOverlay mensaje="Iniciando sesión…" />
       </form>
 
       <div className="flex items-center gap-2">

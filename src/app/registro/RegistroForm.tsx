@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Mail } from "lucide-react";
+import { EnviandoOverlay } from "@/components/EnviandoOverlay";
 import { PasswordInput } from "@/components/PasswordInput";
 import { SubmitButton } from "@/components/SubmitButton";
 import { registroAction } from "./actions";
@@ -81,6 +82,8 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
           >
             Crear cuenta
           </SubmitButton>
+
+          <EnviandoOverlay mensaje="Creando tu cuenta…" />
         </>
       )}
     </form>
