@@ -18,7 +18,7 @@ export function AuthShell({
 }) {
   return (
     <div className="relative flex flex-1 flex-col md:items-center md:justify-center md:p-8">
-      <div className="relative min-h-[30vh] flex-none overflow-hidden md:fixed md:inset-0 md:min-h-0">
+      <div className="relative min-h-[25vh] flex-none overflow-hidden md:fixed md:inset-0 md:min-h-0">
         <Image src={foto} alt="" fill priority sizes="100vw" className="object-cover" />
         <div
           className="absolute inset-0 md:backdrop-brightness-[0.8]"
