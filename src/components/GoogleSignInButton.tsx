@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
+import { CargandoOverlay } from "@/components/CargandoOverlay";
 import { createClient } from "@/lib/supabase/client";
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -29,6 +30,7 @@ export function GoogleSignInButton() {
   const contenedorRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(false);
 
   const iniciarGoogle = useCallback(() => {
     if (!CLIENT_ID || !contenedorRef.current || !window.google) return;
@@ -36,6 +38,7 @@ export function GoogleSignInButton() {
     window.google.accounts.id.initialize({
       client_id: CLIENT_ID,
       callback: async (response: CredentialResponse) => {
+        setCargando(true);
         const supabase = createClient();
         const { error: signInError } = await supabase.auth.signInWithIdToken({
           provider: "google",
@@ -44,6 +47,7 @@ export function GoogleSignInButton() {
 
         if (signInError) {
           setError("No se pudo iniciar sesión con Google");
+          setCargando(false);
           return;
         }
 
@@ -72,6 +76,7 @@ export function GoogleSignInButton() {
       />
       <div ref={contenedorRef} className="flex justify-center" />
       {error && <p className="text-small text-danger">{error}</p>}
+      <CargandoOverlay visible={cargando} mensaje="Iniciando sesión…" />
     </>
   );
 }
