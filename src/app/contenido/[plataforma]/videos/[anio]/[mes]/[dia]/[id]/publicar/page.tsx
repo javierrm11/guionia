@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import { SubmitButton } from "@/components/SubmitButton";
+import { SubirVideoYoutube } from "@/components/SubirVideoYoutube";
 import { publicarConMetadatos } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,7 @@ export default async function PublicarPage({
     .from("escenas_guion")
     .select("*")
     .eq("pieza_id", id)
+    .is("deleted_at", null)
     .order("orden");
 
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
@@ -54,60 +56,70 @@ export default async function PublicarPage({
         )}
       </div>
 
-      <form
-        action={publicarConMetadatos}
-        className="flex flex-col gap-3 rounded-md bg-bg-primary p-4"
-      >
-        <input type="hidden" name="id" value={guion.id} />
-        <input type="hidden" name="plataforma" value={plataforma} />
-        <input type="hidden" name="redirectTo" value={rutaActual} />
-
-        {plataforma === "youtube" && (
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Título para YouTube</span>
-            <input
-              type="text"
-              name="titulo_publicacion"
-              autoFocus
-              defaultValue={guion.titulo_publicacion ?? ""}
-              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-            />
-          </label>
-        )}
-
-        <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">
-            {plataforma === "youtube" ? "Descripción" : "Descripción (con hashtags)"}
-          </span>
-          <textarea
-            name="descripcion_publicacion"
-            rows={5}
-            autoFocus={plataforma !== "youtube"}
-            defaultValue={guion.descripcion_publicacion ?? ""}
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-          />
-        </label>
-
-        {plataforma === "youtube" && (
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">Etiquetas</span>
-            <input
-              type="text"
-              name="etiquetas_publicacion"
-              placeholder="separadas por comas"
-              defaultValue={guion.etiquetas_publicacion ?? ""}
-              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-            />
-          </label>
-        )}
-
-        <SubmitButton
-          pendingLabel="Publicando…"
-          className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
+      {plataforma === "youtube" ? (
+        <SubirVideoYoutube
+          id={guion.id}
+          redirectTo={rutaActual}
+          tituloInicial={guion.titulo_publicacion ?? guion.titulo}
+          descripcionInicial={guion.descripcion_publicacion ?? ""}
+          etiquetasInicial={guion.etiquetas_publicacion ?? ""}
+          botonManual={
+            <form action={publicarConMetadatos}>
+              <input type="hidden" name="id" value={guion.id} />
+              <input type="hidden" name="plataforma" value={plataforma} />
+              <input type="hidden" name="redirectTo" value={rutaActual} />
+              <input
+                type="hidden"
+                name="titulo_publicacion"
+                value={guion.titulo_publicacion ?? guion.titulo}
+              />
+              <input
+                type="hidden"
+                name="descripcion_publicacion"
+                value={guion.descripcion_publicacion ?? ""}
+              />
+              <input
+                type="hidden"
+                name="etiquetas_publicacion"
+                value={guion.etiquetas_publicacion ?? ""}
+              />
+              <SubmitButton
+                pendingLabel="Marcando…"
+                className="rounded-sm bg-neutral-bg px-4 py-2 text-body text-text-primary active:bg-border disabled:opacity-60"
+              >
+                Marcar como publicado
+              </SubmitButton>
+            </form>
+          }
+        />
+      ) : (
+        <form
+          action={publicarConMetadatos}
+          className="flex flex-col gap-3 rounded-md bg-bg-primary p-4"
         >
-          Marcar como publicado
-        </SubmitButton>
-      </form>
+          <input type="hidden" name="id" value={guion.id} />
+          <input type="hidden" name="plataforma" value={plataforma} />
+          <input type="hidden" name="redirectTo" value={rutaActual} />
+
+          <label className="flex flex-col gap-1">
+            <span className="text-h3 text-text-secondary">Descripción (con hashtags)</span>
+            <textarea
+              name="descripcion_publicacion"
+              rows={5}
+              autoFocus
+              defaultValue={guion.descripcion_publicacion ?? ""}
+              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            />
+          </label>
+
+          <SubmitButton
+            pendingLabel="Publicando…"
+            className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
+          >
+            Marcar como publicado
+          </SubmitButton>
+        </form>
+      )}
     </div>
   );
 }

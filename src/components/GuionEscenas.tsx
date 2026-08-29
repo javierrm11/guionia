@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, Pencil, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Trash2, X } from "lucide-react";
 import { Badge, type BadgeTone } from "@/components/Badge";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { EscenaTextoEditor } from "@/components/EscenaTextoEditor";
@@ -160,9 +160,11 @@ export function GuionEscenas({
                       <input type="hidden" name="redirectTo" value={rutaActual} />
                       <ConfirmButton
                         message="¿Eliminar esta escena?"
-                        className="p-2 -m-2 text-small text-accent"
+                        ariaLabel="Eliminar escena"
+                        confirmLabel="Eliminar"
+                        className="flex items-center justify-center rounded-sm bg-badge-danger p-2 text-white"
                       >
-                        Eliminar
+                        <Trash2 size={14} strokeWidth={1.5} />
                       </ConfirmButton>
                     </form>
                   )}

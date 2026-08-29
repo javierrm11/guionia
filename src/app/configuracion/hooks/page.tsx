@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 import { ConfirmButton } from "@/components/ConfirmButton";
@@ -15,6 +16,7 @@ export default async function HooksPage() {
     .from("frases_guardadas")
     .select("*")
     .eq("tipo_escena", "hook")
+    .is("deleted_at", null)
     .order("plataforma")
     .order("created_at", { ascending: false });
 
@@ -40,8 +42,13 @@ export default async function HooksPage() {
                 <form action={eliminarFrase}>
                   <input type="hidden" name="id" value={h.id} />
                   <input type="hidden" name="redirectTo" value={RUTA} />
-                  <ConfirmButton message="¿Eliminar este hook?" className="p-2 -m-2 text-small text-accent">
-                    Eliminar
+                  <ConfirmButton
+                    message="¿Eliminar este hook?"
+                    ariaLabel="Eliminar hook"
+                    confirmLabel="Eliminar"
+                    className="flex items-center justify-center rounded-sm bg-badge-danger p-2 text-white"
+                  >
+                    <Trash2 size={14} strokeWidth={1.5} />
                   </ConfirmButton>
                 </form>
               </div>

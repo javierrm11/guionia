@@ -56,6 +56,7 @@ export default async function GuionPage({
     .from("escenas_guion")
     .select("*")
     .eq("pieza_id", id)
+    .is("deleted_at", null)
     .order("orden");
 
   const escenaIds = (escenas ?? []).map((e) => e.id);

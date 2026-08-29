@@ -46,6 +46,8 @@ export async function crearFrase(formData: FormData) {
   redirect(redirectTo);
 }
 
+/** Borrado suave — la frase pasa a la papelera (`/configuracion/papelera`)
+ *  en vez de desaparecer para siempre. */
 export async function eliminarFrase(formData: FormData) {
   const supabase = await createClient();
 
@@ -55,7 +57,10 @@ export async function eliminarFrase(formData: FormData) {
   if (typeof id !== "string" || !id) throw new Error("Id inválido");
   if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
 
-  const { error } = await supabase.from("frases_guardadas").delete().eq("id", id);
+  const { error } = await supabase
+    .from("frases_guardadas")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) {
     throw new Error(error.message);
   }

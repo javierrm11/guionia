@@ -111,6 +111,32 @@ export async function guardarUrlPublicado(formData: FormData) {
   revalidatePath(redirectTo);
 }
 
+/** Tras subir el vídeo directamente desde el navegador a YouTube (subida
+ *  resumable, ver `SubirVideoYoutube.tsx`), enlaza el vídeo ya creado con el
+ *  guion — mismo resultado final que `publicarConMetadatos` +
+ *  `guardarUrlPublicado` juntas, pero sin depender de pegar la URL a mano. */
+export async function guardarVideoSubido(
+  id: string,
+  youtubeVideoId: string,
+  redirectTo: string
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("piezas_contenido")
+    .update({
+      estado: "publicado",
+      youtube_video_id: youtubeVideoId,
+      url_publicado: `https://www.youtube.com/watch?v=${youtubeVideoId}`,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(redirectTo);
+  redirect(redirectTo);
+}
+
 export async function guardarTextoEscena(formData: FormData) {
   const supabase = await createClient();
 
@@ -202,6 +228,7 @@ export async function agregarEscenaGuion(formData: FormData) {
     .from("escenas_guion")
     .select("orden")
     .eq("pieza_id", piezaId)
+    .is("deleted_at", null)
     .order("orden", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -219,6 +246,8 @@ export async function agregarEscenaGuion(formData: FormData) {
   revalidatePath(redirectTo);
 }
 
+/** Borrado suave — la escena pasa a la papelera (`/configuracion/papelera`)
+ *  en vez de desaparecer para siempre. */
 export async function eliminarEscenaGuion(formData: FormData) {
   const supabase = await createClient();
 
@@ -228,7 +257,10 @@ export async function eliminarEscenaGuion(formData: FormData) {
   if (typeof id !== "string" || !id) throw new Error("Escena inválida");
   if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
 
-  const { error } = await supabase.from("escenas_guion").delete().eq("id", id);
+  const { error } = await supabase
+    .from("escenas_guion")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath(redirectTo);
@@ -250,6 +282,7 @@ export async function moverEscenaGuion(formData: FormData) {
     .from("escenas_guion")
     .select("id, orden")
     .eq("pieza_id", piezaId)
+    .is("deleted_at", null)
     .order("orden", { ascending: true });
 
   if (!escenas) return;

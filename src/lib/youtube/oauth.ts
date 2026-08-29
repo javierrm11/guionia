@@ -1,6 +1,7 @@
 const SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
   "https://www.googleapis.com/auth/yt-analytics.readonly",
+  "https://www.googleapis.com/auth/youtube.upload",
 ].join(" ");
 
 function clientId() {
@@ -653,4 +654,57 @@ export async function obtenerRetencionVideo(
   }));
 
   return puntos.sort((a, b) => a.elapsedRatio - b.elapsedRatio);
+}
+
+export type MetadatosSubidaYoutube = {
+  titulo: string;
+  descripcion: string;
+  etiquetas: string[];
+  privacidad: "public" | "unlisted" | "private";
+  /** ISO 8601 — si se manda, YouTube publica el vídeo solo en esa fecha/hora
+   *  (lo sube como privado hasta entonces; no hace falta ningún cron propio). */
+  publicarEn?: string;
+};
+
+/**
+ * Abre una sesión de subida "resumable" — el servidor solo manda los
+ * metadatos (payload minúsculo); los bytes del vídeo los sube el propio
+ * navegador directamente contra la URL devuelta, sin pasar por nuestras
+ * funciones serverless (Vercel limita el payload a unos pocos MB).
+ */
+export async function iniciarSubidaResumable(
+  accessToken: string,
+  metadata: MetadatosSubidaYoutube
+): Promise<string> {
+  const res = await fetch(
+    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        snippet: {
+          title: metadata.titulo,
+          description: metadata.descripcion,
+          tags: metadata.etiquetas,
+        },
+        status: metadata.publicarEn
+          ? { privacyStatus: "private", publishAt: metadata.publicarEn }
+          : { privacyStatus: metadata.privacidad },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`No se pudo iniciar la subida a YouTube (${res.status})`);
+  }
+
+  const uploadUrl = res.headers.get("Location");
+  if (!uploadUrl) {
+    throw new Error("Google no devolvió la URL de subida");
+  }
+
+  return uploadUrl;
 }

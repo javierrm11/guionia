@@ -90,11 +90,18 @@ export default async function IdeasGlobalPage({
   const { p } = await searchParams;
   const filtro = p && isPlataforma(p) ? p : null;
 
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("*")
-    .in("estado", ESTADOS_IDEA)
-    .order("created_at", { ascending: false });
+  const [{ data }, { data: plataformasActivasData }] = await Promise.all([
+    supabase
+      .from("piezas_contenido")
+      .select("*")
+      .in("estado", ESTADOS_IDEA)
+      .order("created_at", { ascending: false }),
+    supabase.from("plataformas_activas").select("plataforma"),
+  ]);
+
+  const plataformasActivas = (plataformasActivasData ?? [])
+    .map((r) => r.plataforma)
+    .filter(isPlataforma);
 
   const todas = (data ?? []) as Idea[];
   const plataformasConIdeas = [...new Set(todas.map((i) => i.plataforma))].filter(isPlataforma);
@@ -203,12 +210,17 @@ export default async function IdeasGlobalPage({
               {filtro ? "Sin ideas en esta plataforma" : "Todavía no hay ideas guardadas"}
             </h2>
             <p className="text-small text-text-secondary">
-              Captúralas desde Inicio en cuanto se te ocurran, antes de que se te olviden.
+              Apúntala en cuanto se te ocurra, antes de que se te olvide.
             </p>
           </div>
-          <Link href="/contenido" className="text-small text-accent hover:underline">
-            Ir a la captura rápida →
-          </Link>
+          {(filtro ?? plataformasActivas[0]) && (
+            <Link
+              href={`/contenido/${filtro ?? plataformasActivas[0]}/ideas/nueva`}
+              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+            >
+              + Nueva idea
+            </Link>
+          )}
         </section>
       )}
     </div>

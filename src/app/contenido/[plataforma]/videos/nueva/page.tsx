@@ -29,6 +29,7 @@ export default async function NuevoVideoPage({
     .from("frases_guardadas")
     .select("id, tipo_escena, texto")
     .eq("plataforma", plataforma)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   return (

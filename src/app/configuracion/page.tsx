@@ -5,6 +5,7 @@ import {
   Lightbulb,
   LogOut,
   MessageSquare,
+  Trash2,
   Video,
 } from "lucide-react";
 import { Tile } from "@/components/Tile";
@@ -25,6 +26,7 @@ export default function ConfiguracionPage() {
         />
         <Tile href="/configuracion/hooks" label="Banco de hooks" icon={Lightbulb} />
         <Tile href="/configuracion/ctas" label="Banco de CTAs" icon={MessageSquare} />
+        <Tile href="/configuracion/papelera" label="Papelera" icon={Trash2} />
 
         <form action={logoutAction} className="contents">
           <button
