@@ -3,23 +3,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { CopiarGuionButton } from "@/components/CopiarGuionButton";
+import { EstadisticasTiktokVideo } from "@/components/EstadisticasTiktokVideo";
+import { EstadisticasVideoLoader } from "@/components/EstadisticasVideoLoader";
+import { EstadisticasYoutubeVideo } from "@/components/EstadisticasYoutubeVideo";
 import { GuionEscenas } from "@/components/GuionEscenas";
 import { RetencionSection } from "@/components/RetencionSection";
 import { RetencionLoader } from "@/components/RetencionLoader";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Eye, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoYoutube } from "@/lib/youtube/conexion";
-import {
-  extraerVideoId as extraerVideoIdYoutube,
-  obtenerEstadisticasVideos as obtenerEstadisticasVideosYoutube,
-} from "@/lib/youtube/oauth";
-import { obtenerAccessTokenValido as obtenerAccessTokenValidoTiktok } from "@/lib/tiktok/conexion";
-import {
-  extraerVideoId as extraerVideoIdTiktok,
-  obtenerEstadisticasVideos as obtenerEstadisticasVideosTiktok,
-} from "@/lib/tiktok/oauth";
+import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
+import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
 import { ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, getSiguienteEstadoVideo } from "@/lib/contenido";
 import {
   agregarEscenaGuion,
@@ -82,8 +77,9 @@ export default async function GuionPage({
   const siguiente = getSiguienteEstadoVideo(guion.estado);
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
 
-  let estadisticasYoutube: { vistas: number; likes: number; comentarios: number } | null = null;
-  let estadisticasYoutubeError = false;
+  // La llamada a la Data API (vistas/likes/comentarios) y la de retención van
+  // en componentes async aparte, streamed vía <Suspense> — no deben bloquear
+  // el resto de la página, que ya está disponible al instante desde la BD.
   let youtubeVideoId: string | null = null;
   let youtubeAccessToken: string | null = null;
   if (plataforma === "youtube" && guion.estado === "publicado" && guion.url_publicado) {
@@ -96,39 +92,13 @@ export default async function GuionPage({
       if (accessToken) {
         youtubeVideoId = videoId;
         youtubeAccessToken = accessToken;
-        try {
-          const stats = await obtenerEstadisticasVideosYoutube([videoId], accessToken);
-          estadisticasYoutube = stats[videoId] ?? null;
-        } catch {
-          estadisticasYoutubeError = true;
-        }
       }
     }
   }
 
-  let estadisticasTiktok: {
-    vistas: number;
-    likes: number;
-    comentarios: number;
-    compartidos: number;
-  } | null = null;
-  let estadisticasTiktokError = false;
+  let tiktokVideoId: string | null = null;
   if (plataforma === "tiktok" && guion.estado === "publicado" && guion.url_publicado) {
-    const videoId = guion.tiktok_video_id ?? extraerVideoIdTiktok(guion.url_publicado);
-    if (videoId) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      const accessToken = user ? await obtenerAccessTokenValidoTiktok(supabase, user.id) : null;
-      if (accessToken) {
-        try {
-          const stats = await obtenerEstadisticasVideosTiktok([videoId], accessToken);
-          estadisticasTiktok = stats[videoId] ?? null;
-        } catch {
-          estadisticasTiktokError = true;
-        }
-      }
-    }
+    tiktokVideoId = guion.tiktok_video_id ?? extraerVideoIdTiktok(guion.url_publicado);
   }
 
   const textoCompleto =
@@ -242,38 +212,10 @@ export default async function GuionPage({
         </div>
       )}
 
-      {estadisticasYoutubeError && (
-        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-          <h2 className="text-h2">Estadísticas de YouTube</h2>
-          <p className="text-small text-danger">
-            No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
-          </p>
-        </div>
-      )}
-
-      {estadisticasYoutube && (
-        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-          <h2 className="text-h2">Estadísticas de YouTube</h2>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center gap-1">
-              <Eye size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">{estadisticasYoutube.vistas.toLocaleString("es-ES")}</span>
-              <span className="text-caption text-text-secondary">vistas</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <ThumbsUp size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">{estadisticasYoutube.likes.toLocaleString("es-ES")}</span>
-              <span className="text-caption text-text-secondary">likes</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <MessageCircle size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">
-                {estadisticasYoutube.comentarios.toLocaleString("es-ES")}
-              </span>
-              <span className="text-caption text-text-secondary">comentarios</span>
-            </div>
-          </div>
-        </div>
+      {youtubeVideoId && youtubeAccessToken && (
+        <Suspense fallback={<EstadisticasVideoLoader titulo="Estadísticas de YouTube" />}>
+          <EstadisticasYoutubeVideo videoId={youtubeVideoId} accessToken={youtubeAccessToken} />
+        </Suspense>
       )}
 
       {youtubeVideoId && youtubeAccessToken && (
@@ -282,45 +224,10 @@ export default async function GuionPage({
         </Suspense>
       )}
 
-      {estadisticasTiktokError && (
-        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-          <h2 className="text-h2">Estadísticas de TikTok</h2>
-          <p className="text-small text-danger">
-            No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
-          </p>
-        </div>
-      )}
-
-      {estadisticasTiktok && (
-        <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
-          <h2 className="text-h2">Estadísticas de TikTok</h2>
-          <div className="grid grid-cols-4 gap-3">
-            <div className="flex flex-col items-center gap-1">
-              <Eye size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">{estadisticasTiktok.vistas.toLocaleString("es-ES")}</span>
-              <span className="text-caption text-text-secondary">vistas</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <ThumbsUp size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">{estadisticasTiktok.likes.toLocaleString("es-ES")}</span>
-              <span className="text-caption text-text-secondary">likes</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <MessageCircle size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">
-                {estadisticasTiktok.comentarios.toLocaleString("es-ES")}
-              </span>
-              <span className="text-caption text-text-secondary">comentarios</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <Share2 size={18} strokeWidth={1.5} className="text-accent" />
-              <span className="text-h3">
-                {estadisticasTiktok.compartidos.toLocaleString("es-ES")}
-              </span>
-              <span className="text-caption text-text-secondary">compartidos</span>
-            </div>
-          </div>
-        </div>
+      {tiktokVideoId && (
+        <Suspense fallback={<EstadisticasVideoLoader titulo="Estadísticas de TikTok" />}>
+          <EstadisticasTiktokVideo videoId={tiktokVideoId} />
+        </Suspense>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
