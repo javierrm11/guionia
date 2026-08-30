@@ -192,3 +192,12 @@ textarea::placeholder {
 .text-accent {
   color: var(--link);
 }
+
+/* Carruseles horizontales con flechas propias (TendenciasCarrusel) — oculta
+   la barra nativa, el desplazamiento sigue funcionando por swipe/flechas. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

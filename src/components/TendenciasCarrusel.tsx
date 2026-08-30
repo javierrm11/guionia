@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight, Eye, TrendingUp } from "lucide-react";
+import { CarruselFlechas } from "@/components/CarruselFlechas";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerVideosParaTi } from "@/lib/youtube/videosParaTi";
 
@@ -24,20 +26,25 @@ export async function TendenciasCarrusel() {
   const videos = resultado.videos.slice(0, LIMITE);
 
   return (
-    <section className="flex flex-col gap-3 border-b border-border py-6">
+    <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6">
       <div className="flex items-center justify-between">
         <span
-          className="text-caption font-display text-text-secondary uppercase"
+          className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase"
           style={{ letterSpacing: "0.06em" }}
         >
+          <TrendingUp size={14} strokeWidth={1.5} />
           Tendencias
         </span>
-        <Link href="/contenido/tendencias" className="text-caption text-accent">
+        <Link
+          href="/contenido/tendencias"
+          className="flex items-center gap-0.5 text-caption text-text-secondary"
+        >
           Ver todas
+          <ChevronRight size={14} strokeWidth={2} />
         </Link>
       </div>
 
-      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8">
+      <CarruselFlechas>
         {videos.map((v) => (
           <a
             key={v.videoId}
@@ -47,7 +54,14 @@ export async function TendenciasCarrusel() {
             className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
           >
             {v.miniatura && (
-              <Image src={v.miniatura} alt="" fill sizes="128px" className="object-cover" />
+              <Image
+                src={v.miniatura}
+                alt=""
+                fill
+                sizes="256px"
+                quality={90}
+                className="object-cover"
+              />
             )}
             <div
               className="absolute inset-0"
@@ -56,13 +70,17 @@ export async function TendenciasCarrusel() {
                   "linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.15) 55%, transparent)",
               }}
             />
+            <span className="absolute top-2 left-2 z-10 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-caption text-white">
+              <Eye size={12} strokeWidth={1.5} />
+              {v.vistas.toLocaleString("es-ES")}
+            </span>
             <div className="relative z-10 flex flex-col gap-0.5 p-2">
-              <p className="line-clamp-2 text-caption font-medium text-white">{v.titulo}</p>
+              <p className="truncate text-[11px] font-medium text-white">{v.titulo}</p>
               <p className="truncate text-caption text-white/70">{v.canal}</p>
             </div>
           </a>
         ))}
-      </div>
+      </CarruselFlechas>
     </section>
   );
 }

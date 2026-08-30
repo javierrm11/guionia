@@ -34,6 +34,10 @@ import { guardarPlataformasActivas } from "../configuracion/plataformas/actions"
 
 export const dynamic = "force-dynamic";
 
+function diasDesde(fechaISO: string) {
+  return Math.floor((Date.now() - new Date(fechaISO).getTime()) / 86400000);
+}
+
 function hrefVideo(plataforma: string, fechaPublicacion: string, id: string) {
   const [anio, mes, dia] = fechaPublicacion.split("-");
   return `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${id}`;
@@ -114,7 +118,6 @@ export default async function ContenidoPage() {
   const hechasSemana = progreso.reduce((suma, p) => suma + p.hechas, 0);
   const hayCadencia = objetivoSemana > 0;
   const porcentajeCadencia = hayCadencia ? Math.round((hechasSemana / objetivoSemana) * 100) : 0;
-  const progresoPorPlataforma = new Map(progreso.map((p) => [p.plataforma, p]));
 
   // Las piezas reales van primero — así el hero prioriza una pieza ya en
   // curso sobre una entrada de plantilla que todavía no tiene nada empezado.
@@ -160,21 +163,6 @@ export default async function ContenidoPage() {
           </Link>
           <BarraCadencia porcentaje={porcentajeCadencia} />
           <span className="text-caption text-white/80">de la cadencia semanal</span>
-          <div className="flex items-center justify-center gap-1.5 pt-1">
-            {plataformasActivas.map((p) => {
-              const prog = progresoPorPlataforma.get(p);
-              const completa = prog ? prog.hechas >= prog.cantidad : false;
-              return (
-                <span
-                  key={p}
-                  title={`${PLATAFORMA_LABEL[p]}: ${prog ? `${prog.hechas} de ${prog.cantidad}` : "sin cadencia"}`}
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    completa ? "bg-success" : prog ? "bg-white" : "bg-white/30"
-                  }`}
-                />
-              );
-            })}
-          </div>
         </section>
       ) : (
         <>
@@ -224,7 +212,7 @@ export default async function ContenidoPage() {
             return (
               <Link
                 href={tareaHero.href}
-                className="flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-accent-bg active:bg-accent-bg"
+                className="flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg"
               >
                 <span
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
@@ -344,18 +332,17 @@ export default async function ContenidoPage() {
             </div>
           </div>
 
-          <div className="flex flex-col">
-            {ultimasIdeas.map((idea, index) => {
+          <div className="flex flex-col gap-2">
+            {ultimasIdeas.map((idea) => {
               const Icon = PLATAFORMA_ICON[idea.plataforma];
               const tono = PLATAFORMA_TONO[idea.plataforma];
+              const dias = diasDesde(idea.created_at);
 
               return (
                 <Link
                   key={idea.id}
                   href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-                  className={`flex min-h-11 items-center gap-2.5 hover:opacity-70 ${
-                    index > 0 ? "border-t border-border" : ""
-                  }`}
+                  className="flex items-center gap-2.5 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
                 >
                   <span
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"
@@ -363,7 +350,10 @@ export default async function ContenidoPage() {
                   >
                     <Icon size={14} strokeWidth={1.5} className="text-white" />
                   </span>
-                  <span className="flex-1 truncate text-body">{idea.titulo}</span>
+                  <span className="min-w-0 flex-1 truncate text-body">{idea.titulo}</span>
+                  <span className="shrink-0 text-caption text-text-disabled">
+                    {dias === 0 ? "Hoy" : `hace ${dias} ${dias === 1 ? "día" : "días"}`}
+                  </span>
                 </Link>
               );
             })}

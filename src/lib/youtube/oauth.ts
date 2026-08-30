@@ -333,7 +333,11 @@ export async function obtenerVideosTendencia(
       categoryId: item.snippet.categoryId ?? null,
       titulo: item.snippet.title,
       canal: item.snippet.channelTitle,
-      miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
+      miniatura:
+        item.snippet.thumbnails?.high?.url ??
+        item.snippet.thumbnails?.medium?.url ??
+        item.snippet.thumbnails?.default?.url ??
+        null,
       vistas: Number(item.statistics?.viewCount ?? 0),
       publicadoEn: item.snippet.publishedAt,
     })

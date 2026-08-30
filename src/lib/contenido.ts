@@ -306,19 +306,20 @@ export type IdeaReciente = {
   id: string;
   titulo: string;
   plataforma: Plataforma;
+  created_at: string;
 };
 
 /** Las últimas ideas guardadas (sin descartar) — para no perderlas de vista en el dashboard. */
 export async function getUltimasIdeas(
   supabase: SupabaseClient,
   plataformas: Plataforma[],
-  limite = 4
+  limite = 3
 ): Promise<IdeaReciente[]> {
   if (plataformas.length === 0) return [];
 
   const { data } = await supabase
     .from("piezas_contenido")
-    .select("id, titulo, plataforma")
+    .select("id, titulo, plataforma, created_at")
     .in("plataforma", plataformas)
     .eq("estado", "idea")
     .order("created_at", { ascending: false })
