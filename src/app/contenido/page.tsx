@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CalendarDays, ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
 import { Badge } from "@/components/Badge";
+import { CapturaIdeaInline } from "@/components/CapturaIdeaInline";
 import { GaugeCadencia } from "@/components/GaugeCadencia";
 import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
@@ -37,6 +38,24 @@ function hrefVideo(plataforma: string, fechaPublicacion: string, id: string) {
   const [anio, mes, dia] = fechaPublicacion.split("-");
   return `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${id}`;
 }
+
+/** Qué toca hacer a continuación con una pieza real, según su estado —
+ *  mismo criterio que ya usaba el badge de "Hoy": guion escrito → toca
+ *  grabar, grabado → toca editar, editado → toca publicar. */
+const VERBO_SIGUIENTE: Record<string, string> = {
+  guion_escrito: "Toca grabar",
+  grabado: "Toca editar",
+  editado: "Toca publicar",
+};
+
+type Tarea = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma | null;
+  /** `null` = entrada de plantilla, sin pieza real todavía. */
+  estado: string | null;
+  href: string;
+};
 
 export default async function ContenidoPage() {
   const supabase = await createClient();
@@ -97,6 +116,28 @@ export default async function ContenidoPage() {
   const porcentajeCadencia = hayCadencia ? Math.round((hechasSemana / objetivoSemana) * 100) : 0;
   const progresoPorPlataforma = new Map(progreso.map((p) => [p.plataforma, p]));
 
+  // Las piezas reales van primero — así el hero prioriza una pieza ya en
+  // curso sobre una entrada de plantilla que todavía no tiene nada empezado.
+  const tareas: Tarea[] = [
+    ...paraHoy.map((p) => ({
+      id: p.id,
+      titulo: p.titulo,
+      plataforma: p.plataforma,
+      estado: p.estado,
+      href: hrefVideo(p.plataforma, p.fecha_publicacion, p.id),
+    })),
+    ...plantillaHoy.map((entrada) => ({
+      id: entrada.id,
+      titulo: entrada.nota,
+      plataforma: entrada.plataforma,
+      estado: null,
+      href: entrada.plataforma
+        ? `/contenido/${entrada.plataforma}/videos/nueva?fecha=${hoy}`
+        : "/configuracion/plantilla",
+    })),
+  ];
+  const [tareaHero, ...tareasResto] = tareas;
+
   return (
     <div className="relative flex flex-1 flex-col">
       <div className="pointer-events-none absolute inset-x-0 z-0" style={{ top: -56 }}>
@@ -106,7 +147,8 @@ export default async function ContenidoPage() {
       <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       {hayCadencia ? (
         <section className="flex flex-col items-center gap-1 pb-7">
-          <span
+          <Link
+            href="/contenido/plataformas?vista=calendario"
             className="mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white"
             style={{
               backgroundImage: "linear-gradient(135deg, #FFD23F, #FF6B35 55%, #E8393B)",
@@ -115,9 +157,24 @@ export default async function ContenidoPage() {
           >
             <Flame size={14} strokeWidth={0} fill="#FFFFFF" />
             {racha} {racha === 1 ? "semana seguida" : "semanas seguidas"}
-          </span>
+          </Link>
           <GaugeCadencia porcentaje={porcentajeCadencia} />
           <span className="text-caption text-white/80">de la cadencia semanal</span>
+          <div className="flex items-center justify-center gap-1.5 pt-1">
+            {plataformasActivas.map((p) => {
+              const prog = progresoPorPlataforma.get(p);
+              const completa = prog ? prog.hechas >= prog.cantidad : false;
+              return (
+                <span
+                  key={p}
+                  title={`${PLATAFORMA_LABEL[p]}: ${prog ? `${prog.hechas} de ${prog.cantidad}` : "sin cadencia"}`}
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    completa ? "bg-success" : prog ? "bg-white" : "bg-white/30"
+                  }`}
+                />
+              );
+            })}
+          </div>
         </section>
       ) : (
         <>
@@ -153,101 +210,84 @@ export default async function ContenidoPage() {
         </>
       )}
 
-      {(paraHoy.length > 0 || plantillaHoy.length > 0) && (
+      {tareaHero && (
         <section className="flex flex-col gap-3 pt-6 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-accent px-3 py-1 text-small font-semibold text-white">
-              Hoy
-            </span>
-            <span className="text-caption text-text-secondary">
-              {paraHoy.length + plantillaHoy.length}{" "}
-              {paraHoy.length + plantillaHoy.length === 1 ? "tarea" : "tareas"}
-            </span>
-          </div>
+          {(() => {
+            const Icon = tareaHero.plataforma ? PLATAFORMA_ICON[tareaHero.plataforma] : Plus;
+            const tono = tareaHero.plataforma
+              ? PLATAFORMA_TONO[tareaHero.plataforma]
+              : "var(--neutral)";
+            const etiqueta = tareaHero.estado
+              ? (VERBO_SIGUIENTE[tareaHero.estado] ?? ESTADO_PIEZA_LABEL[tareaHero.estado])
+              : "Publicar hoy";
 
-          <div className="flex flex-col gap-2">
-            {paraHoy.map((p) => {
-              const Icon = PLATAFORMA_ICON[p.plataforma];
-              const tono = PLATAFORMA_TONO[p.plataforma];
-
-              return (
-                <Link
-                  key={p.id}
-                  href={hrefVideo(p.plataforma, p.fecha_publicacion, p.id)}
-                  className="flex items-center gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+            return (
+              <Link
+                href={tareaHero.href}
+                className="flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-accent-bg active:bg-accent-bg"
+              >
+                <span
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                  style={{ backgroundColor: tono }}
                 >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
-                    style={{ backgroundColor: tono }}
-                  >
-                    <Icon size={16} strokeWidth={1.5} className="text-white" />
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-body">{p.titulo}</span>
-                  <Badge tone={ESTADO_PIEZA_TONE[p.estado]}>{ESTADO_PIEZA_LABEL[p.estado]}</Badge>
-                </Link>
-              );
-            })}
-            {plantillaHoy.map((entrada) => {
-              const Icon = entrada.plataforma ? PLATAFORMA_ICON[entrada.plataforma] : Plus;
-              const tono = entrada.plataforma ? PLATAFORMA_TONO[entrada.plataforma] : "var(--neutral)";
+                  <Icon size={20} strokeWidth={1.5} className="text-white" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-caption font-semibold text-accent">{etiqueta}</span>
+                  <p className="truncate text-h2">{tareaHero.titulo}</p>
+                </div>
+                <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
+              </Link>
+            );
+          })()}
 
-              return (
-                <Link
-                  key={entrada.id}
-                  href={
-                    entrada.plataforma
-                      ? `/contenido/${entrada.plataforma}/videos/nueva?fecha=${hoy}`
-                      : "/configuracion/plantilla"
-                  }
-                  className="flex items-center gap-3 rounded-md bg-bg-primary p-3 opacity-70 hover:opacity-100 active:bg-accent-bg"
+          {tareasResto.length > 0 && (
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="flex items-center gap-2 px-1">
+                <span
+                  className="text-caption font-display text-text-secondary uppercase"
+                  style={{ letterSpacing: "0.06em" }}
                 >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
-                    style={{ backgroundColor: tono }}
+                  Más para hoy
+                </span>
+                <span className="text-caption text-text-disabled">{tareasResto.length}</span>
+              </div>
+
+              {tareasResto.map((t) => {
+                const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
+                const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
+                const pendiente = t.estado === null;
+
+                return (
+                  <Link
+                    key={t.id}
+                    href={t.href}
+                    className={`flex items-center gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg ${
+                      pendiente ? "opacity-70 hover:opacity-100" : ""
+                    }`}
                   >
-                    <Icon size={16} strokeWidth={1.5} className="text-white" />
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-body text-text-secondary">
-                    {entrada.nota}
-                    {entrada.plataforma && ` · ${PLATAFORMA_LABEL[entrada.plataforma]}`}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+                    <span
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
+                      style={{ backgroundColor: tono }}
+                    >
+                      <Icon size={16} strokeWidth={1.5} className="text-white" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-body">
+                      {t.titulo}
+                      {pendiente && t.plataforma && ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
+                    </span>
+                    {t.estado && (
+                      <Badge tone={ESTADO_PIEZA_TONE[t.estado]}>{ESTADO_PIEZA_LABEL[t.estado]}</Badge>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </section>
       )}
 
-      <div className="border-b border-border pt-3 pb-6">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-          {plataformasActivas.map((p) => {
-            const Icon = PLATAFORMA_ICON[p];
-            const tono = PLATAFORMA_TONO[p];
-            const prog = progresoPorPlataforma.get(p);
-
-            return (
-              <Link key={p} href={`/contenido/${p}/videos`} className="flex items-center gap-2.5">
-                <span
-                  className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]"
-                  style={{ backgroundColor: tono }}
-                >
-                  <Icon size={14} strokeWidth={1.5} className="text-white" />
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-small font-semibold text-text-primary">
-                    {PLATAFORMA_LABEL[p]}
-                  </p>
-                  <p className="text-caption text-text-secondary">
-                    {prog ? `${prog.hechas} de ${prog.cantidad}` : "Sin cadencia"}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {!hayCadencia && paraHoy.length === 0 && plantillaHoy.length === 0 && ultimasIdeas.length === 0 && (
+      {!hayCadencia && tareas.length === 0 && ultimasIdeas.length === 0 && (
         <section className="flex flex-col items-center gap-3 py-10 text-center">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
             <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
@@ -296,9 +336,12 @@ export default async function ContenidoPage() {
             >
               Ideas
             </span>
-            <Link href="/contenido/ideas" className="text-caption text-accent">
-              Ver todas
-            </Link>
+            <div className="flex items-center gap-3">
+              <CapturaIdeaInline plataformas={plataformasActivas as Plataforma[]} />
+              <Link href="/contenido/ideas" className="text-caption text-accent">
+                Ver todas
+              </Link>
+            </div>
           </div>
 
           <div className="flex flex-col">
