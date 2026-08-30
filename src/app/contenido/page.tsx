@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CalendarDays, ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
 import { Badge } from "@/components/Badge";
+import { BarraCadencia } from "@/components/BarraCadencia";
 import { CapturaIdeaInline } from "@/components/CapturaIdeaInline";
-import { GaugeCadencia } from "@/components/GaugeCadencia";
 import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
@@ -146,7 +146,7 @@ export default async function ContenidoPage() {
 
       <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       {hayCadencia ? (
-        <section className="flex flex-col items-center gap-1 pb-7">
+        <section className="flex flex-col items-center gap-1 pb-4">
           <Link
             href="/contenido/plataformas?vista=calendario"
             className="mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white"
@@ -158,7 +158,7 @@ export default async function ContenidoPage() {
             <Flame size={14} strokeWidth={0} fill="#FFFFFF" />
             {racha} {racha === 1 ? "semana seguida" : "semanas seguidas"}
           </Link>
-          <GaugeCadencia porcentaje={porcentajeCadencia} />
+          <BarraCadencia porcentaje={porcentajeCadencia} />
           <span className="text-caption text-white/80">de la cadencia semanal</span>
           <div className="flex items-center justify-center gap-1.5 pt-1">
             {plataformasActivas.map((p) => {
