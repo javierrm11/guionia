@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
+import { CalendarDays, ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { GaugeCadencia } from "@/components/GaugeCadencia";
 import { OndaCadencia } from "@/components/OndaCadencia";
@@ -265,6 +265,22 @@ export default async function ContenidoPage() {
             Nueva idea
           </Link>
         </section>
+      )}
+
+      {hayCadencia && (
+        <div className="grid grid-cols-3 gap-3">
+          <Tile
+            href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
+            label="Nueva idea"
+            icon={Lightbulb}
+          />
+          <Tile
+            href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
+            label="Nuevo vídeo"
+            icon={Video}
+          />
+          <Tile href="/contenido/plataformas?vista=calendario" label="Calendario" icon={CalendarDays} />
+        </div>
       )}
 
       <Suspense fallback={null}>
