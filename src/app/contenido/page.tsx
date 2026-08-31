@@ -316,18 +316,23 @@ export default async function ContenidoPage() {
       </Suspense>
 
       {ultimasIdeas.length > 0 && (
-        <section className="flex flex-col gap-3 border-b border-border py-6">
+        <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6">
           <div className="flex items-center justify-between">
             <span
-              className="text-caption font-display text-text-secondary uppercase"
+              className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase"
               style={{ letterSpacing: "0.06em" }}
             >
+              <Lightbulb size={14} strokeWidth={1.5} />
               Ideas
             </span>
             <div className="flex items-center gap-3">
               <CapturaIdeaInline plataformas={plataformasActivas as Plataforma[]} />
-              <Link href="/contenido/ideas" className="text-caption text-accent">
+              <Link
+                href="/contenido/ideas"
+                className="flex items-center gap-0.5 text-caption text-text-secondary"
+              >
                 Ver todas
+                <ChevronRight size={14} strokeWidth={2} />
               </Link>
             </div>
           </div>
