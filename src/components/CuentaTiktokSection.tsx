@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Eye, Heart, MessageSquare, Share2, Users, Video } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerAccessTokenValido } from "@/lib/tiktok/conexion";
 import {
@@ -30,7 +31,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   if (!accessToken) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-md border border-border p-4">
+      <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
         <p className="text-small text-text-secondary">
           Conecta TikTok para ver las estadísticas de tu cuenta.
         </p>
@@ -48,7 +49,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     await obtenerCuentaPropia(accessToken);
   } catch {
     return (
-      <div className="rounded-md border border-border p-4">
+      <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
           No se pudieron cargar las estadísticas de TikTok ahora mismo. Inténtalo de nuevo más tarde.
         </p>
@@ -169,18 +170,26 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
             {hayComparativa && (
               <>
                 <StatMes
+                  icon={Eye}
                   etiqueta="Vistas"
                   actual={actual.vistas}
                   anterior={anterior?.vistas ?? null}
                 />
-                <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
+                <StatMes icon={Video} etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
                 <StatMes
+                  icon={MessageSquare}
                   etiqueta="Comentarios"
                   actual={actual.comentarios}
                   anterior={anterior?.comentarios ?? null}
                 />
-                <StatMes etiqueta="Likes" actual={actual.likes} anterior={anterior?.likes ?? null} />
                 <StatMes
+                  icon={Heart}
+                  etiqueta="Likes"
+                  actual={actual.likes}
+                  anterior={anterior?.likes ?? null}
+                />
+                <StatMes
+                  icon={Share2}
                   etiqueta="Compartidos"
                   actual={actual.compartidos}
                   anterior={anterior?.compartidos ?? null}
@@ -188,7 +197,12 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
               </>
             )}
             {estadisticasCuenta && (
-              <StatMes etiqueta="Seguidores" actual={estadisticasCuenta.seguidores} anterior={null} />
+              <StatMes
+                icon={Users}
+                etiqueta="Seguidores"
+                actual={estadisticasCuenta.seguidores}
+                anterior={null}
+              />
             )}
           </div>
         </div>

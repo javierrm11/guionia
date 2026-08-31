@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react";
 
 function formatoNumero(n: number) {
   return n.toLocaleString("es-ES");
@@ -22,15 +22,22 @@ export function StatMes({
   actual,
   anterior,
   sufijo = "",
+  icon: Icon,
 }: {
   etiqueta: string;
   actual: number;
   anterior: number | null;
   /** Añadido tras el número, p. ej. " h" para tiempo de visualización. */
   sufijo?: string;
+  icon?: LucideIcon;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-md border border-border p-4">
+    <div className="flex flex-col gap-2 rounded-md bg-bg-primary p-4">
+      {Icon && (
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-bg">
+          <Icon size={16} strokeWidth={1.5} className="text-accent" />
+        </span>
+      )}
       <span className="text-caption text-text-secondary">{etiqueta}</span>
       <span className="text-h2">
         {formatoNumero(actual)}

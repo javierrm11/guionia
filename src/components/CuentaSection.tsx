@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Clock, Eye, Heart, MessageSquare, Users, Video } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerAccessTokenValido } from "@/lib/youtube/conexion";
 import {
@@ -28,7 +29,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
 
   if (!accessToken) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-md border border-border p-4">
+      <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
         <p className="text-small text-text-secondary">
           Conecta YouTube para ver las estadísticas de tu cuenta.
         </p>
@@ -82,7 +83,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
 
   if (error || !canal) {
     return (
-      <div className="rounded-md border border-border p-4">
+      <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
           No se pudieron cargar las estadísticas de YouTube ahora mismo. Inténtalo de nuevo más tarde.
         </p>
@@ -96,22 +97,26 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
             <StatMes
+              icon={Eye}
               etiqueta="Vistas"
               actual={comparativa.actual.vistas}
               anterior={comparativa.anterior?.vistas ?? null}
             />
-            <StatMes etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
+            <StatMes icon={Video} etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
             <StatMes
+              icon={MessageSquare}
               etiqueta="Comentarios"
               actual={comparativa.actual.comentarios}
               anterior={comparativa.anterior?.comentarios ?? null}
             />
             <StatMes
+              icon={Heart}
               etiqueta="Likes"
               actual={comparativa.actual.likes}
               anterior={comparativa.anterior?.likes ?? null}
             />
             <StatMes
+              icon={Users}
               etiqueta="Suscriptores (neto)"
               actual={comparativa.actual.suscriptoresGanados - comparativa.actual.suscriptoresPerdidos}
               anterior={
@@ -121,6 +126,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
               }
             />
             <StatMes
+              icon={Clock}
               etiqueta="Tiempo de visualización"
               actual={Math.round(comparativa.actual.minutosVistos / 60)}
               anterior={
@@ -179,7 +185,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
           >
             De dónde vienen tus vistas
           </span>
-          <div className="flex flex-col gap-2.5 rounded-md border border-border p-4">
+          <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4">
             {fuentesTrafico.map((fuente) => (
               <div key={fuente.fuente} className="flex flex-col gap-1">
                 <div className="flex items-center justify-between text-small">
