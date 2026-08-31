@@ -58,8 +58,8 @@ export default async function PlantillaPage() {
                 </div>
                 <div className="min-w-0 flex-1 pb-4">
                   {entradas.length > 0 ? (
-                    <div className="flex flex-col gap-2">
-                      {entradas.map((entrada) => {
+                    <div className="flex flex-col">
+                      {entradas.map((entrada, entradaIndex) => {
                         const plataforma = entrada.plataforma as Plataforma | null;
                         const Icon = plataforma ? PLATAFORMA_ICON[plataforma] : FileText;
                         const tono = plataforma ? PLATAFORMA_TONO[plataforma] : "var(--neutral)";
@@ -67,7 +67,9 @@ export default async function PlantillaPage() {
                         return (
                           <div
                             key={entrada.id}
-                            className="flex items-center gap-3 rounded-md bg-bg-primary p-3"
+                            className={`flex items-center gap-3 py-2 ${
+                              entradaIndex > 0 ? "border-t border-border" : ""
+                            }`}
                           >
                             <span
                               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"

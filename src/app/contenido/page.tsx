@@ -74,7 +74,7 @@ export default async function ContenidoPage() {
   if (plataformasActivas.length === 0) {
     return (
       <div className="flex flex-1 flex-col gap-6 p-4">
-        <section className="flex flex-col gap-4 rounded-md bg-bg-primary p-6">
+        <section className="flex flex-col gap-4 rounded-md border border-border p-6">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
             <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
           </span>
@@ -171,7 +171,7 @@ export default async function ContenidoPage() {
           </p>
           <Link
             href="/configuracion/cadencia"
-            className="mb-6 flex items-center justify-between rounded-md bg-bg-primary p-4"
+            className="mb-6 flex items-center justify-between rounded-md border border-border p-4"
           >
             <div className="flex flex-col gap-0.5">
               <span className="text-h3">Define tu cadencia semanal</span>
@@ -230,8 +230,8 @@ export default async function ContenidoPage() {
           })()}
 
           {tareasResto.length > 0 && (
-            <div className="flex flex-col gap-2 pt-1">
-              <div className="flex items-center gap-2 px-1">
+            <div className="flex flex-col pt-1">
+              <div className="flex items-center gap-2 px-1 pb-2">
                 <span
                   className="text-caption font-display text-text-secondary uppercase"
                   style={{ letterSpacing: "0.06em" }}
@@ -241,7 +241,7 @@ export default async function ContenidoPage() {
                 <span className="text-caption text-text-disabled">{tareasResto.length}</span>
               </div>
 
-              {tareasResto.map((t) => {
+              {tareasResto.map((t, index) => {
                 const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
                 const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
                 const pendiente = t.estado === null;
@@ -250,9 +250,9 @@ export default async function ContenidoPage() {
                   <Link
                     key={t.id}
                     href={t.href}
-                    className={`flex items-center gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg ${
-                      pendiente ? "opacity-70 hover:opacity-100" : ""
-                    }`}
+                    className={`flex items-center gap-3 py-3 hover:opacity-70 ${
+                      index > 0 ? "border-t border-border" : ""
+                    } ${pendiente ? "opacity-70 hover:opacity-100" : ""}`}
                   >
                     <span
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
@@ -337,8 +337,8 @@ export default async function ContenidoPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            {ultimasIdeas.map((idea) => {
+          <div className="flex flex-col">
+            {ultimasIdeas.map((idea, index) => {
               const Icon = PLATAFORMA_ICON[idea.plataforma];
               const tono = PLATAFORMA_TONO[idea.plataforma];
               const dias = diasDesde(idea.created_at);
@@ -347,7 +347,9 @@ export default async function ContenidoPage() {
                 <Link
                   key={idea.id}
                   href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-                  className="flex items-center gap-2.5 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+                  className={`flex items-center gap-2.5 py-3 hover:opacity-70 ${
+                    index > 0 ? "border-t border-border" : ""
+                  }`}
                 >
                   <span
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"

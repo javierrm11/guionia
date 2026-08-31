@@ -32,9 +32,14 @@ export default async function CtasPage() {
       </div>
 
       {ctas && ctas.length > 0 ? (
-        <ul className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
-          {ctas.map((c) => (
-            <li key={c.id} className="flex flex-col gap-1 rounded-md bg-bg-primary p-3.5">
+        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+          {ctas.map((c, index) => (
+            <li
+              key={c.id}
+              className={`flex flex-col gap-1 py-3.5 ${
+                index > 0 ? "border-t border-border lg:border-t-0" : ""
+              }`}
+            >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-caption text-text-secondary">
                   {PLATAFORMA_LABEL[c.plataforma as Plataforma]}

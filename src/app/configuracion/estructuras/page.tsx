@@ -28,11 +28,16 @@ export default async function EstructurasPage() {
       </div>
 
       {estructuras && estructuras.length > 0 ? (
-        <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
-          {estructuras.map((e) => {
+        <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+          {estructuras.map((e, index) => {
             const numEscenas = e.estructura_escenas?.[0]?.count ?? 0;
             return (
-              <div key={e.id} className="flex flex-col gap-2 rounded-md bg-bg-primary p-3.5">
+              <div
+                key={e.id}
+                className={`flex flex-col gap-2 py-3.5 ${
+                  index > 0 ? "border-t border-border lg:border-t-0" : ""
+                }`}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/configuracion/estructuras/${e.id}`}

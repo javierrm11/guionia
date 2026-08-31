@@ -81,7 +81,7 @@ export function SubirVideoYoutube({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+    <div className="flex flex-col gap-3 rounded-md border border-border p-4">
       <label className="flex flex-col gap-1">
         <span className="text-h3 text-text-secondary">Título para YouTube</span>
         <input

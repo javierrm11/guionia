@@ -32,9 +32,14 @@ export default async function HooksPage() {
       </div>
 
       {hooks && hooks.length > 0 ? (
-        <ul className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
-          {hooks.map((h) => (
-            <li key={h.id} className="flex flex-col gap-1 rounded-md bg-bg-primary p-3.5">
+        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+          {hooks.map((h, index) => (
+            <li
+              key={h.id}
+              className={`flex flex-col gap-1 py-3.5 ${
+                index > 0 ? "border-t border-border lg:border-t-0" : ""
+              }`}
+            >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-caption text-text-secondary">
                   {PLATAFORMA_LABEL[h.plataforma as Plataforma]}

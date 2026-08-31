@@ -145,7 +145,7 @@ export default async function GuionPage({
           {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
 
           {guion.texto && (
-            <p className="text-body whitespace-pre-wrap rounded-md bg-bg-primary p-4">
+            <p className="text-body whitespace-pre-wrap rounded-md border border-border p-4">
               {guion.texto}
             </p>
           )}
@@ -156,7 +156,7 @@ export default async function GuionPage({
         guion.titulo_publicacion ||
         guion.etiquetas_publicacion ||
         guion.estado === "publicado") && (
-        <div className="flex flex-col gap-2 rounded-md bg-bg-primary p-4">
+        <div className="flex flex-col gap-2 rounded-md border border-border p-4">
           <h2 className="text-h2">Datos de publicación</h2>
           {guion.titulo_publicacion && (
             <div className="flex flex-col gap-1">

@@ -22,7 +22,7 @@ type Idea = {
   created_at: string;
 };
 
-function TarjetaIdea({ idea }: { idea: Idea }) {
+function TarjetaIdea({ idea, primera }: { idea: Idea; primera: boolean }) {
   const plataforma = idea.plataforma as Plataforma;
   const Icon = PLATAFORMA_ICON[plataforma];
   const tono = PLATAFORMA_TONO[plataforma];
@@ -33,7 +33,7 @@ function TarjetaIdea({ idea }: { idea: Idea }) {
   return (
     <Link
       href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-      className={`flex flex-col gap-3 rounded-md bg-bg-primary p-3.5 hover:bg-accent-bg active:bg-accent-bg ${
+      className={`flex flex-col gap-3 py-3.5 hover:opacity-70 ${primera ? "" : "border-t border-border"} ${
         descartada ? "opacity-70 hover:opacity-100" : ""
       }`}
       style={
@@ -173,9 +173,9 @@ export default async function IdeasGlobalPage({
             </h2>
             <span className="text-caption text-text-disabled">{activas.length}</span>
           </div>
-          <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
-            {activas.map((idea) => (
-              <TarjetaIdea key={idea.id} idea={idea} />
+          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+            {activas.map((idea, index) => (
+              <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}
           </div>
         </section>
@@ -192,16 +192,16 @@ export default async function IdeasGlobalPage({
             </h2>
             <span className="text-caption text-text-disabled">{descartadas.length}</span>
           </div>
-          <div className="flex flex-col gap-2.5 lg:grid lg:grid-cols-2">
-            {descartadas.map((idea) => (
-              <TarjetaIdea key={idea.id} idea={idea} />
+          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+            {descartadas.map((idea, index) => (
+              <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}
           </div>
         </section>
       )}
 
       {ideas.length === 0 && (
-        <section className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-6">
+        <section className="flex flex-col items-start gap-3 p-6">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
             <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
           </span>

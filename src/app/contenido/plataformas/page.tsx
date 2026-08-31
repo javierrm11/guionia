@@ -69,11 +69,11 @@ export default async function PlataformasPage({
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <div className="flex gap-2">
+      <div className="inline-flex w-fit items-center gap-1 rounded-full border border-border bg-neutral-bg p-[0.15rem]">
         <Link
           href="/contenido/plataformas"
           className={`text-caption rounded-full px-3 py-1.5 ${
-            enCalendario ? "bg-neutral-bg text-text-secondary" : "bg-accent text-white"
+            enCalendario ? "text-text-secondary" : "bg-accent text-white"
           }`}
         >
           Plataformas
@@ -81,7 +81,7 @@ export default async function PlataformasPage({
         <Link
           href={`/contenido/plataformas?vista=calendario&semana=${semanaCalendario}`}
           className={`text-caption rounded-full px-3 py-1.5 ${
-            enCalendario ? "bg-accent text-white" : "bg-neutral-bg text-text-secondary"
+            enCalendario ? "bg-accent text-white" : "text-text-secondary"
           }`}
         >
           Calendario
@@ -94,7 +94,7 @@ export default async function PlataformasPage({
           semanaInicio={semanaCalendario}
         />
       ) : (
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-3">
       {plataformasActivas.map((plataforma) => {
         const Icon = PLATAFORMA_ICON[plataforma];
         const tono = PLATAFORMA_TONO[plataforma];
@@ -106,7 +106,10 @@ export default async function PlataformasPage({
         const olvidadas = contar(ideasOlvidadas, plataforma);
 
         return (
-          <section key={plataforma} className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4">
+          <section
+            key={plataforma}
+            className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4"
+          >
             <Link href={`/contenido/${plataforma}/videos`} className="flex items-center gap-3">
               <span
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"

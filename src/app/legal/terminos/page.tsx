@@ -8,7 +8,7 @@ export default function TerminosPage() {
       <h1 className="text-h1">Términos de Servicio</h1>
       <p className="text-small text-text-secondary">Última actualización: 21 de agosto de 2026</p>
 
-      <div className="flex flex-col gap-4 rounded-md bg-bg-primary p-6 text-body text-text-secondary">
+      <div className="flex flex-col gap-4 rounded-md border border-border p-6 text-body text-text-secondary">
         <p>
           Guionia es una aplicación personal desarrollada y operada por Javier Rumo
           (contacto: javierrumo2@gmail.com) para planificar, escribir y programar

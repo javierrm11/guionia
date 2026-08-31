@@ -47,7 +47,7 @@ export function Puntuacion({
             <button
               type="button"
               onClick={() => setAbierto(true)}
-              className="flex items-center justify-between gap-2 rounded-sm bg-bg-primary px-3 py-2 text-small text-text-primary active:bg-bg-secondary"
+              className="flex items-center justify-between gap-2 rounded-sm border border-border px-3 py-2 text-small text-text-primary hover:opacity-70"
             >
               Cómo mejorarla ({pendientes})
               <ChevronRight size={16} strokeWidth={1.5} className="text-accent" />

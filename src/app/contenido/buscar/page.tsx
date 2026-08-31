@@ -58,8 +58,8 @@ export default async function BuscarPage({
       {consulta.length === 0 ? (
         <p className="text-small text-text-disabled">Escribe algo para buscar.</p>
       ) : resultados && resultados.length > 0 ? (
-        <ul className="flex flex-col gap-2.5">
-          {resultados.map((r) => {
+        <ul className="flex flex-col">
+          {resultados.map((r, index) => {
             const esIdea = (ESTADOS_IDEA as readonly string[]).includes(r.estado);
             const href = esIdea
               ? `/contenido/${r.plataforma}/ideas/${r.id}`
@@ -71,7 +71,7 @@ export default async function BuscarPage({
               <li key={r.id}>
                 <Link
                   href={href}
-                  className="flex items-center justify-between gap-2 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+                  className={`flex items-center justify-between gap-2 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
                 >
                   <span className="truncate text-body text-text-primary">{r.titulo}</span>
                   <div className="flex shrink-0 items-center gap-2">

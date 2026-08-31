@@ -12,7 +12,7 @@ export default async function OlvidePasswordPage({
     <div className="flex flex-1 flex-col justify-center gap-6 p-6 md:mx-auto md:w-full md:max-w-sm">
       <h1 className="text-h1 text-center">Recuperar contraseña</h1>
 
-      <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-6">
+      <div className="flex flex-col gap-4 rounded-md border border-border p-6">
         {enviado ? (
           <p className="text-body text-text-secondary">
             Si existe una cuenta con ese email, te hemos enviado un enlace para restablecer la

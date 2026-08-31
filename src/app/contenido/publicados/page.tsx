@@ -23,8 +23,8 @@ export default async function PublicadosPage() {
       </Link>
 
       {publicados && publicados.length > 0 ? (
-        <ul className="flex flex-col gap-2.5">
-          {publicados.map((p) => {
+        <ul className="flex flex-col">
+          {publicados.map((p, index) => {
             const plataforma = p.plataforma as Plataforma;
             const Icon = PLATAFORMA_ICON[plataforma];
             const tono = PLATAFORMA_TONO[plataforma];
@@ -32,7 +32,10 @@ export default async function PublicadosPage() {
             const href = `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${p.id}`;
 
             return (
-              <li key={p.id} className="flex items-center gap-3 rounded-md bg-bg-primary p-3">
+              <li
+                key={p.id}
+                className={`flex items-center gap-3 py-3 ${index > 0 ? "border-t border-border" : ""}`}
+              >
                 <span
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
                   style={{ backgroundColor: tono }}

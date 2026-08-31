@@ -42,7 +42,7 @@ export function ThemeToggle() {
       type="button"
       onClick={() => establecerOscuro(!oscuro)}
       aria-pressed={oscuro}
-      className="flex items-center justify-between rounded-md bg-bg-primary p-4"
+      className="flex items-center justify-between rounded-md border border-border p-4"
     >
       <span className="flex items-center gap-2.5 text-body text-text-primary">
         {oscuro ? (

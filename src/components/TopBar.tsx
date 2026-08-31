@@ -68,33 +68,37 @@ export function TopBar() {
 
       {mostrarBusqueda ? (
         <form action="/contenido/buscar" className="flex-1">
-          <div className="relative">
-            <Search
-              size={16}
-              strokeWidth={1.5}
-              className={`pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 ${
-                sobreOnda ? "text-white/85" : "text-text-disabled"
-              }`}
-            />
-            <input
-              key={query}
-              type="text"
-              name="q"
-              defaultValue={query}
-              placeholder="Buscar por título o etiqueta…"
-              style={
-                {
-                  "--input-bg": "transparent",
-                  ...(sobreOnda ? { "--placeholder-color": "rgba(255,255,255,0.85)" } : {}),
-                } as React.CSSProperties
-              }
-              className={`w-full border-b bg-transparent py-2 pr-3 pl-9 text-body focus:outline-none ${
-                sobreOnda
-                  ? "border-white/40 text-white focus:border-white"
-                  : "border-border text-text-primary focus:border-accent"
-              }`}
-            />
-          </div>
+          {sobreOnda ? (
+            <div className="flex items-center gap-2 rounded-full bg-white py-2.5 px-4 shadow-md">
+              <Search size={16} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
+              <input
+                key={query}
+                type="text"
+                name="q"
+                defaultValue={query}
+                placeholder="Buscar por título o etiqueta…"
+                style={{ "--input-bg": "transparent" } as React.CSSProperties}
+                className="w-full min-w-0 flex-1 bg-transparent text-body text-text-primary focus:outline-none"
+              />
+            </div>
+          ) : (
+            <div className="relative">
+              <Search
+                size={16}
+                strokeWidth={1.5}
+                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-disabled"
+              />
+              <input
+                key={query}
+                type="text"
+                name="q"
+                defaultValue={query}
+                placeholder="Buscar por título o etiqueta…"
+                style={{ "--input-bg": "transparent" } as React.CSSProperties}
+                className="w-full border-b border-border bg-transparent py-2 pr-3 pl-9 text-body text-text-primary focus:border-accent focus:outline-none"
+              />
+            </div>
+          )}
         </form>
       ) : (
         <div className="flex-1" />

@@ -30,7 +30,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   if (!accessToken) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
+      <div className="flex flex-col items-start gap-3 rounded-md border border-border p-4">
         <p className="text-small text-text-secondary">
           Conecta TikTok para ver las estadísticas de tu cuenta.
         </p>
@@ -48,7 +48,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     await obtenerCuentaPropia(accessToken);
   } catch {
     return (
-      <div className="rounded-md bg-bg-primary p-4">
+      <div className="rounded-md border border-border p-4">
         <p className="text-small text-danger">
           No se pudieron cargar las estadísticas de TikTok ahora mismo. Inténtalo de nuevo más tarde.
         </p>

@@ -25,7 +25,7 @@ export function CapturaIdeaInline({ plataformas }: { plataformas: Plataforma[] }
   }
 
   return (
-    <div className="rounded-md bg-bg-primary p-4">
+    <div className="rounded-md border border-border p-4">
       <CapturaRapidaForm plataformas={plataformas} onGuardado={() => setAbierto(false)} />
     </div>
   );

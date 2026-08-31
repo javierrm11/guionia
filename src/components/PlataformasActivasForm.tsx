@@ -33,7 +33,7 @@ export function PlataformasActivasForm({
           return (
             <label
               key={p}
-              className="relative flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-md bg-bg-primary p-4"
+              className="relative flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-border p-4"
             >
               <input
                 type="checkbox"

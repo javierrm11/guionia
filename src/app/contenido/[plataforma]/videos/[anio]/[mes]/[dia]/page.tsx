@@ -52,12 +52,12 @@ export default async function DiaPage({
       </Link>
 
       {guiones && guiones.length > 0 ? (
-        <ul className="flex flex-col gap-2.5">
-          {guiones.map((guion) => (
+        <ul className="flex flex-col">
+          {guiones.map((guion, index) => (
             <li key={guion.id}>
               <Link
                 href={`/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`}
-                className="flex items-center gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+                className={`flex items-center gap-3 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
               >
                 {guion.numero != null && (
                   <span className="shrink-0 text-caption text-text-disabled">#{guion.numero}</span>

@@ -284,7 +284,7 @@ export function GuionForm({
           {escenas.map((escena, index) => (
             <div
               key={escena.clientId}
-              className="flex flex-col gap-2 rounded-md bg-bg-primary p-3.5"
+              className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
             >
               <div className="flex items-center gap-2">
                 <input type="hidden" name="escena_tipo" value={escena.tipoEscena} />
@@ -401,7 +401,7 @@ export function GuionForm({
             </div>
           ))}
 
-          <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-3.5">
+          <div className="flex flex-col gap-3 rounded-md border border-border p-3.5">
             <label className="flex flex-col gap-1">
               <span className="text-h3 text-text-secondary">Tipo</span>
               <select

@@ -27,13 +27,16 @@ export default async function BienvenidaPage() {
       </div>
 
       <form action={crearCadenciaInicial} className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          {activas.map((p) => {
+        <div className="flex flex-col">
+          {activas.map((p, index) => {
             const Icon = PLATAFORMA_ICON[p];
             const tono = PLATAFORMA_TONO[p];
 
             return (
-              <div key={p} className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+              <div
+                key={p}
+                className={`flex flex-col gap-3 py-4 ${index > 0 ? "border-t border-border" : ""}`}
+              >
                 <div className="flex items-center gap-3.5">
                   <span
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"

@@ -14,7 +14,7 @@ export async function TendenciasSection() {
     resultado = await obtenerVideosParaTi(supabase, user.id);
   } catch {
     return (
-      <div className="rounded-md bg-bg-primary p-4">
+      <div className="rounded-md border border-border p-4">
         <p className="text-small text-danger">
           No se pudieron cargar los vídeos ahora mismo. Inténtalo de nuevo más tarde.
         </p>
@@ -24,7 +24,7 @@ export async function TendenciasSection() {
 
   if (!resultado) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
+      <div className="flex flex-col items-start gap-3 rounded-md border border-border p-4">
         <p className="text-small text-text-secondary">
           Conecta YouTube para ver vídeos parecidos a los tuyos.
         </p>
@@ -42,21 +42,21 @@ export async function TendenciasSection() {
 
   if (videos.length === 0) {
     return (
-      <div className="rounded-md bg-bg-primary p-4">
+      <div className="rounded-md border border-border p-4">
         <p className="text-small text-text-secondary">No hay vídeos disponibles ahora mismo.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {videos.map((v) => (
+    <div className="flex flex-col">
+      {videos.map((v, index) => (
         <a
           key={v.videoId}
           href={`https://www.youtube.com/watch?v=${v.videoId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex gap-3 rounded-md bg-bg-primary p-3 hover:bg-accent-bg active:bg-accent-bg"
+          className={`flex gap-3 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
         >
           <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-sm bg-neutral-bg">
             {v.miniatura && (

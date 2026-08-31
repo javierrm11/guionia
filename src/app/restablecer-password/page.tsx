@@ -11,7 +11,7 @@ export default async function RestablecerPasswordPage({
     <div className="flex flex-1 flex-col justify-center gap-6 p-6 md:mx-auto md:w-full md:max-w-sm">
       <h1 className="text-h1 text-center">Nueva contraseña</h1>
 
-      <div className="flex flex-col gap-4 rounded-md border border-border bg-bg-primary p-6">
+      <div className="flex flex-col gap-4 rounded-md border border-border p-6">
         <form action={restablecerPasswordAction} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
             <span className="text-h3 text-text-secondary">Nueva contraseña</span>

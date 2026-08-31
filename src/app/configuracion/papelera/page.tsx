@@ -71,11 +71,11 @@ export default async function PapeleraPage() {
       <h1 className="text-h1">Papelera</h1>
 
       {elementos.length > 0 ? (
-        <ul className="flex flex-col gap-2.5">
-          {elementos.map((el) => (
+        <ul className="flex flex-col">
+          {elementos.map((el, index) => (
             <li
               key={`${el.tipoBadge}-${el.id}`}
-              className="flex flex-col gap-2 rounded-md bg-bg-primary p-3.5"
+              className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="rounded-full bg-neutral-bg px-2.5 py-1 text-caption text-text-secondary">

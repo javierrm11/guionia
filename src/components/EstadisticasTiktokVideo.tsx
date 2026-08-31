@@ -24,7 +24,7 @@ export async function EstadisticasTiktokVideo({ videoId }: { videoId: string }) 
     stats = resultado[videoId] ?? null;
   } catch {
     return (
-      <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+      <div className="flex flex-col gap-3 rounded-md border border-border p-4">
         <h2 className="text-h2">Estadísticas de TikTok</h2>
         <p className="text-small text-danger">
           No se pudieron cargar las estadísticas ahora mismo. Inténtalo de nuevo más tarde.
@@ -36,7 +36,7 @@ export async function EstadisticasTiktokVideo({ videoId }: { videoId: string }) 
   if (!stats) return null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4">
+    <div className="flex flex-col gap-3 rounded-md border border-border p-4">
       <h2 className="text-h2">Estadísticas de TikTok</h2>
       <div className="grid grid-cols-4 gap-3">
         <div className="flex flex-col items-center gap-1">

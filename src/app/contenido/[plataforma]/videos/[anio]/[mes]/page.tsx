@@ -118,7 +118,7 @@ export default async function CalendarioPage({
             <Link
               key={dia}
               href={`/contenido/${plataforma}/videos/${anio}/${pad2(mes)}/${pad2(dia)}`}
-              className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-bg-secondary lg:min-h-24 lg:p-2 ${colorBorde}`}
+              className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-neutral-bg lg:min-h-24 lg:p-2 ${colorBorde}`}
             >
               <span
                 className={`text-caption ${riesgo ? "text-danger" : "text-text-secondary"}`}

@@ -139,8 +139,8 @@ export async function CalendarioPlataformas({
             </div>
 
             {tareas.length > 0 ? (
-              <div className="flex flex-col gap-2">
-                {tareas.map((t) => {
+              <div className="flex flex-col rounded-md bg-bg-primary px-4">
+                {tareas.map((t, i) => {
                   const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
                   const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
                   const pendiente = t.estado === null;
@@ -148,7 +148,7 @@ export async function CalendarioPlataformas({
                   return (
                     <div
                       key={t.id}
-                      className={`flex items-center gap-3 rounded-md bg-bg-primary p-3 ${
+                      className={`flex items-center gap-3 py-3 ${i > 0 ? "border-t border-border " : ""}${
                         pendiente ? "opacity-70" : ""
                       }`}
                     >
@@ -159,10 +159,14 @@ export async function CalendarioPlataformas({
                         <Icon size={16} strokeWidth={1.5} className="text-white" />
                       </span>
                       <span className="min-w-0 flex-1 truncate text-body">{t.titulo}</span>
-                      {t.estado && (
+                      {t.estado ? (
                         <Badge tone={ESTADO_PIEZA_TONE[t.estado]}>
                           {ESTADO_PIEZA_LABEL[t.estado]}
                         </Badge>
+                      ) : (
+                        <span className="text-caption text-text-secondary shrink-0 rounded-full bg-neutral-bg px-2.5 py-1">
+                          Plantilla
+                        </span>
                       )}
                     </div>
                   );

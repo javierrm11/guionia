@@ -28,7 +28,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
 
   if (!accessToken) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
+      <div className="flex flex-col items-start gap-3 rounded-md border border-border p-4">
         <p className="text-small text-text-secondary">
           Conecta YouTube para ver las estadísticas de tu cuenta.
         </p>
@@ -82,7 +82,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
 
   if (error || !canal) {
     return (
-      <div className="rounded-md bg-bg-primary p-4">
+      <div className="rounded-md border border-border p-4">
         <p className="text-small text-danger">
           No se pudieron cargar las estadísticas de YouTube ahora mismo. Inténtalo de nuevo más tarde.
         </p>
@@ -179,7 +179,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
           >
             De dónde vienen tus vistas
           </span>
-          <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4">
+          <div className="flex flex-col gap-2.5 rounded-md border border-border p-4">
             {fuentesTrafico.map((fuente) => (
               <div key={fuente.fuente} className="flex flex-col gap-1">
                 <div className="flex items-center justify-between text-small">

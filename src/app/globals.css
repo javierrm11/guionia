@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  /* Fondo — plano, gris muy claro. Sin degradado ni cristal: las tarjetas son
-     blancas sólidas, separadas del fondo con una sombra suave en vez de blur. */
-  --bg-page: #f5f5f7;
+  /* Fondo — plano, blanco. Sin degradado ni cristal: las tarjetas son
+     blancas sólidas también, separadas del fondo solo con --card-shadow
+     (sombra suave) en vez de un contraste de tono o un blur. */
+  --bg-page: #ffffff;
 
   --bg-primary: #ffffff;
   --bg-secondary: #ffffff;
@@ -155,7 +156,7 @@
   --text-small--line-height: 1.5;
   --text-small--font-weight: 400;
 
-  --text-caption: 12px;
+  --text-caption: 14px;
   --text-caption--line-height: 1.4;
   --text-caption--font-weight: 500;
 }

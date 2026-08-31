@@ -30,7 +30,7 @@ export function StatMes({
   sufijo?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-md bg-bg-primary p-4">
+    <div className="flex flex-col gap-1 rounded-md border border-border p-4">
       <span className="text-caption text-text-secondary">{etiqueta}</span>
       <span className="text-h2">
         {formatoNumero(actual)}

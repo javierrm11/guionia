@@ -34,8 +34,8 @@ export default async function CadenciaPage() {
         </div>
 
         {cadencia && cadencia.length > 0 ? (
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2">
-            {cadencia.map((c) => {
+          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+            {cadencia.map((c, index) => {
               const plataforma = c.plataforma as Plataforma;
               const Icon = PLATAFORMA_ICON[plataforma];
               const tono = PLATAFORMA_TONO[plataforma];
@@ -43,7 +43,9 @@ export default async function CadenciaPage() {
               return (
                 <div
                   key={c.id}
-                  className="flex items-center gap-3.5 rounded-md bg-bg-primary p-4"
+                  className={`flex items-center gap-3.5 py-3.5 ${
+                    index > 0 ? "border-t border-border lg:border-t-0" : ""
+                  }`}
                 >
                   <span
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"

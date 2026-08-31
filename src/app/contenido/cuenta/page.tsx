@@ -57,8 +57,8 @@ export default async function CuentaPage({
       <div className="flex flex-wrap gap-3">
         <Link
           href={`/contenido/cuenta?rango=${rango}&cuenta=youtube`}
-          className={`flex items-center gap-2.5 rounded-md p-3 ${
-            cuenta === "youtube" ? "bg-bg-primary ring-2 ring-accent" : "bg-bg-primary opacity-60"
+          className={`flex items-center gap-2.5 rounded-md border border-border p-3 ${
+            cuenta === "youtube" ? "ring-2 ring-accent" : "opacity-60"
           }`}
         >
           {conexionYoutube?.canal_thumbnail_url ? (
@@ -84,8 +84,8 @@ export default async function CuentaPage({
 
         <Link
           href={`/contenido/cuenta?rango=${rango}&cuenta=tiktok`}
-          className={`flex items-center gap-2.5 rounded-md p-3 ${
-            cuenta === "tiktok" ? "bg-bg-primary ring-2 ring-accent" : "bg-bg-primary opacity-60"
+          className={`flex items-center gap-2.5 rounded-md border border-border p-3 ${
+            cuenta === "tiktok" ? "ring-2 ring-accent" : "opacity-60"
           }`}
         >
           {conexionTiktok?.avatar_url ? (
