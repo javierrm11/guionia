@@ -11,7 +11,7 @@ export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: 
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="border-t border-border py-3.5 first:border-t-0">
+    <div className="rounded-md bg-bg-primary p-4">
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}

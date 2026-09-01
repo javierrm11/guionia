@@ -15,7 +15,6 @@ import {
 import { Badge } from "@/components/Badge";
 import { FaqItem } from "@/components/FaqItem";
 import { LandingHeader } from "@/components/LandingHeader";
-import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PLATAFORMA_ICON } from "@/lib/plataformas";
 import { createClient } from "@/lib/supabase/server";
@@ -156,7 +155,7 @@ export default async function LandingPage() {
         >
           <Link
             href="/registro"
-            className="animate-cta-brillo rounded-sm bg-accent px-6 py-3 text-body text-white active:bg-accent-hover"
+            className="animate-cta-brillo rounded-full bg-accent px-7 py-3.5 text-body font-medium text-white shadow-lg active:bg-accent-hover"
           >
             Crear cuenta gratis
           </Link>
@@ -173,8 +172,8 @@ export default async function LandingPage() {
           className="overflow-hidden rounded-md border border-border"
           style={{ boxShadow: "var(--card-shadow), 0 24px 48px rgba(16,24,40,0.08)" }}
         >
-          <div className="flex items-center gap-2 border-b border-border bg-neutral-bg px-4 py-2.5">
-            <div className="flex flex-1 items-center gap-2 rounded-full bg-bg-page px-3 py-1.5">
+          <div className="flex items-center gap-2 border-b border-border bg-bg-page px-4 py-2.5">
+            <div className="flex flex-1 items-center gap-2 rounded-full bg-neutral-bg px-3 py-1.5">
               <Search size={13} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
               <span className="text-caption text-text-disabled">
                 Buscar por título o etiqueta…
@@ -275,49 +274,63 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-10 border-t border-border px-4 py-14 lg:mx-auto lg:w-full lg:max-w-4xl lg:px-8">
-        <h2 className="text-center text-h1">Cómo funciona</h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="flex flex-col gap-8 border-t border-border px-4 py-14 lg:mx-auto lg:w-full lg:max-w-4xl lg:px-8">
+        <h2 className="text-h1">Cómo funciona</h2>
+
+        {/* Móvil: lista icono-izquierda/texto-derecha. Escritorio (lg:): */}
+        {/* rejilla de 4 columnas, numerada y conectada por una línea — */}
+        {/* misma alineación a la izquierda en ambos casos. */}
+        <div className="flex flex-col gap-7 lg:grid lg:grid-cols-4 lg:gap-8">
           {PASOS.map(({ icon: Icon, titulo, texto, extra }, i) => (
-            <div key={titulo} className="relative flex flex-col items-center gap-3 text-center">
+            <div key={titulo} className="flex gap-4 lg:relative lg:flex-col">
               {i < PASOS.length - 1 && (
                 <span className="absolute top-5 left-[calc(50%+26px)] hidden h-px w-[calc(100%-52px)] bg-border lg:block" />
               )}
-              <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-accent">
+              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent">
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -top-3 -left-2 font-display text-2xl text-accent-bg select-none"
+                  className="pointer-events-none absolute -top-3 -left-2 hidden font-display text-2xl text-accent-bg select-none lg:block"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <Icon size={20} strokeWidth={1.5} className="relative text-white" />
               </span>
-              <span className="text-h3">{titulo}</span>
-              <p className="text-small text-text-secondary">{texto}</p>
-              {extra}
+              <div className="flex min-w-0 flex-col gap-2">
+                <span className="text-h3">{titulo}</span>
+                <p className="text-small text-text-secondary">{texto}</p>
+                {extra}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="flex flex-col gap-1 border-t border-border bg-neutral-bg px-4 py-14 lg:mx-auto lg:w-full lg:max-w-2xl lg:px-8">
-        <h2 className="pb-3 text-center text-h1">Preguntas frecuentes</h2>
+      <section className="flex flex-col gap-3 border-t border-border bg-neutral-bg px-4 py-14 lg:mx-auto lg:w-full lg:max-w-2xl lg:px-8">
+        <h2 className="pb-2 text-center text-h1">Preguntas frecuentes</h2>
         {FAQS.map((f) => (
           <FaqItem key={f.pregunta} pregunta={f.pregunta} respuesta={f.respuesta} />
         ))}
       </section>
 
-      <section className="relative flex flex-col items-center justify-center gap-4 overflow-hidden px-4 py-20 text-center">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <OndaCadencia porcentaje={100} alturaFija={220} />
-        </div>
+      <section
+        className="relative flex flex-col items-center justify-center gap-4 overflow-hidden px-4 pt-20 pb-24 text-center"
+        style={{ backgroundColor: "var(--ai)" }}
+      >
         <h2 className="text-h1 text-white">Empieza a organizar tu contenido hoy</h2>
         <Link
           href="/registro"
-          className="rounded-sm bg-white px-6 py-3 text-body text-accent active:bg-neutral-bg"
+          className="rounded-full bg-white px-7 py-3.5 text-body font-medium text-accent shadow-lg active:bg-neutral-bg"
         >
           Crear cuenta gratis
         </Link>
+        {/* Ola en el borde inferior — transición hacia el footer blanco. */}
+        <svg
+          viewBox="0 0 400 40"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute right-0 bottom-0 left-0 h-10 w-full"
+        >
+          <path d="M0,16 C100,40 300,-8 400,16 L400,40 L0,40 Z" fill="var(--bg-page)" />
+        </svg>
       </section>
 
       <footer className="flex flex-col items-center gap-3 border-t border-border px-4 py-8 text-center lg:flex-row lg:justify-between lg:px-8">
