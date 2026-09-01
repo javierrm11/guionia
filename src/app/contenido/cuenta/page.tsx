@@ -56,7 +56,7 @@ export default async function CuentaPage({
   return (
     <div className="relative flex flex-1 flex-col">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-0">
-        <OndaCadencia porcentaje={0} alturaFija={290} />
+        <OndaCadencia porcentaje={0} alturaFija={255} />
       </div>
 
       <div className="relative z-10 flex flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
@@ -71,15 +71,17 @@ export default async function CuentaPage({
           </Link>
         </div>
 
-        <div className="flex flex-col items-center gap-1.5 pt-4 pb-8">
-          <span className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black">
-            {avatarUrl ? (
-              <Image src={avatarUrl} alt="" fill sizes="80px" className="object-cover" />
-            ) : (
-              <span className="font-display text-h1 text-white">{nombre[0]?.toUpperCase()}</span>
-            )}
+        <div className="flex flex-col items-center gap-1.5 pt-4 pb-4">
+          <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center">
+            <span className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-black">
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt="" fill sizes="80px" className="object-cover" />
+              ) : (
+                <span className="font-display text-h1 text-white">{nombre[0]?.toUpperCase()}</span>
+              )}
+            </span>
             <span
-              className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white"
+              className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full"
               style={{ backgroundColor: tonoCuenta }}
             >
               <IconCuenta size={11} strokeWidth={1.5} className="text-white" />
@@ -117,7 +119,7 @@ export default async function CuentaPage({
         </div>
       </div>
 
-      <div className="relative z-10 flex flex-col gap-2 p-4 pt-10 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8 lg:pt-10">
+      <div className="relative z-10 flex flex-col gap-2 px-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:px-8">
         <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
           {cuenta === "youtube" ? <CuentaSection rango={rango} /> : <CuentaTiktokSection rango={rango} />}
         </Suspense>

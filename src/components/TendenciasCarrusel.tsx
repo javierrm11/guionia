@@ -51,7 +51,7 @@ export async function TendenciasCarrusel() {
             href={`https://www.youtube.com/watch?v=${v.videoId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
+            className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg transition-[transform,box-shadow] duration-200 lg:hover:-translate-y-0.5 lg:hover:shadow-lg"
           >
             {v.miniatura && (
               <Image

@@ -152,7 +152,9 @@ export default async function ContenidoPage() {
         <section className="flex flex-col items-center gap-1 pb-4">
           <Link
             href="/contenido/plataformas?vista=calendario"
-            className="mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white"
+            className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white ${
+              racha >= 1 ? "animate-racha-brillo" : ""
+            }`}
             style={{
               backgroundImage: "linear-gradient(135deg, #FFD23F, #FF6B35 55%, #E8393B)",
               boxShadow: "0 4px 12px rgba(232,57,59,0.35)",
@@ -212,7 +214,7 @@ export default async function ContenidoPage() {
             return (
               <Link
                 href={tareaHero.href}
-                className="flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg"
+                className="animate-tarjeta-entrada flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg"
               >
                 <span
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"

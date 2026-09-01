@@ -202,3 +202,123 @@ textarea::placeholder {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* Animaciones puntuales, todas cortas (≤300ms) y desactivadas por completo
+   bajo prefers-reduced-motion — no hay ninguna variante "reducida", se
+   quitan sin más. */
+@keyframes escala-entrada {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-escala-entrada {
+  animation: escala-entrada 220ms ease-out;
+}
+
+@keyframes deslizar-derecha {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes deslizar-izquierda {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-deslizar-derecha {
+  animation: deslizar-derecha 260ms ease-out;
+}
+.animate-deslizar-izquierda {
+  animation: deslizar-izquierda 260ms ease-out;
+}
+
+/* Pulso único (no en bucle) para llamar la atención una vez, p. ej. una
+   idea "olvidada" al cargar la lista. */
+@keyframes aviso-pulso {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 40%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--warning) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 0%, transparent);
+  }
+}
+.animate-aviso-pulso {
+  animation: aviso-pulso 1200ms ease-out 1;
+}
+
+/* Sol/luna de ThemeToggle — el icono cambia de tipo (Sun/Moon) al alternar,
+   así que React ya lo remonta solo con darle `key`; aquí solo se anima esa
+   entrada en vez de sustituirse sin más. */
+@keyframes icono-tema-entrada {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+.animate-icono-tema {
+  animation: icono-tema-entrada 240ms ease-out;
+}
+
+/* Píldora de racha (Control) — brillo continuo y sutil mientras hay racha
+   (≥1 semana), para que destaque sin sonar a alerta (no es un aviso). */
+@keyframes racha-brillo {
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(232, 57, 59, 0.35);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(232, 57, 59, 0.55);
+  }
+}
+.animate-racha-brillo {
+  animation: racha-brillo 2400ms ease-in-out infinite;
+}
+
+/* Tarjeta "hero" del día (Control) — entrada al montar. */
+@keyframes tarjeta-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-tarjeta-entrada {
+  animation: tarjeta-entrada 260ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-escala-entrada,
+  .animate-deslizar-derecha,
+  .animate-deslizar-izquierda,
+  .animate-aviso-pulso,
+  .animate-icono-tema,
+  .animate-racha-brillo,
+  .animate-tarjeta-entrada {
+    animation: none;
+  }
+}

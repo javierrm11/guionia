@@ -45,11 +45,9 @@ export function ThemeToggle() {
       className="flex items-center justify-between rounded-md border border-border p-4"
     >
       <span className="flex items-center gap-2.5 text-body text-text-primary">
-        {oscuro ? (
-          <Moon size={18} strokeWidth={1.5} />
-        ) : (
-          <Sun size={18} strokeWidth={1.5} />
-        )}
+        <span key={oscuro ? "luna" : "sol"} className="animate-icono-tema inline-flex">
+          {oscuro ? <Moon size={18} strokeWidth={1.5} /> : <Sun size={18} strokeWidth={1.5} />}
+        </span>
         Modo oscuro
       </span>
       <span

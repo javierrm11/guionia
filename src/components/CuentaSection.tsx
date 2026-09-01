@@ -12,6 +12,7 @@ import {
   type VideoDestacado,
 } from "@/lib/youtube/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
+import { CarruselFlechas } from "@/components/CarruselFlechas";
 import { calcularLimitesRango, type RangoEstadisticas } from "@/lib/contenido";
 
 function formatoNumero(n: number) {
@@ -146,7 +147,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
           >
             Mejores vídeos
           </span>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8">
+          <CarruselFlechas>
             {destacados.map((video) => (
               <a
                 key={video.videoId}
@@ -173,7 +174,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
                 </div>
               </a>
             ))}
-          </div>
+          </CarruselFlechas>
         </div>
       )}
 

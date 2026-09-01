@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Check, ChevronRight } from "lucide-react";
 import { CalendarioPlataformas } from "@/components/CalendarioPlataformas";
+import { CalendarioSemanaTransicion } from "@/components/CalendarioSemanaTransicion";
+import { BarraProgresoCadencia } from "@/components/BarraProgresoCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -89,10 +91,12 @@ export default async function PlataformasPage({
       </div>
 
       {enCalendario ? (
-        <CalendarioPlataformas
-          plataformasActivas={plataformasActivas}
-          semanaInicio={semanaCalendario}
-        />
+        <CalendarioSemanaTransicion semanaKey={semanaCalendario}>
+          <CalendarioPlataformas
+            plataformasActivas={plataformasActivas}
+            semanaInicio={semanaCalendario}
+          />
+        </CalendarioSemanaTransicion>
       ) : (
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-3">
       {plataformasActivas.map((plataforma) => {
@@ -128,12 +132,7 @@ export default async function PlataformasPage({
             </Link>
 
             {p ? (
-              <div className="h-1.5 w-full rounded-full bg-neutral-bg">
-                <div
-                  className={`h-1.5 rounded-full ${completa ? "bg-success" : "bg-accent"}`}
-                  style={{ width: `${porcentaje}%` }}
-                />
-              </div>
+              <BarraProgresoCadencia porcentaje={porcentaje} completa={completa} />
             ) : (
               <Link
                 href="/configuracion/cadencia"

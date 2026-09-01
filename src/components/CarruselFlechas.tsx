@@ -30,7 +30,7 @@ export function CarruselFlechas({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="relative">
+    <div className="group relative">
       <div
         ref={scrollRef}
         onScroll={actualizar}
@@ -48,7 +48,7 @@ export function CarruselFlechas({ children }: { children: ReactNode }) {
             desplazar(-1);
           }}
           aria-label="Anterior"
-          className="absolute top-1/2 left-1 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-primary text-text-primary shadow-md"
+          className="absolute top-1/2 left-1 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-primary text-text-primary shadow-md transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100"
         >
           <ChevronLeft size={18} strokeWidth={2} />
         </button>
@@ -62,7 +62,7 @@ export function CarruselFlechas({ children }: { children: ReactNode }) {
             desplazar(1);
           }}
           aria-label="Siguiente"
-          className="absolute top-1/2 right-1 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-primary text-text-primary shadow-md"
+          className="absolute top-1/2 right-1 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-primary text-text-primary shadow-md transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100"
         >
           <ChevronRight size={18} strokeWidth={2} />
         </button>

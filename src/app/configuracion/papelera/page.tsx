@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ConfirmButton } from "@/components/ConfirmButton";
+import { FilaPapelera } from "@/components/FilaPapelera";
 import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
 import { TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
 import {
@@ -73,41 +73,17 @@ export default async function PapeleraPage() {
       {elementos.length > 0 ? (
         <ul className="flex flex-col">
           {elementos.map((el, index) => (
-            <li
+            <FilaPapelera
               key={`${el.tipoBadge}-${el.id}`}
-              className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="rounded-full bg-neutral-bg px-2.5 py-1 text-caption text-text-secondary">
-                  {el.tipoBadge}
-                </span>
-                <span className="text-caption text-text-disabled">
-                  Eliminado el {new Date(el.deletedAt).toLocaleDateString("es-ES")}
-                </span>
-              </div>
-
-              <p className="text-body line-clamp-2">{el.texto}</p>
-              <p className="text-small text-text-secondary">{el.contexto}</p>
-
-              <div className="flex items-center gap-3">
-                <form action={el.restaurar}>
-                  <input type="hidden" name="id" value={el.id} />
-                  <button type="submit" className="p-2 -m-2 text-small text-accent">
-                    Restaurar
-                  </button>
-                </form>
-                <form action={el.eliminar}>
-                  <input type="hidden" name="id" value={el.id} />
-                  <ConfirmButton
-                    message="Esto borra el elemento para siempre — no se puede deshacer. ¿Seguro?"
-                    pendingLabel="Eliminando…"
-                    className="p-2 -m-2 text-small text-danger"
-                  >
-                    Eliminar definitivamente
-                  </ConfirmButton>
-                </form>
-              </div>
-            </li>
+              id={el.id}
+              tipoBadge={el.tipoBadge}
+              texto={el.texto}
+              contexto={el.contexto}
+              deletedAt={el.deletedAt}
+              primera={index === 0}
+              restaurar={el.restaurar}
+              eliminar={el.eliminar}
+            />
           ))}
         </ul>
       ) : (

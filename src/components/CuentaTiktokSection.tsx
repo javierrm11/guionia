@@ -8,6 +8,7 @@ import {
   obtenerEstadisticasVideos,
 } from "@/lib/tiktok/oauth";
 import { StatMes } from "@/components/StatMesComparativa";
+import { CarruselFlechas } from "@/components/CarruselFlechas";
 import { calcularLimitesRango, type RangoEstadisticas } from "@/lib/contenido";
 
 function formatoNumero(n: number) {
@@ -160,12 +161,6 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     <div className="flex flex-col gap-6">
       {(hayComparativa || estadisticasCuenta) && (
         <div className="flex flex-col gap-3">
-          {hayComparativa && (
-            <p className="text-caption text-text-disabled">
-              Suma de tus vídeos publicados en cada periodo — TikTok no da un total de cuenta por
-              fechas.
-            </p>
-          )}
           <div className="grid grid-cols-2 gap-3">
             {hayComparativa && (
               <>
@@ -216,7 +211,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
           >
             Mejores vídeos
           </span>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8">
+          <CarruselFlechas>
             {destacados.map((video) => (
               <a
                 key={video.videoId}
@@ -251,7 +246,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
                 </div>
               </a>
             ))}
-          </div>
+          </CarruselFlechas>
         </div>
       )}
     </div>

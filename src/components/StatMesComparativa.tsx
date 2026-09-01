@@ -1,8 +1,5 @@
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react";
-
-function formatoNumero(n: number) {
-  return n.toLocaleString("es-ES");
-}
+import { NumeroAnimado } from "@/components/NumeroAnimado";
 
 function Delta({ actual, anterior }: { actual: number; anterior: number }) {
   if (anterior === 0) return null;
@@ -40,8 +37,7 @@ export function StatMes({
       )}
       <span className="text-caption text-text-secondary">{etiqueta}</span>
       <span className="text-h2">
-        {formatoNumero(actual)}
-        {sufijo}
+        <NumeroAnimado valor={actual} sufijo={sufijo} />
       </span>
       {anterior != null && <Delta actual={actual} anterior={anterior} />}
     </div>
