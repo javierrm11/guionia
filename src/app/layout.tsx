@@ -20,6 +20,10 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  // Rellena NEXT_PUBLIC_SITE_URL en el hosting cuando haya dominio definitivo
+  // — de momento cae a localhost, solo afecta a las URLs absolutas de
+  // Open Graph (la preview al compartir un enlace), no a la app en sí.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Guionia",
   description: "Panel para centralizar la gestión de contenido de Guionia.",
 };

@@ -311,6 +311,22 @@ textarea::placeholder {
   animation: tarjeta-entrada 260ms ease-out;
 }
 
+/* CTA principal de la landing — glow muy sutil que arranca a los 3s (deja
+   que el usuario mire el hero primero) para dirigir el ojo sin ser
+   intrusivo. */
+@keyframes cta-brillo {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+.animate-cta-brillo {
+  animation: cta-brillo 2600ms ease-in-out 3s infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-escala-entrada,
   .animate-deslizar-derecha,
@@ -318,7 +334,8 @@ textarea::placeholder {
   .animate-aviso-pulso,
   .animate-icono-tema,
   .animate-racha-brillo,
-  .animate-tarjeta-entrada {
+  .animate-tarjeta-entrada,
+  .animate-cta-brillo {
     animation: none;
   }
 }

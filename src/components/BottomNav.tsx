@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ITEMS_NAV, RUTAS_AUTH, esRutaActiva, type ItemNav } from "@/lib/navegacion";
+import { ITEMS_NAV, esRutaActiva, esRutaSinChrome, type ItemNav } from "@/lib/navegacion";
 import { NuevoGuionFab } from "@/components/NuevoGuionFab";
 
 function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
@@ -28,7 +28,7 @@ function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
  *  de crear guion va en el centro, partiendo la lista en dos mitades. */
 export function BottomNav() {
   const pathname = usePathname();
-  if (RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta))) return null;
+  if (esRutaSinChrome(pathname)) return null;
 
   const mitad = Math.ceil(ITEMS_NAV.length / 2);
 

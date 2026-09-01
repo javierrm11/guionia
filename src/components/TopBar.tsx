@@ -4,15 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Search, TrendingUp } from "lucide-react";
-
-const RUTAS_AUTH = [
-  "/login",
-  "/registro",
-  "/olvide-password",
-  "/restablecer-password",
-  "/auth",
-  "/legal",
-];
+import { esRutaSinChrome } from "@/lib/navegacion";
 
 /** Rutas con flecha de volver que además llevan su título aquí mismo, junto
  *  a la flecha, en vez de repetirlo como `<h1>` dentro de la página. */
@@ -32,7 +24,7 @@ const TITULOS: Record<string, string> = {
 export function TopBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const enAuth = RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
+  const enAuth = esRutaSinChrome(pathname);
   const enRaiz = pathname === "/contenido" || pathname === "/contenido/cuenta";
   const enBusqueda = pathname === "/contenido/buscar";
   const mostrarBusqueda = pathname === "/contenido" || enBusqueda;

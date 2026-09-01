@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ITEMS_NAV, RUTAS_AUTH, esRutaActiva } from "@/lib/navegacion";
+import { ITEMS_NAV, esRutaActiva, esRutaSinChrome } from "@/lib/navegacion";
 
 /** Navegación principal en escritorio (`lg:` en adelante) — sustituye a
  *  `BottomNav` a partir de ese ancho. Panel de cristal fijo a la izquierda,
  *  pegado arriba mientras se hace scroll del contenido. */
 export function Sidebar() {
   const pathname = usePathname();
-  if (RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta))) return null;
+  if (esRutaSinChrome(pathname)) return null;
 
   return (
     <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:flex-col lg:p-4">

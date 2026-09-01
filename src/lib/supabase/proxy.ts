@@ -36,7 +36,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const esRutaPublica = RUTAS_PUBLICAS.some((ruta) => request.nextUrl.pathname.startsWith(ruta));
+  // "/" (landing) es pública, pero por comparación exacta — con `startsWith`
+  // en la lista de abajo coincidiría con cualquier ruta de la app.
+  const esRutaPublica =
+    request.nextUrl.pathname === "/" ||
+    RUTAS_PUBLICAS.some((ruta) => request.nextUrl.pathname.startsWith(ruta));
 
   if (!user && !esRutaPublica) {
     const url = request.nextUrl.clone();

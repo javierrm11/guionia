@@ -29,6 +29,13 @@ export const ITEMS_NAV: readonly ItemNav[] = [
   { href: "/contenido/cuenta", label: "Cuenta", icon: User, prefijo: "/contenido/cuenta" },
 ];
 
+/** `/` es la landing pública (marketing) — sin el "chrome" de la app
+ *  (Sidebar/TopBar/BottomNav), igual que las rutas de auth. Comparación
+ *  exacta (no `startsWith`) porque toda ruta empieza por "/". */
+export function esRutaSinChrome(pathname: string) {
+  return pathname === "/" || RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
+}
+
 export function esRutaActiva(pathname: string, prefijo: string) {
   return prefijo === "/contenido"
     ? pathname.startsWith("/contenido") &&
