@@ -13,12 +13,15 @@ export function LandingHeader() {
           <span className="text-h2">Guionia</span>
         </span>
         <nav className="ml-auto flex items-center gap-4">
-          <Link href="/login" className="text-body text-text-secondary">
+          <Link
+            href="/login"
+            className="rounded-sm text-body text-text-secondary focus-visible:ring-2 focus-visible:ring-accent-bg focus-visible:outline-none"
+          >
             Iniciar sesión
           </Link>
           <Link
             href="/registro"
-            className="rounded-full bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+            className="rounded-full bg-accent px-4 py-2 text-body text-white active:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-bg focus-visible:outline-none"
           >
             Crear cuenta
           </Link>

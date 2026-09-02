@@ -16,7 +16,7 @@ export default function NuevoCtaPage() {
             name="plataforma"
             required
             defaultValue=""
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="" disabled>
               Selecciona una plataforma
@@ -38,7 +38,7 @@ export default function NuevoCtaPage() {
             required
             rows={3}
             autoFocus
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
@@ -48,13 +48,13 @@ export default function NuevoCtaPage() {
             type="text"
             name="nota"
             placeholder="Ej. Funciona bien para vender directo"
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
         <button
           type="submit"
-          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
         >
           Guardar
         </button>

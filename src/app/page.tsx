@@ -278,32 +278,32 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="flex flex-col items-center gap-6 border-t border-border bg-neutral-bg px-4 py-12 lg:px-8">
-        <span className="text-caption text-text-secondary">Conecta tus cuentas</span>
-        <div className="flex items-center gap-8">
-          <div className="flex flex-col items-center gap-2">
+      <section className="flex flex-col items-center gap-6 border-t border-border bg-neutral-bg px-4 py-12 lg:mx-auto lg:w-full lg:max-w-6xl lg:gap-8 lg:px-8 lg:py-16">
+        <span className="text-caption text-text-secondary lg:text-body">Conecta tus cuentas</span>
+        <div className="flex items-center gap-8 lg:gap-16">
+          <div className="flex flex-col items-center gap-2 lg:gap-3">
             <span
-              className="flex h-12 w-12 items-center justify-center rounded-sm"
+              className="flex h-12 w-12 items-center justify-center rounded-sm lg:h-16 lg:w-16"
               style={{ backgroundColor: PLATAFORMA_TONO.youtube }}
             >
-              <PLATAFORMA_ICON.youtube size={22} strokeWidth={1.5} className="text-white" />
+              <PLATAFORMA_ICON.youtube size={22} strokeWidth={1.5} className="text-white lg:h-7 lg:w-7" />
             </span>
-            <span className="text-caption text-text-secondary">YouTube</span>
+            <span className="text-caption text-text-secondary lg:text-body">YouTube</span>
           </div>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 lg:gap-3">
             <span
-              className="flex h-12 w-12 items-center justify-center rounded-sm"
+              className="flex h-12 w-12 items-center justify-center rounded-sm lg:h-16 lg:w-16"
               style={{ backgroundColor: PLATAFORMA_TONO.tiktok }}
             >
-              <PLATAFORMA_ICON.tiktok size={22} strokeWidth={1.5} className="text-white" />
+              <PLATAFORMA_ICON.tiktok size={22} strokeWidth={1.5} className="text-white lg:h-7 lg:w-7" />
             </span>
-            <span className="text-caption text-text-secondary">TikTok</span>
+            <span className="text-caption text-text-secondary lg:text-body">TikTok</span>
           </div>
-          <div className="flex flex-col items-center gap-2 opacity-50">
-            <span className="flex h-12 w-12 items-center justify-center rounded-sm bg-neutral">
-              <Camera size={22} strokeWidth={1.5} className="text-white" />
+          <div className="flex flex-col items-center gap-2 opacity-50 lg:gap-3">
+            <span className="flex h-12 w-12 items-center justify-center rounded-sm bg-neutral lg:h-16 lg:w-16">
+              <Camera size={22} strokeWidth={1.5} className="text-white lg:h-7 lg:w-7" />
             </span>
-            <span className="text-caption text-text-disabled">Próximamente</span>
+            <span className="text-caption text-text-disabled lg:text-body">Próximamente</span>
           </div>
         </div>
       </section>

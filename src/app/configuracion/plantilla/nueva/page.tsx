@@ -13,7 +13,7 @@ export default function NuevaPlantillaPage() {
             name="dia_semana"
             required
             defaultValue=""
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="" disabled>
               Selecciona un día
@@ -31,7 +31,7 @@ export default function NuevaPlantillaPage() {
           <select
             name="plataforma"
             defaultValue=""
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="">Sin definir</option>
             {PLATAFORMAS.map((p) => (
@@ -50,13 +50,13 @@ export default function NuevaPlantillaPage() {
             type="text"
             name="nota"
             required
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
         <button
           type="submit"
-          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
         >
           Guardar
         </button>

@@ -13,7 +13,7 @@ export default function NuevaCadenciaPage() {
             name="plataforma"
             required
             defaultValue=""
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="" disabled>
               Selecciona una plataforma
@@ -36,7 +36,7 @@ export default function NuevaCadenciaPage() {
             required
             min={1}
             defaultValue={1}
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
@@ -48,7 +48,7 @@ export default function NuevaCadenciaPage() {
             name="periodo"
             required
             defaultValue="semana"
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="semana">Semana</option>
             <option value="mes">Mes</option>
@@ -60,13 +60,13 @@ export default function NuevaCadenciaPage() {
           <input
             type="text"
             name="nota"
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
         <button
           type="submit"
-          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
         >
           Guardar
         </button>

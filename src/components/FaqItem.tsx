@@ -16,7 +16,7 @@ export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: 
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="flex w-full items-center justify-between gap-3 text-left text-h3 lg:text-h2"
+        className="flex w-full items-center justify-between gap-3 rounded-sm text-left text-h3 focus-visible:ring-2 focus-visible:ring-accent-bg focus-visible:outline-none lg:text-h2"
       >
         {pregunta}
         <ChevronDown

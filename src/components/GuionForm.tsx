@@ -180,7 +180,7 @@ export function GuionForm({
                   autoFocus
                   value={titulo}
                   onChange={(e) => setTitulo(e.target.value)}
-                  className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                  className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
                 />
               </label>
 
@@ -189,7 +189,7 @@ export function GuionForm({
                 <select
                   value={pilar}
                   onChange={(e) => setPilar(e.target.value)}
-                  className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                  className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
                 >
                   <option value="">Sin definir</option>
                   {Object.entries(PILAR_LABEL).map(([value, label]) => (
@@ -208,7 +208,7 @@ export function GuionForm({
               <select
                 value={estructuraId}
                 onChange={(e) => elegirEstructura(e.target.value)}
-                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
               >
                 <option value="">Sin estructura (texto libre)</option>
                 {estructuras.map((e) => (
@@ -229,7 +229,7 @@ export function GuionForm({
               required
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
             />
           </label>
 
@@ -237,7 +237,7 @@ export function GuionForm({
             type="button"
             onClick={() => setPaso(2)}
             disabled={!ideaId && !titulo.trim()}
-            className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40"
+            className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40 lg:px-5 lg:py-2.5"
           >
             Escribir guion
           </button>
@@ -390,7 +390,7 @@ export function GuionForm({
                 onChange={(e) =>
                   setTextosPuntuacion((prev) => ({ ...prev, [escena.clientId]: e.target.value }))
                 }
-                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
               />
 
               <PuntuacionEscena
@@ -407,7 +407,7 @@ export function GuionForm({
               <select
                 value={nuevoTipo}
                 onChange={(e) => setNuevoTipo(e.target.value as TipoEscena)}
-                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
               >
                 <option value="">Selecciona un tipo</option>
                 {TIPOS_ESCENA.map((t) => (
@@ -425,7 +425,7 @@ export function GuionForm({
                 min={1}
                 value={nuevaDuracion}
                 onChange={(e) => setNuevaDuracion(e.target.value)}
-                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
               />
             </label>
 
@@ -433,7 +433,7 @@ export function GuionForm({
               type="button"
               onClick={agregarEscena}
               disabled={!nuevoTipo}
-              className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40"
+              className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40 lg:px-5 lg:py-2.5"
             >
               + Añadir escena
             </button>
@@ -448,14 +448,14 @@ export function GuionForm({
                 name="texto"
                 required
                 rows={8}
-                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
               />
             </label>
           )}
 
           <SubmitButton
             pendingLabel={ideaId ? "Convirtiendo…" : "Creando…"}
-            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
+            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60 lg:px-5 lg:py-2.5"
           >
             {ideaId ? "Convertir en guion" : "Crear vídeo"}
           </SubmitButton>

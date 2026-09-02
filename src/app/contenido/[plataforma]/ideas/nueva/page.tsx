@@ -25,7 +25,7 @@ export default async function NuevaIdeaPage({
             name="titulo"
             required
             autoFocus
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
@@ -34,7 +34,7 @@ export default async function NuevaIdeaPage({
           <select
             name="pilar"
             defaultValue=""
-            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           >
             <option value="">Sin definir</option>
             {Object.entries(PILAR_LABEL).map(([value, label]) => (
@@ -51,13 +51,13 @@ export default async function NuevaIdeaPage({
             type="text"
             name="etiquetas"
             placeholder="separadas por comas, ej. whatsapp, ia"
-            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+            className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
           />
         </label>
 
         <button
           type="submit"
-          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
         >
           Guardar idea
         </button>
