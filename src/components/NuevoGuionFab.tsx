@@ -8,12 +8,20 @@ import { PLATAFORMA_ICON, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataf
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { obtenerPlataformasActivas } from "@/app/contenido/_shared/plataformasActivasAction";
 
-/** Botón "+" central de la barra inferior — abre un modal para elegir
- *  plataforma y lleva directo a crear un vídeo nuevo en esa plataforma.
+/** Botón "+" que abre un modal para elegir plataforma y lleva directo a
+ *  crear un vídeo nuevo en esa plataforma.
  *  El modal se porta a `document.body`: `BottomNav` (`fixed`, `z-20`) crea su
  *  propio contexto de apilamiento, así que un `z-40` anidado ahí dentro no
- *  lograría superar a `CapturaFlotante` (`z-30`, hermano de `BottomNav`). */
-export function NuevoGuionFab() {
+ *  lograría superar a `CapturaFlotante` (`z-30`, hermano de `BottomNav`).
+ *
+ *  Se monta dos veces con distinto `variant`: dentro de `BottomNav` (círculo
+ *  flotante, `variant="fab"`, el `BottomNav` entero lleva `lg:hidden`) y
+ *  dentro de `Sidebar` (fila de nav, `variant="sidebar"`, solo visible en
+ *  `lg:`) — sin la segunda, el atajo de crear guion no existía en absoluto
+ *  en escritorio, aunque el propio panel ya llevaba estilos `lg:` pensados
+ *  para esa pantalla. Cada instancia tiene su propio estado `abierto`, sin
+ *  problema al ser independientes. */
+export function NuevoGuionFab({ variant = "fab" }: { variant?: "fab" | "sidebar" }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [plataformas, setPlataformas] = useState<Plataforma[] | null>(null);
@@ -26,15 +34,26 @@ export function NuevoGuionFab() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setAbierto(true)}
-        aria-label="Crear guion"
-        className="-mt-8 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent active:bg-accent-hover"
-        style={{ boxShadow: "0 8px 20px rgba(108,92,224,0.4)" }}
-      >
-        <Plus size={24} strokeWidth={1.5} className="text-white" />
-      </button>
+      {variant === "fab" ? (
+        <button
+          type="button"
+          onClick={() => setAbierto(true)}
+          aria-label="Crear guion"
+          className="-mt-8 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent active:bg-accent-hover"
+          style={{ boxShadow: "0 8px 20px rgba(108,92,224,0.4)" }}
+        >
+          <Plus size={24} strokeWidth={1.5} className="text-white" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setAbierto(true)}
+          className="flex min-h-11 items-center gap-3 rounded-sm bg-accent px-3 text-body text-white hover:bg-accent-hover"
+        >
+          <Plus size={20} strokeWidth={1.5} />
+          Crear guion
+        </button>
+      )}
 
       {abierto &&
         createPortal(

@@ -357,7 +357,7 @@ export default async function LandingPage() {
         <h2 className="text-h1 text-white">Empieza a organizar tu contenido hoy</h2>
         <Link
           href="/registro"
-          className="rounded-full bg-white px-7 py-3.5 text-body font-medium text-accent shadow-lg active:bg-neutral-bg"
+          className="animate-cta-brillo rounded-full bg-white px-7 py-3.5 text-body font-medium text-accent shadow-lg active:bg-neutral-bg"
         >
           Crear cuenta gratis
         </Link>
