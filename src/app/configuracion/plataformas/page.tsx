@@ -53,7 +53,7 @@ export default async function PlataformasPage({
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <h1 className="text-h1">Cuentas conectadas</h1>
 
-      <section className="flex flex-col gap-3 rounded-md border border-border p-4">
+      <section className="flex flex-col gap-3 rounded-md border border-border p-4 lg:gap-4 lg:p-5">
         {youtube_conectado && (
           <p className="text-small text-success">Cuenta de YouTube conectada.</p>
         )}
@@ -96,12 +96,12 @@ export default async function PlataformasPage({
                 className="rounded-full"
               />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
                 <Clapperboard size={18} strokeWidth={1.5} className="text-accent" />
               </span>
             )}
             <div className="flex flex-col">
-              <span className="text-body text-text-primary">YouTube</span>
+              <span className="text-body text-text-primary lg:text-h3">YouTube</span>
               <span className={`text-caption ${youtube_error && conexionYoutube ? "text-danger" : "text-text-secondary"}`}>
                 {conexionYoutube
                   ? youtube_error
@@ -159,12 +159,12 @@ export default async function PlataformasPage({
                 className="rounded-full"
               />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
                 <Music size={18} strokeWidth={1.5} className="text-accent" />
               </span>
             )}
             <div className="flex flex-col">
-              <span className="text-body text-text-primary">TikTok</span>
+              <span className="text-body text-text-primary lg:text-h3">TikTok</span>
               <span className={`text-caption ${tiktok_error && conexionTiktok ? "text-danger" : "text-text-secondary"}`}>
                 {conexionTiktok
                   ? tiktok_error
@@ -213,11 +213,11 @@ export default async function PlataformasPage({
 
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
               <Camera size={18} strokeWidth={1.5} className="text-accent" />
             </span>
             <div className="flex flex-col">
-              <span className="text-body text-text-primary">Instagram</span>
+              <span className="text-body text-text-primary lg:text-h3">Instagram</span>
               <span className="text-caption text-text-secondary">Próximamente</span>
             </div>
           </div>
@@ -225,11 +225,11 @@ export default async function PlataformasPage({
 
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
               <Briefcase size={18} strokeWidth={1.5} className="text-accent" />
             </span>
             <div className="flex flex-col">
-              <span className="text-body text-text-primary">LinkedIn</span>
+              <span className="text-body text-text-primary lg:text-h3">LinkedIn</span>
               <span className="text-caption text-text-secondary">Próximamente</span>
             </div>
           </div>

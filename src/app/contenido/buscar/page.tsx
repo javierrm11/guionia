@@ -71,9 +71,9 @@ export default async function BuscarPage({
               <li key={r.id}>
                 <Link
                   href={href}
-                  className={`flex items-center justify-between gap-2 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
+                  className={`flex items-center justify-between gap-2 py-3 hover:opacity-70 lg:py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
                 >
-                  <span className="truncate text-body text-text-primary">{r.titulo}</span>
+                  <span className="truncate text-body text-text-primary lg:text-h3">{r.titulo}</span>
                   <div className="flex shrink-0 items-center gap-2">
                     <span className="text-caption text-text-secondary">
                       {PLATAFORMA_LABEL[r.plataforma as Plataforma]}

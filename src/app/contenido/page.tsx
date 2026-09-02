@@ -143,16 +143,19 @@ export default async function ContenidoPage() {
 
   return (
     <div className="relative flex flex-1 flex-col">
-      <div className="pointer-events-none absolute inset-x-0 z-0" style={{ top: -56 }}>
+      <div
+        className="pointer-events-none absolute inset-x-0 z-0 lg:origin-top lg:scale-y-110"
+        style={{ top: -56 }}
+      >
         <OndaCadencia porcentaje={porcentajeCadencia} />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       {hayCadencia ? (
-        <section className="flex flex-col items-center gap-1 pb-4">
+        <section className="flex flex-col items-center gap-1 pb-4 lg:gap-2 lg:pb-6">
           <Link
             href="/contenido/plataformas?vista=calendario"
-            className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white ${
+            className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white lg:mb-2 lg:gap-2 lg:px-4 lg:py-1.5 lg:text-body ${
               racha >= 1 ? "animate-racha-brillo" : ""
             }`}
             style={{
@@ -160,31 +163,31 @@ export default async function ContenidoPage() {
               boxShadow: "0 4px 12px rgba(232,57,59,0.35)",
             }}
           >
-            <Flame size={14} strokeWidth={0} fill="#FFFFFF" />
+            <Flame size={14} strokeWidth={0} fill="#FFFFFF" className="lg:h-4 lg:w-4" />
             {racha} {racha === 1 ? "semana seguida" : "semanas seguidas"}
           </Link>
           <BarraCadencia porcentaje={porcentajeCadencia} />
-          <span className="text-caption text-white/80">de la cadencia semanal</span>
+          <span className="text-caption text-white/80 lg:text-body">de la cadencia semanal</span>
         </section>
       ) : (
         <>
-          <p className="pt-2 pb-6 text-center font-display text-3xl leading-tight font-semibold text-white">
+          <p className="pt-2 pb-6 text-center font-display text-3xl leading-tight font-semibold text-white lg:pt-4 lg:pb-8 lg:text-5xl">
             Bienvenido a Guionia
           </p>
           <Link
             href="/configuracion/cadencia"
-            className="mb-6 flex items-center justify-between rounded-md border border-border p-4"
+            className="mb-6 flex items-center justify-between rounded-md border border-border p-4 lg:p-5"
           >
             <div className="flex flex-col gap-0.5">
-              <span className="text-h3">Define tu cadencia semanal</span>
-              <span className="text-caption text-text-secondary">
+              <span className="text-h3 lg:text-h2">Define tu cadencia semanal</span>
+              <span className="text-caption text-text-secondary lg:text-body">
                 Así sabremos cuánto tienes que publicar cada semana
               </span>
             </div>
             <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
           </Link>
 
-          <div className="mb-6 grid grid-cols-3 gap-3">
+          <div className="mb-6 grid grid-cols-3 gap-3 lg:gap-4">
             <Tile
               href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
               label="Nuevo vídeo"
@@ -201,7 +204,7 @@ export default async function ContenidoPage() {
       )}
 
       {tareaHero && (
-        <section className="flex flex-col gap-3 pt-6 pb-3">
+        <section className="flex flex-col gap-3 pt-6 pb-3 lg:gap-4 lg:pt-8 lg:pb-4">
           {(() => {
             const Icon = tareaHero.plataforma ? PLATAFORMA_ICON[tareaHero.plataforma] : Plus;
             const tono = tareaHero.plataforma
@@ -214,17 +217,19 @@ export default async function ContenidoPage() {
             return (
               <Link
                 href={tareaHero.href}
-                className="animate-tarjeta-entrada flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg"
+                className="animate-tarjeta-entrada flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg lg:gap-4 lg:p-6"
               >
                 <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-14 lg:w-14"
                   style={{ backgroundColor: tono }}
                 >
-                  <Icon size={20} strokeWidth={1.5} className="text-white" />
+                  <Icon size={20} strokeWidth={1.5} className="text-white lg:h-6 lg:w-6" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <span className="text-caption font-semibold text-accent">{etiqueta}</span>
-                  <p className="truncate text-h2">{tareaHero.titulo}</p>
+                  <span className="text-caption font-semibold text-accent lg:text-body">
+                    {etiqueta}
+                  </span>
+                  <p className="truncate text-h2 lg:text-h1">{tareaHero.titulo}</p>
                 </div>
                 <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
               </Link>
@@ -252,17 +257,17 @@ export default async function ContenidoPage() {
                   <Link
                     key={t.id}
                     href={t.href}
-                    className={`flex items-center gap-3 py-3 hover:opacity-70 ${
+                    className={`flex items-center gap-3 py-3 hover:opacity-70 lg:gap-3.5 lg:py-3.5 ${
                       index > 0 ? "border-t border-border" : ""
                     } ${pendiente ? "opacity-70 hover:opacity-100" : ""}`}
                   >
                     <span
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
                       style={{ backgroundColor: tono }}
                     >
-                      <Icon size={16} strokeWidth={1.5} className="text-white" />
+                      <Icon size={16} strokeWidth={1.5} className="text-white lg:h-[18px] lg:w-[18px]" />
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-body">
+                    <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
                       {t.titulo}
                       {pendiente && t.plataforma && ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
                     </span>
@@ -298,7 +303,7 @@ export default async function ContenidoPage() {
       )}
 
       {hayCadencia && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 lg:gap-4">
           <Tile
             href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
             label="Nueva idea"
@@ -318,13 +323,13 @@ export default async function ContenidoPage() {
       </Suspense>
 
       {ultimasIdeas.length > 0 && (
-        <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6">
+        <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
           <div className="flex items-center justify-between">
             <span
-              className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase"
+              className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
               style={{ letterSpacing: "0.06em" }}
             >
-              <Lightbulb size={14} strokeWidth={1.5} />
+              <Lightbulb size={14} strokeWidth={1.5} className="lg:h-4 lg:w-4" />
               Ideas
             </span>
             <div className="flex items-center gap-3">
@@ -349,18 +354,18 @@ export default async function ContenidoPage() {
                 <Link
                   key={idea.id}
                   href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-                  className={`flex items-center gap-2.5 py-3 hover:opacity-70 ${
+                  className={`flex items-center gap-2.5 py-3 hover:opacity-70 lg:gap-3 lg:py-3.5 ${
                     index > 0 ? "border-t border-border" : ""
                   }`}
                 >
                   <span
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm lg:h-8 lg:w-8"
                     style={{ backgroundColor: tono }}
                   >
-                    <Icon size={14} strokeWidth={1.5} className="text-white" />
+                    <Icon size={14} strokeWidth={1.5} className="text-white lg:h-4 lg:w-4" />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-body">{idea.titulo}</span>
-                  <span className="shrink-0 text-caption text-text-disabled">
+                  <span className="min-w-0 flex-1 truncate text-body lg:text-h3">{idea.titulo}</span>
+                  <span className="shrink-0 text-caption text-text-disabled lg:text-small">
                     {dias === 0 ? "Hoy" : `hace ${dias} ${dias === 1 ? "día" : "días"}`}
                   </span>
                 </Link>

@@ -161,7 +161,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     <div className="flex flex-col gap-6">
       {(hayComparativa || estadisticasCuenta) && (
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4">
             {hayComparativa && (
               <>
                 <StatMes
@@ -206,7 +206,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
       {destacados.length > 0 && (
         <div className="flex flex-col gap-3">
           <span
-            className="text-caption font-display text-text-secondary uppercase"
+            className="text-caption font-display text-text-secondary uppercase lg:text-body"
             style={{ letterSpacing: "0.06em" }}
           >
             Mejores vídeos
@@ -218,7 +218,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
                 href={video.url ?? `https://www.tiktok.com/video/${video.videoId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
+                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg lg:h-48 lg:w-36"
               >
                 {video.stats.miniatura && (
                   <Image

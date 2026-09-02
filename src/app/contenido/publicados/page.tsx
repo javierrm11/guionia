@@ -34,19 +34,19 @@ export default async function PublicadosPage() {
             return (
               <li
                 key={p.id}
-                className={`flex items-center gap-3 py-3 ${index > 0 ? "border-t border-border" : ""}`}
+                className={`flex items-center gap-3 py-3 lg:gap-3.5 lg:py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
               >
                 <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
                   style={{ backgroundColor: tono }}
                 >
-                  <Icon size={16} strokeWidth={1.5} className="text-white" />
+                  <Icon size={16} strokeWidth={1.5} className="text-white lg:h-[18px] lg:w-[18px]" />
                 </span>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <Link href={href} className="truncate text-body text-text-primary hover:underline">
+                  <Link href={href} className="truncate text-body text-text-primary hover:underline lg:text-h3">
                     {p.titulo}
                   </Link>
-                  <span className="text-caption text-text-secondary">
+                  <span className="text-caption text-text-secondary lg:text-small">
                     {PLATAFORMA_LABEL[plataforma]} · {p.fecha_publicacion}
                   </span>
                 </div>

@@ -56,15 +56,15 @@ export async function TendenciasSection() {
           href={`https://www.youtube.com/watch?v=${v.videoId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex gap-3 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
+          className={`flex gap-3 py-3 hover:opacity-70 lg:gap-4 lg:py-4 ${index > 0 ? "border-t border-border" : ""}`}
         >
-          <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-sm bg-neutral-bg">
+          <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-sm bg-neutral-bg lg:h-24 lg:w-40">
             {v.miniatura && (
-              <Image src={v.miniatura} alt="" fill sizes="128px" className="object-cover" />
+              <Image src={v.miniatura} alt="" fill sizes="160px" className="object-cover" />
             )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-            <p className="line-clamp-2 text-body text-text-primary">{v.titulo}</p>
+            <p className="line-clamp-2 text-body text-text-primary lg:text-h3">{v.titulo}</p>
             <p className="text-small text-text-secondary">{v.canal}</p>
             <p className="text-caption text-text-disabled">
               {v.vistas.toLocaleString("es-ES")} vistas

@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { RegistroForm } from "./RegistroForm";
+
+export const metadata: Metadata = {
+  title: "Crear cuenta",
+  robots: { index: false, follow: false },
+};
 
 export default async function RegistroPage({
   searchParams,

@@ -6,13 +6,16 @@ export function BarraCadencia({ porcentaje }: { porcentaje: number }) {
   const pct = Math.min(100, Math.max(0, porcentaje));
 
   return (
-    <div className="flex w-full max-w-xs flex-col items-center gap-2">
-      <span className="font-display text-3xl font-bold text-white" style={{ letterSpacing: "-1px" }}>
+    <div className="flex w-full max-w-xs flex-col items-center gap-2 lg:max-w-sm lg:gap-3">
+      <span
+        className="font-display text-3xl font-bold text-white lg:text-5xl"
+        style={{ letterSpacing: "-1px" }}
+      >
         {Math.round(pct)}%
       </span>
-      <div className="h-2 w-full rounded-full bg-white/25">
+      <div className="h-2 w-full rounded-full bg-white/25 lg:h-2.5">
         <div
-          className="h-2 rounded-full bg-white transition-all"
+          className="h-2 rounded-full bg-white transition-all lg:h-2.5"
           style={{ width: `${pct}%` }}
         />
       </div>

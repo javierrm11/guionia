@@ -71,10 +71,10 @@ export default async function PlataformasPage({
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <div className="inline-flex w-fit items-center gap-1 rounded-full border border-border bg-neutral-bg p-[0.15rem]">
+      <div className="inline-flex w-fit items-center gap-1 rounded-full border border-border bg-neutral-bg p-[0.15rem] lg:p-1">
         <Link
           href="/contenido/plataformas"
-          className={`text-caption rounded-full px-3 py-1.5 ${
+          className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
             enCalendario ? "text-text-secondary" : "bg-accent text-white"
           }`}
         >
@@ -82,7 +82,7 @@ export default async function PlataformasPage({
         </Link>
         <Link
           href={`/contenido/plataformas?vista=calendario&semana=${semanaCalendario}`}
-          className={`text-caption rounded-full px-3 py-1.5 ${
+          className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
             enCalendario ? "bg-accent text-white" : "text-text-secondary"
           }`}
         >
@@ -98,7 +98,7 @@ export default async function PlataformasPage({
           />
         </CalendarioSemanaTransicion>
       ) : (
-      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-3">
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
       {plataformasActivas.map((plataforma) => {
         const Icon = PLATAFORMA_ICON[plataforma];
         const tono = PLATAFORMA_TONO[plataforma];
@@ -112,18 +112,18 @@ export default async function PlataformasPage({
         return (
           <section
             key={plataforma}
-            className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4"
+            className="flex flex-col gap-3.5 rounded-md bg-bg-primary p-4 lg:gap-4 lg:p-5"
           >
-            <Link href={`/contenido/${plataforma}/videos`} className="flex items-center gap-3">
+            <Link href={`/contenido/${plataforma}/videos`} className="flex items-center gap-3 lg:gap-3.5">
               <span
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-12 lg:w-12"
                 style={{ backgroundColor: tono }}
               >
-                <Icon size={20} strokeWidth={1.5} className="text-white" />
+                <Icon size={20} strokeWidth={1.5} className="text-white lg:h-[22px] lg:w-[22px]" />
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-px">
                 <span className="text-h2">{PLATAFORMA_LABEL[plataforma]}</span>
-                <span className="text-caption text-text-secondary truncate">
+                <span className="text-caption text-text-secondary truncate lg:text-small">
                   {p ? `${p.hechas} de ${p.cantidad} esta semana` : "Sin cadencia definida"}
                   {p?.nota ? ` · ${p.nota}` : ""}
                 </span>

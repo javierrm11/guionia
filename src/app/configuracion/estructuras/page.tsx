@@ -21,27 +21,27 @@ export default async function EstructurasPage() {
       <div className="flex justify-end">
         <Link
           href="/configuracion/estructuras/nueva"
-          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover lg:px-4 lg:py-2 lg:text-body"
         >
           + Añadir
         </Link>
       </div>
 
       {estructuras && estructuras.length > 0 ? (
-        <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
           {estructuras.map((e, index) => {
             const numEscenas = e.estructura_escenas?.[0]?.count ?? 0;
             return (
               <div
                 key={e.id}
-                className={`flex flex-col gap-2 py-3.5 ${
+                className={`flex flex-col gap-2 py-3.5 lg:py-4 ${
                   index > 0 ? "border-t border-border lg:border-t-0" : ""
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/configuracion/estructuras/${e.id}`}
-                    className="flex items-center gap-2 text-h3 text-text-primary hover:underline"
+                    className="flex items-center gap-2 text-h3 text-text-primary hover:underline lg:text-h2"
                   >
                     {e.nombre}
                     {numEscenas === 0 && <Badge tone="warning">Incompleta</Badge>}
@@ -53,7 +53,7 @@ export default async function EstructurasPage() {
                     </SubmitButton>
                   </form>
                 </div>
-                <p className="text-caption text-text-secondary">
+                <p className="text-caption text-text-secondary lg:text-small">
                   {PLATAFORMA_LABEL[e.plataforma as Plataforma]} · {e.duracion_segundos}s · {numEscenas}{" "}
                   {numEscenas === 1 ? "escena" : "escenas"}
                 </p>

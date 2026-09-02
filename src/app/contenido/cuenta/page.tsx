@@ -71,33 +71,33 @@ export default async function CuentaPage({
           </Link>
         </div>
 
-        <div className="flex flex-col items-center gap-1.5 pt-4 pb-4">
-          <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center">
-            <span className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-black">
+        <div className="flex flex-col items-center gap-1.5 pt-4 pb-4 lg:gap-2">
+          <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center lg:h-24 lg:w-24">
+            <span className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-black lg:h-24 lg:w-24">
               {avatarUrl ? (
-                <Image src={avatarUrl} alt="" fill sizes="80px" className="object-cover" />
+                <Image src={avatarUrl} alt="" fill sizes="96px" className="object-cover" />
               ) : (
                 <span className="font-display text-h1 text-white">{nombre[0]?.toUpperCase()}</span>
               )}
             </span>
             <span
-              className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full"
+              className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full lg:h-7 lg:w-7"
               style={{ backgroundColor: tonoCuenta }}
             >
-              <IconCuenta size={11} strokeWidth={1.5} className="text-white" />
+              <IconCuenta size={11} strokeWidth={1.5} className="text-white lg:h-3.5 lg:w-3.5" />
             </span>
           </span>
-          <span className="text-h2 text-white">{nombre}</span>
-          <span className="text-caption text-white/80">
+          <span className="text-h2 text-white lg:text-h1">{nombre}</span>
+          <span className="text-caption text-white/80 lg:text-body">
             {cuenta === "youtube" ? "Canal de YouTube" : "Cuenta de TikTok"}
           </span>
         </div>
 
         <div className="-mb-4 flex items-center justify-between gap-3">
-          <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md">
+          <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=youtube`}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption lg:px-4 lg:py-2 lg:text-body ${
                 cuenta === "youtube" ? "bg-accent text-white" : "text-text-secondary"
               }`}
             >
@@ -106,7 +106,7 @@ export default async function CuentaPage({
             </Link>
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=tiktok`}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption lg:px-4 lg:py-2 lg:text-body ${
                 cuenta === "tiktok" ? "bg-accent text-white" : "text-text-secondary"
               }`}
             >
@@ -119,7 +119,7 @@ export default async function CuentaPage({
         </div>
       </div>
 
-      <div className="relative z-10 flex flex-col gap-2 px-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:px-8">
+      <div className="relative z-10 flex flex-col gap-2 px-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-3 lg:px-8">
         <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
           {cuenta === "youtube" ? <CuentaSection rango={rango} /> : <CuentaTiktokSection rango={rango} />}
         </Suspense>

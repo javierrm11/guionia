@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { restablecerPasswordAction } from "./actions";
+
+export const metadata: Metadata = {
+  title: "Nueva contraseña",
+  robots: { index: false, follow: false },
+};
 
 export default async function RestablecerPasswordPage({
   searchParams,

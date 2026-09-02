@@ -46,7 +46,7 @@ export default async function DiaPage({
 
       <Link
         href={`/contenido/${plataforma}/videos/nueva?fecha=${fecha}`}
-        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
       >
         + Nuevo vídeo
       </Link>
@@ -57,12 +57,12 @@ export default async function DiaPage({
             <li key={guion.id}>
               <Link
                 href={`/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`}
-                className={`flex items-center gap-3 py-3 hover:opacity-70 ${index > 0 ? "border-t border-border" : ""}`}
+                className={`flex items-center gap-3 py-3 hover:opacity-70 lg:py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
               >
                 {guion.numero != null && (
                   <span className="shrink-0 text-caption text-text-disabled">#{guion.numero}</span>
                 )}
-                <span className="min-w-0 flex-1 truncate text-body text-text-primary">
+                <span className="min-w-0 flex-1 truncate text-body text-text-primary lg:text-h3">
                   {guion.titulo}
                 </span>
                 <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>{ESTADO_PIEZA_LABEL[guion.estado]}</Badge>

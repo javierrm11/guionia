@@ -29,14 +29,14 @@ export function StatMes({
   icon?: LucideIcon;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-bg-primary p-4">
+    <div className="flex flex-col gap-2 rounded-md bg-bg-primary p-4 lg:gap-2.5 lg:p-5">
       {Icon && (
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-bg">
-          <Icon size={16} strokeWidth={1.5} className="text-accent" />
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-bg lg:h-9 lg:w-9">
+          <Icon size={16} strokeWidth={1.5} className="text-accent lg:h-[18px] lg:w-[18px]" />
         </span>
       )}
-      <span className="text-caption text-text-secondary">{etiqueta}</span>
-      <span className="text-h2">
+      <span className="text-caption text-text-secondary lg:text-small">{etiqueta}</span>
+      <span className="text-h2 lg:text-h1">
         <NumeroAnimado valor={actual} sufijo={sufijo} />
       </span>
       {anterior != null && <Delta actual={actual} anterior={anterior} />}

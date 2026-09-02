@@ -26,13 +26,13 @@ export async function TendenciasCarrusel() {
   const videos = resultado.videos.slice(0, LIMITE);
 
   return (
-    <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6">
+    <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
       <div className="flex items-center justify-between">
         <span
-          className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase"
+          className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
           style={{ letterSpacing: "0.06em" }}
         >
-          <TrendingUp size={14} strokeWidth={1.5} />
+          <TrendingUp size={14} strokeWidth={1.5} className="lg:h-4 lg:w-4" />
           Tendencias
         </span>
         <Link
@@ -51,7 +51,7 @@ export async function TendenciasCarrusel() {
             href={`https://www.youtube.com/watch?v=${v.videoId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg transition-[transform,box-shadow] duration-200 lg:hover:-translate-y-0.5 lg:hover:shadow-lg"
+            className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg transition-[transform,box-shadow] duration-200 lg:h-48 lg:w-36 lg:hover:-translate-y-0.5 lg:hover:shadow-lg"
           >
             {v.miniatura && (
               <Image
@@ -74,8 +74,10 @@ export async function TendenciasCarrusel() {
               <Eye size={12} strokeWidth={1.5} />
               {v.vistas.toLocaleString("es-ES")}
             </span>
-            <div className="relative z-10 flex flex-col gap-0.5 p-2">
-              <p className="truncate text-[11px] font-medium text-white">{v.titulo}</p>
+            <div className="relative z-10 flex flex-col gap-0.5 p-2 lg:p-2.5">
+              <p className="truncate text-[11px] font-medium text-white lg:text-caption">
+                {v.titulo}
+              </p>
               <p className="truncate text-caption text-white/70">{v.canal}</p>
             </div>
           </a>

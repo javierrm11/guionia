@@ -77,7 +77,7 @@ export function GuionEscenas({
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <p className="text-h2">{titulo}</p>
+          <p className="text-h2 lg:text-h1">{titulo}</p>
 
           <div className="flex items-center gap-2">
             {numero != null && <span className="text-small text-text-secondary">#{numero}</span>}
@@ -99,7 +99,7 @@ export function GuionEscenas({
           return (
             <div
               key={escena.id}
-              className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
+              className={`flex flex-col gap-2 py-3.5 lg:gap-2.5 lg:py-4 ${index > 0 ? "border-t border-border" : ""}`}
             >
               <div className="flex items-center gap-2">
                 <div className="flex flex-col gap-0.5">
@@ -224,7 +224,7 @@ export function GuionEscenas({
                   )}
                 </>
               ) : texto.trim() ? (
-                <p className="whitespace-pre-wrap text-body text-text-secondary">{texto}</p>
+                <p className="whitespace-pre-wrap text-body text-text-secondary lg:text-h3">{texto}</p>
               ) : (
                 <p className="text-small text-text-disabled">Sin texto todavía.</p>
               )}

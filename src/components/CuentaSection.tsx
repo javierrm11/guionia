@@ -96,7 +96,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
     <div className="flex flex-col gap-6">
       {comparativa && (
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4">
             <StatMes
               icon={Eye}
               etiqueta="Vistas"
@@ -142,7 +142,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
       {destacados.length > 0 && (
         <div className="flex flex-col gap-3">
           <span
-            className="text-caption font-display text-text-secondary uppercase"
+            className="text-caption font-display text-text-secondary uppercase lg:text-body"
             style={{ letterSpacing: "0.06em" }}
           >
             Mejores vídeos
@@ -154,7 +154,7 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
                 href={`https://www.youtube.com/watch?v=${video.videoId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg"
+                className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg lg:h-48 lg:w-36"
               >
                 {video.miniatura && (
                   <Image src={video.miniatura} alt="" fill sizes="128px" className="object-cover" />
@@ -181,15 +181,15 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
       {fuentesTrafico.length > 0 && (
         <div className="flex flex-col gap-3">
           <span
-            className="text-caption font-display text-text-secondary uppercase"
+            className="text-caption font-display text-text-secondary uppercase lg:text-body"
             style={{ letterSpacing: "0.06em" }}
           >
             De dónde vienen tus vistas
           </span>
-          <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4">
+          <div className="flex flex-col gap-2.5 rounded-md bg-bg-primary p-4 lg:gap-3 lg:p-5">
             {fuentesTrafico.map((fuente) => (
               <div key={fuente.fuente} className="flex flex-col gap-1">
-                <div className="flex items-center justify-between text-small">
+                <div className="flex items-center justify-between text-small lg:text-body">
                   <span className="text-text-primary">{fuente.etiqueta}</span>
                   <span className="text-text-secondary">{fuente.porcentaje}%</span>
                 </div>

@@ -11,12 +11,12 @@ export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: 
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="rounded-md bg-bg-primary p-4">
+    <div className="rounded-md bg-bg-primary p-4 lg:p-5">
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="flex w-full items-center justify-between gap-3 text-left text-h3"
+        className="flex w-full items-center justify-between gap-3 text-left text-h3 lg:text-h2"
       >
         {pregunta}
         <ChevronDown
@@ -32,7 +32,7 @@ export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: 
         style={{ gridTemplateRows: abierto ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <p className="pt-2 text-small text-text-secondary">{respuesta}</p>
+          <p className="pt-2 text-small text-text-secondary lg:text-body">{respuesta}</p>
         </div>
       </div>
     </div>

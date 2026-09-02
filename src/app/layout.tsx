@@ -24,7 +24,11 @@ export const metadata: Metadata = {
   // — de momento cae a localhost, solo afecta a las URLs absolutas de
   // Open Graph (la preview al compartir un enlace), no a la app en sí.
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "Guionia",
+  // Páginas que fijan su propio `title` (string corto, p. ej. "Iniciar
+  // sesión") heredan esta plantilla — así no hace falta repetir "Guionia" en
+  // cada una. La landing ("/") sí pone un `title` completo propio para SEO,
+  // que también pasa por la plantilla (ver comentario en su metadata).
+  title: { default: "Guionia", template: "%s — Guionia" },
   description: "Panel para centralizar la gestión de contenido de Guionia.",
 };
 

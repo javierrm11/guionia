@@ -21,14 +21,20 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
+// Este `title` (string corto) pasa por la plantilla del layout raíz
+// (`%s — Guionia`) — de ahí que no repita "Guionia" aquí.
+const TITULO = "Planifica y organiza tu contenido de YouTube y TikTok";
+const DESCRIPCION =
+  "Organiza tus ideas, guiones y calendario de contenido para YouTube y TikTok en un solo sitio. Define tu cadencia de publicación semanal y no vuelvas a perder una idea de vídeo. Gratis.";
+
 export const metadata: Metadata = {
-  title: "Guionia — Organiza y publica tu contenido de YouTube y TikTok",
-  description:
-    "Guionia centraliza tus ideas, guiones y calendario de publicación para YouTube y TikTok. Define tu cadencia semanal, escribe con estructura y sube tus vídeos sin salir de la app. Gratis.",
+  title: TITULO,
+  description: DESCRIPCION,
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Guionia — Organiza y publica tu contenido de YouTube y TikTok",
-    description:
-      "Ideas, guiones y calendario de publicación en un solo sitio, para creadores que publican en YouTube y TikTok.",
+    // openGraph.title no pasa por la plantilla del layout — va completo.
+    title: `Guionia — ${TITULO}`,
+    description: DESCRIPCION,
   },
 };
 
@@ -128,48 +134,76 @@ export default async function LandingPage() {
 
   if (user) redirect("/contenido");
 
+  const jsonLdApp = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Guionia",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: DESCRIPCION,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+  };
+
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.pregunta,
+      acceptedAnswer: { "@type": "Answer", text: f.respuesta },
+    })),
+  };
+
   return (
     <div className="flex flex-1 flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApp) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+      />
       <LandingHeader />
 
-      <section className="flex flex-col items-center gap-6 px-4 pt-8 pb-12 text-center lg:mx-auto lg:w-full lg:max-w-3xl lg:px-8 lg:pt-16">
-        <span className="animate-tarjeta-entrada inline-flex items-center gap-1.5 rounded-full bg-accent-bg px-3 py-1 text-caption text-accent">
-          Para creadores de YouTube y TikTok
-        </span>
-        <h1
-          className="animate-tarjeta-entrada font-display text-3xl leading-tight font-semibold text-text-primary lg:text-5xl"
-          style={{ animationDelay: "80ms" }}
-        >
-          Deja de perder ideas de vídeo entre notas sueltas
-        </h1>
-        <p
-          className="animate-tarjeta-entrada max-w-xl text-body text-text-secondary lg:text-h3"
-          style={{ animationDelay: "160ms" }}
-        >
-          Guionia centraliza tus ideas, guiones y calendario de publicación para YouTube y
-          TikTok — para que sepas siempre qué toca grabar hoy.
-        </p>
-        <div
-          className="animate-tarjeta-entrada flex flex-col items-center gap-1.5"
-          style={{ animationDelay: "220ms" }}
-        >
-          <Link
-            href="/registro"
-            className="animate-cta-brillo rounded-full bg-accent px-7 py-3.5 text-body font-medium text-white shadow-lg active:bg-accent-hover"
-          >
-            Crear cuenta gratis
-          </Link>
-          <span className="text-caption text-text-disabled">Gratis, sin tarjeta.</span>
-          <span className="text-caption text-text-disabled">
-            Construido por un creador, para creadores.
+      <section className="flex flex-col items-center gap-10 px-4 pt-8 pb-16 lg:mx-auto lg:w-full lg:max-w-6xl lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:pt-16 lg:pb-20">
+        <div className="flex flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+          <span className="animate-tarjeta-entrada inline-flex items-center gap-1.5 rounded-full bg-accent-bg px-3 py-1 text-caption text-accent">
+            Para creadores de YouTube y TikTok
           </span>
+          <h1
+            className="animate-tarjeta-entrada font-display text-3xl leading-tight font-semibold text-text-primary lg:text-5xl"
+            style={{ animationDelay: "80ms" }}
+          >
+            Deja de perder ideas de vídeo entre notas sueltas
+          </h1>
+          <p
+            className="animate-tarjeta-entrada max-w-xl text-body text-text-secondary lg:text-h3"
+            style={{ animationDelay: "160ms" }}
+          >
+            Guionia centraliza tus ideas, guiones y calendario de publicación para YouTube y
+            TikTok — para que sepas siempre qué toca grabar hoy.
+          </p>
+          <div
+            className="animate-tarjeta-entrada flex flex-col items-center gap-1.5 lg:items-start"
+            style={{ animationDelay: "220ms" }}
+          >
+            <Link
+              href="/registro"
+              className="animate-cta-brillo rounded-full bg-accent px-7 py-3.5 text-body font-medium text-white shadow-lg active:bg-accent-hover"
+            >
+              Crear cuenta gratis
+            </Link>
+            <span className="text-caption text-text-disabled">Gratis, sin tarjeta.</span>
+            <span className="text-caption text-text-disabled">
+              Construido por un creador, para creadores.
+            </span>
+          </div>
         </div>
-      </section>
 
-      {/* Mockup ilustrativo del dashboard "Control" — datos de ejemplo, no en vivo. */}
-      <section className="px-4 pb-16 lg:mx-auto lg:w-full lg:max-w-2xl lg:px-8">
+        {/* Mockup ilustrativo del dashboard "Control" — datos de ejemplo, no en vivo. */}
         <div
-          className="overflow-hidden rounded-md border border-border"
+          className="w-full overflow-hidden rounded-md border border-border"
           style={{ boxShadow: "var(--card-shadow), 0 24px 48px rgba(16,24,40,0.08)" }}
         >
           <div className="flex items-center gap-2 border-b border-border bg-bg-page px-4 py-2.5">
@@ -274,17 +308,21 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-8 border-t border-border px-4 py-14 lg:mx-auto lg:w-full lg:max-w-4xl lg:px-8">
+      <section className="flex flex-col gap-8 border-t border-border px-4 py-14 lg:mx-auto lg:w-full lg:max-w-6xl lg:px-8">
         <h2 className="text-h1">Cómo funciona</h2>
 
         {/* Móvil: lista icono-izquierda/texto-derecha. Escritorio (lg:): */}
         {/* rejilla de 4 columnas, numerada y conectada por una línea — */}
         {/* misma alineación a la izquierda en ambos casos. */}
-        <div className="flex flex-col gap-7 lg:grid lg:grid-cols-4 lg:gap-8">
+        <div className="flex flex-col gap-7 lg:grid lg:grid-cols-4 lg:gap-14">
           {PASOS.map(({ icon: Icon, titulo, texto, extra }, i) => (
             <div key={titulo} className="flex gap-4 lg:relative lg:flex-col">
               {i < PASOS.length - 1 && (
-                <span className="absolute top-5 left-[calc(50%+26px)] hidden h-px w-[calc(100%-52px)] bg-border lg:block" />
+                // `left` = alto del icono + margen, `width: 100%` llega justo hasta el
+                // siguiente icono porque ese margen coincide con el gap de la rejilla
+                // (ambos 56px = `lg:gap-14`) — no es una coincidencia, hay que mantenerlos
+                // iguales si se cambia el espaciado.
+                <span className="absolute top-5 left-14 hidden h-px w-full bg-border lg:block" />
               )}
               <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent">
                 <span
@@ -305,7 +343,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-3 border-t border-border bg-neutral-bg px-4 py-14 lg:mx-auto lg:w-full lg:max-w-2xl lg:px-8">
+      <section className="flex flex-col gap-3 border-t border-border bg-neutral-bg px-4 py-14 lg:mx-auto lg:w-full lg:max-w-6xl lg:gap-5 lg:px-8">
         <h2 className="pb-2 text-center text-h1">Preguntas frecuentes</h2>
         {FAQS.map((f) => (
           <FaqItem key={f.pregunta} pregunta={f.pregunta} respuesta={f.respuesta} />

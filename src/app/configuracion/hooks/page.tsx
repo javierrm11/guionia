@@ -25,23 +25,23 @@ export default async function HooksPage() {
       <div className="flex justify-end">
         <Link
           href="/configuracion/hooks/nuevo"
-          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover"
+          className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover lg:px-4 lg:py-2 lg:text-body"
         >
           + Añadir
         </Link>
       </div>
 
       {hooks && hooks.length > 0 ? (
-        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
           {hooks.map((h, index) => (
             <li
               key={h.id}
-              className={`flex flex-col gap-1 py-3.5 ${
+              className={`flex flex-col gap-1 py-3.5 lg:py-4 ${
                 index > 0 ? "border-t border-border lg:border-t-0" : ""
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-caption text-text-secondary">
+                <span className="text-caption text-text-secondary lg:text-small">
                   {PLATAFORMA_LABEL[h.plataforma as Plataforma]}
                 </span>
                 <form action={eliminarFrase}>
@@ -57,7 +57,7 @@ export default async function HooksPage() {
                   </ConfirmButton>
                 </form>
               </div>
-              <p className="text-body">{h.texto}</p>
+              <p className="text-body lg:text-h3">{h.texto}</p>
               {h.nota && <p className="text-small text-text-secondary">{h.nota}</p>}
             </li>
           ))}

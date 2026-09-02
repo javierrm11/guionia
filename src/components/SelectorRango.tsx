@@ -15,7 +15,7 @@ export function SelectorRango({ rango }: { rango: RangoEstadisticas }) {
         params.set("rango", e.target.value);
         router.push(`/contenido/cuenta?${params.toString()}`);
       }}
-      className="self-start rounded-full bg-bg-primary px-4 py-2 text-small focus:ring-2 focus:ring-accent-bg focus:outline-none"
+      className="self-start rounded-full bg-bg-primary px-4 py-2 text-small focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-5 lg:py-2.5 lg:text-body"
     >
       {RANGOS_ESTADISTICAS.map((r) => (
         <option key={r} value={r}>

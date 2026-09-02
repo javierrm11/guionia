@@ -110,7 +110,7 @@ export default async function GuionPage({
       : (guion.texto ?? "");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-5 lg:p-8">
       {escenas && escenas.length > 0 ? (
         <GuionEscenas
           piezaId={id}
@@ -132,7 +132,7 @@ export default async function GuionPage({
         />
       ) : (
         <>
-          <p className="text-h2">{guion.titulo}</p>
+          <p className="text-h2 lg:text-h1">{guion.titulo}</p>
 
           <div className="flex items-center gap-2">
             {guion.numero != null && (
@@ -145,7 +145,7 @@ export default async function GuionPage({
           {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
 
           {guion.texto && (
-            <p className="text-body whitespace-pre-wrap rounded-md border border-border p-4">
+            <p className="text-body whitespace-pre-wrap rounded-md border border-border p-4 lg:text-h3 lg:p-5">
               {guion.texto}
             </p>
           )}
@@ -156,8 +156,8 @@ export default async function GuionPage({
         guion.titulo_publicacion ||
         guion.etiquetas_publicacion ||
         guion.estado === "publicado") && (
-        <div className="flex flex-col gap-2 rounded-md border border-border p-4">
-          <h2 className="text-h2">Datos de publicación</h2>
+        <div className="flex flex-col gap-2 rounded-md border border-border p-4 lg:gap-3 lg:p-5">
+          <h2 className="text-h2 lg:text-h1">Datos de publicación</h2>
           {guion.titulo_publicacion && (
             <div className="flex flex-col gap-1">
               <span className="text-h3 text-text-secondary">Título</span>
@@ -237,7 +237,7 @@ export default async function GuionPage({
           (siguiente === "publicado" && plataforma !== "linkedin" ? (
             <Link
               href={`${rutaActual}/publicar`}
-              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
             >
               Preparar publicación
             </Link>
@@ -249,7 +249,7 @@ export default async function GuionPage({
               <input type="hidden" name="redirectTo" value={rutaActual} />
               <SubmitButton
                 pendingLabel="Guardando…"
-                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60"
+                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60 lg:px-5 lg:py-2.5"
               >
                 Marcar como {ESTADO_PIEZA_LABEL[siguiente].toLowerCase()}
               </SubmitButton>

@@ -30,7 +30,7 @@ export default async function PlantillaPage() {
           <h1 className="text-h1">Plantilla semanal</h1>
           <Link
             href="/configuracion/plantilla/nueva"
-            className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover"
+            className="rounded-sm bg-accent px-3 py-1.5 text-small text-white active:bg-accent-hover lg:px-4 lg:py-2 lg:text-body"
           >
             + Añadir
           </Link>
@@ -72,13 +72,13 @@ export default async function PlantillaPage() {
                             }`}
                           >
                             <span
-                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm"
+                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm lg:h-8 lg:w-8"
                               style={{ backgroundColor: tono }}
                             >
-                              <Icon size={14} strokeWidth={1.5} className="text-white" />
+                              <Icon size={14} strokeWidth={1.5} className="text-white lg:h-4 lg:w-4" />
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="truncate text-small font-medium text-text-primary">
+                              <p className="truncate text-small font-medium text-text-primary lg:text-body">
                                 {entrada.nota}
                               </p>
                               {plataforma && (

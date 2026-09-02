@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { olvidePasswordAction } from "./actions";
+
+export const metadata: Metadata = {
+  title: "Recuperar contraseña",
+  robots: { index: false, follow: false },
+};
 
 export default async function OlvidePasswordPage({
   searchParams,

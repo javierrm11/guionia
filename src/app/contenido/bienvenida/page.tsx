@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DIA_SEMANA_ABREV, PLATAFORMA_ICON, PLATAFORMA_LABEL, isPlataforma } from "@/lib/plataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
@@ -39,15 +40,15 @@ export default async function BienvenidaPage() {
               >
                 <div className="flex items-center gap-3.5">
                   <span
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-12 lg:w-12"
                     style={{ backgroundColor: tono }}
                   >
-                    <Icon size={20} strokeWidth={1.5} className="text-white" />
+                    <Icon size={20} strokeWidth={1.5} className="text-white lg:h-[22px] lg:w-[22px]" />
                   </span>
-                  <span className="flex-1 text-h3">{PLATAFORMA_LABEL[p]}</span>
+                  <span className="flex-1 text-h3 lg:text-h2">{PLATAFORMA_LABEL[p]}</span>
                 </div>
 
-                <div className="grid grid-cols-7 gap-1.5">
+                <div className="grid grid-cols-7 gap-1.5 lg:gap-2">
                   {DIA_SEMANA_ABREV.map((abrev, index) => {
                     const dia = index + 1;
                     return (
@@ -57,7 +58,7 @@ export default async function BienvenidaPage() {
                           name={`dia_${p}_${dia}`}
                           className="peer sr-only"
                         />
-                        <span className="flex h-9 items-center justify-center rounded-sm bg-bg-secondary text-caption font-medium text-text-secondary peer-checked:bg-accent peer-checked:text-white">
+                        <span className="flex h-9 items-center justify-center rounded-sm bg-bg-secondary text-caption font-medium text-text-secondary peer-checked:bg-accent peer-checked:text-white lg:h-11 lg:text-small">
                           {abrev}
                         </span>
                       </label>
@@ -76,9 +77,9 @@ export default async function BienvenidaPage() {
           >
             Crear cadencia y plantilla
           </button>
-          <a href="/contenido" className="text-small text-text-secondary">
+          <Link href="/contenido" className="text-small text-text-secondary">
             Saltar por ahora
-          </a>
+          </Link>
         </div>
       </form>
     </div>

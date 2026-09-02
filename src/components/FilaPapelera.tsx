@@ -53,8 +53,8 @@ export function FilaPapelera({
       style={{ gridTemplateRows: saliendo ? "0fr" : "1fr" }}
     >
       <div
-        className={`flex flex-col gap-2 overflow-hidden transition-opacity duration-150 ${
-          saliendo ? "opacity-0" : "py-3.5 opacity-100"
+        className={`flex flex-col gap-2 overflow-hidden transition-opacity duration-150 lg:gap-2.5 ${
+          saliendo ? "opacity-0" : "py-3.5 opacity-100 lg:py-4"
         }`}
       >
         <div className="flex items-center justify-between gap-2">
@@ -66,7 +66,7 @@ export function FilaPapelera({
           </span>
         </div>
 
-        <p className="text-body line-clamp-2">{texto}</p>
+        <p className="text-body line-clamp-2 lg:text-h3">{texto}</p>
         <p className="text-small text-text-secondary">{contexto}</p>
 
         <div className="flex items-center gap-3">

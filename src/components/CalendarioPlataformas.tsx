@@ -86,7 +86,7 @@ export async function CalendarioPlataformas({
   const semanaSiguiente = addDaysISO(semanaInicio, 7);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 lg:gap-6">
       <div className="flex items-center justify-between">
         <Link
           href={`/contenido/plataformas?vista=calendario&semana=${semanaAnterior}`}
@@ -94,7 +94,7 @@ export async function CalendarioPlataformas({
         >
           <ChevronLeft size={20} strokeWidth={1.5} />
         </Link>
-        <h2 className="text-h2">{formatearRangoSemana(semanaInicio, semanaFin)}</h2>
+        <h2 className="text-h2 lg:text-h1">{formatearRangoSemana(semanaInicio, semanaFin)}</h2>
         <Link
           href={`/contenido/plataformas?vista=calendario&semana=${semanaSiguiente}`}
           className="text-text-secondary"
@@ -131,15 +131,15 @@ export async function CalendarioPlataformas({
         return (
           <div key={fecha} className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2 px-1">
-              <span className="text-h3">{DIA_SEMANA_LABEL[index]}</span>
-              <span className="text-caption text-text-secondary">
+              <span className="text-h3 lg:text-h2">{DIA_SEMANA_LABEL[index]}</span>
+              <span className="text-caption text-text-secondary lg:text-small">
                 {diaNum} de {MES_LABEL[mesNum - 1]}
               </span>
-              {fecha === hoy && <span className="text-caption text-accent">Hoy</span>}
+              {fecha === hoy && <span className="text-caption text-accent lg:text-small">Hoy</span>}
             </div>
 
             {tareas.length > 0 ? (
-              <div className="flex flex-col rounded-md bg-bg-primary px-4">
+              <div className="flex flex-col rounded-md bg-bg-primary px-4 lg:px-5">
                 {tareas.map((t, i) => {
                   const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
                   const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
@@ -148,17 +148,17 @@ export async function CalendarioPlataformas({
                   return (
                     <div
                       key={t.id}
-                      className={`flex items-center gap-3 py-3 ${i > 0 ? "border-t border-border " : ""}${
+                      className={`flex items-center gap-3 py-3 lg:gap-3.5 lg:py-3.5 ${i > 0 ? "border-t border-border " : ""}${
                         pendiente ? "opacity-70" : ""
                       }`}
                     >
                       <span
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm lg:h-9 lg:w-9"
                         style={{ backgroundColor: tono }}
                       >
                         <Icon size={16} strokeWidth={1.5} className="text-white" />
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-body">{t.titulo}</span>
+                      <span className="min-w-0 flex-1 truncate text-body lg:text-h3">{t.titulo}</span>
                       {t.estado ? (
                         <Badge tone={ESTADO_PIEZA_TONE[t.estado]}>
                           {ESTADO_PIEZA_LABEL[t.estado]}

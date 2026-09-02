@@ -45,12 +45,12 @@ function TarjetaIdea({ idea, primera }: { idea: Idea; primera: boolean }) {
           : undefined
       }
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 lg:gap-3.5">
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm lg:h-9 lg:w-9"
           style={{ backgroundColor: tono }}
         >
-          <Icon size={16} strokeWidth={1.5} className="text-white" />
+          <Icon size={16} strokeWidth={1.5} className="text-white lg:h-[18px] lg:w-[18px]" />
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-1.5">
           <span className="text-h2 truncate">{idea.titulo}</span>
@@ -113,14 +113,14 @@ export default async function IdeasGlobalPage({
   return (
     <div className="flex flex-1 flex-col gap-5 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <div className="flex items-end justify-between gap-3 px-1">
-        <p className="text-caption text-text-secondary">
+        <p className="text-caption text-text-secondary lg:text-body">
           {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
           {olvidadas > 0 && ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
         </p>
         {filtro ? (
           <Link
             href={`/contenido/${filtro}/ideas/nueva`}
-            className="text-caption text-accent"
+            className="text-caption text-accent lg:text-body"
           >
             + Nueva idea
           </Link>
@@ -135,10 +135,10 @@ export default async function IdeasGlobalPage({
       </div>
 
       {plataformasConIdeas.length > 1 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 lg:gap-2.5">
           <Link
             href="/contenido/ideas"
-            className={`text-caption rounded-full px-3 py-1.5 ${
+            className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
               filtro ? "bg-neutral-bg text-text-secondary" : "bg-accent text-white"
             }`}
           >
@@ -148,7 +148,7 @@ export default async function IdeasGlobalPage({
             <Link
               key={plataforma}
               href={`/contenido/ideas?p=${plataforma}`}
-              className={`text-caption flex items-center gap-1.5 rounded-full px-3 py-1.5 ${
+              className={`text-caption flex items-center gap-1.5 rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
                 filtro === plataforma ? "bg-accent text-white" : "bg-neutral-bg text-text-secondary"
               }`}
             >
@@ -173,7 +173,7 @@ export default async function IdeasGlobalPage({
             </h2>
             <span className="text-caption text-text-disabled">{activas.length}</span>
           </div>
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
             {activas.map((idea, index) => (
               <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}
@@ -192,7 +192,7 @@ export default async function IdeasGlobalPage({
             </h2>
             <span className="text-caption text-text-disabled">{descartadas.length}</span>
           </div>
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
             {descartadas.map((idea, index) => (
               <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}

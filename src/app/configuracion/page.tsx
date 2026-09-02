@@ -15,7 +15,7 @@ import { logoutAction } from "../login/actions";
 export default function ConfiguracionPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:gap-5">
         <Tile href="/configuracion/plataformas" label="Plataformas" icon={Video} />
         <Tile href="/configuracion/cadencia" label="Cadencia fija" icon={CalendarClock} />
         <Tile href="/configuracion/plantilla" label="Plantilla semanal" icon={CalendarDays} />
@@ -31,10 +31,10 @@ export default function ConfiguracionPage() {
         <form action={logoutAction} className="contents">
           <button
             type="submit"
-            className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-border p-4 hover:bg-accent-bg active:bg-accent-bg"
+            className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-border p-4 hover:bg-accent-bg active:bg-accent-bg lg:min-h-28 lg:gap-3 lg:p-5"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-badge-danger">
-              <LogOut size={20} strokeWidth={1.5} className="text-white" />
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-badge-danger lg:h-12 lg:w-12">
+              <LogOut size={20} strokeWidth={1.5} className="text-white lg:h-[22px] lg:w-[22px]" />
             </span>
             <span className="text-h3 text-center text-text-primary">Cerrar sesión</span>
           </button>

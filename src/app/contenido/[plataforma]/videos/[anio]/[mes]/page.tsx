@@ -88,12 +88,12 @@ export default async function CalendarioPage({
 
       <Link
         href={`/contenido/${plataforma}/videos/nueva`}
-        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+        className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
       >
         + Nuevo vídeo
       </Link>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 lg:gap-1.5">
         {DIAS_CABECERA.map((d) => (
           <div key={d} className="text-caption text-center text-text-secondary">
             {d}
@@ -121,12 +121,12 @@ export default async function CalendarioPage({
               className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-neutral-bg lg:min-h-24 lg:p-2 ${colorBorde}`}
             >
               <span
-                className={`text-caption ${riesgo ? "text-danger" : "text-text-secondary"}`}
+                className={`text-caption lg:text-small ${riesgo ? "text-danger" : "text-text-secondary"}`}
               >
                 {dia}
               </span>
               {visibles.map((p, i) => (
-                <span key={i} className="truncate text-caption text-accent" title={p.titulo}>
+                <span key={i} className="truncate text-caption text-accent lg:text-small" title={p.titulo}>
                   {p.titulo}
                 </span>
               ))}
