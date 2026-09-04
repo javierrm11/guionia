@@ -2,10 +2,13 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
+import { AdaptarGuionButton } from "@/components/AdaptarGuionButton";
 import { CopiarGuionButton } from "@/components/CopiarGuionButton";
+import { TeleprompterButton } from "@/components/TeleprompterButton";
 import { EstadisticasTiktokVideo } from "@/components/EstadisticasTiktokVideo";
 import { EstadisticasVideoLoader } from "@/components/EstadisticasVideoLoader";
 import { EstadisticasYoutubeVideo } from "@/components/EstadisticasYoutubeVideo";
+import { GrabarVideoButton } from "@/components/GrabarVideoButton";
 import { GuionEscenas } from "@/components/GuionEscenas";
 import { RetencionSection } from "@/components/RetencionSection";
 import { RetencionLoader } from "@/components/RetencionLoader";
@@ -17,6 +20,7 @@ import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
 import { ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, getSiguienteEstadoVideo } from "@/lib/contenido";
 import {
+  adaptarAOtraPlataforma,
   agregarEscenaGuion,
   avanzarEstado,
   eliminarEscenaGuion,
@@ -46,6 +50,14 @@ export default async function GuionPage({
     .maybeSingle();
 
   if (!guion) notFound();
+
+  const { data: plataformasActivasData } = await supabase
+    .from("plataformas_activas")
+    .select("plataforma");
+  const plataformasDisponibles = (plataformasActivasData ?? [])
+    .map((r) => r.plataforma)
+    .filter(isPlataforma)
+    .filter((p) => p !== plataforma);
 
   const { data: escenas } = await supabase
     .from("escenas_guion")
@@ -232,6 +244,14 @@ export default async function GuionPage({
 
       <div className="flex flex-wrap items-center gap-3">
         {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
+        {textoCompleto && <TeleprompterButton texto={textoCompleto} />}
+        {textoCompleto && (
+          <AdaptarGuionButton
+            piezaId={guion.id}
+            plataformasDisponibles={plataformasDisponibles}
+            adaptarAOtraPlataforma={adaptarAOtraPlataforma}
+          />
+        )}
 
         {siguiente &&
           (siguiente === "publicado" && plataforma !== "linkedin" ? (
@@ -241,6 +261,14 @@ export default async function GuionPage({
             >
               Preparar publicación
             </Link>
+          ) : siguiente === "grabado" ? (
+            <GrabarVideoButton
+              piezaId={guion.id}
+              plataforma={plataforma}
+              redirectTo={rutaActual}
+              tituloArchivo={guion.titulo}
+              avanzarEstado={avanzarEstado}
+            />
           ) : (
             <form action={avanzarEstado}>
               <input type="hidden" name="id" value={guion.id} />

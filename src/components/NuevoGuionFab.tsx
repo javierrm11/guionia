@@ -39,6 +39,7 @@ export function NuevoGuionFab({ variant = "fab" }: { variant?: "fab" | "sidebar"
           type="button"
           onClick={() => setAbierto(true)}
           aria-label="Crear guion"
+          data-tour="fab"
           className="-mt-8 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent active:bg-accent-hover"
           style={{ boxShadow: "0 8px 20px rgba(108,92,224,0.4)" }}
         >
@@ -48,6 +49,7 @@ export function NuevoGuionFab({ variant = "fab" }: { variant?: "fab" | "sidebar"
         <button
           type="button"
           onClick={() => setAbierto(true)}
+          data-tour="fab"
           className="flex min-h-11 items-center gap-3 rounded-sm bg-accent px-3 text-body text-white hover:bg-accent-hover"
         >
           <Plus size={20} strokeWidth={1.5} />

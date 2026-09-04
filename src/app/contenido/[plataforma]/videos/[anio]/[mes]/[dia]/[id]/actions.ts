@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isPlataforma } from "@/lib/plataformas";
+import { isPlataforma, todayISO } from "@/lib/plataformas";
 import { ESTADOS_VIDEO, TIPOS_ESCENA } from "@/lib/contenido";
 import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
@@ -135,6 +135,77 @@ export async function guardarVideoSubido(
 
   revalidatePath(redirectTo);
   redirect(redirectTo);
+}
+
+type EscenaOriginal = {
+  deleted_at: string | null;
+  orden: number;
+  tipo_escena: string;
+  duracion_segundos: number | null;
+  texto: string | null;
+};
+
+/** Crea un guion nuevo en otra plataforma a partir de uno ya escrito —
+ *  mismo título, mismo pilar y las mismas escenas (o el texto libre, si no
+ *  tiene escenas), como punto de partida para ajustar al formato de la
+ *  plataforma destino. Fecha de publicación: hoy, por defecto — se puede
+ *  reprogramar después arrastrando la pieza en el calendario mensual. */
+export async function adaptarAOtraPlataforma(formData: FormData) {
+  const supabase = await createClient();
+
+  const id = formData.get("id");
+  const plataformaDestino = formData.get("plataforma_destino");
+
+  if (typeof id !== "string" || !id) throw new Error("Guion inválido");
+  if (typeof plataformaDestino !== "string" || !isPlataforma(plataformaDestino)) {
+    throw new Error("Plataforma inválida");
+  }
+
+  const { data: original } = await supabase
+    .from("piezas_contenido")
+    .select("*, escenas_guion(*)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!original) throw new Error("Guion no encontrado");
+
+  const escenasActivas = ((original.escenas_guion ?? []) as EscenaOriginal[]).filter(
+    (e) => !e.deleted_at
+  );
+  const hoy = todayISO();
+
+  const { data: copia, error } = await supabase
+    .from("piezas_contenido")
+    .insert({
+      plataforma: plataformaDestino,
+      pilar: original.pilar,
+      titulo: original.titulo,
+      estado: "guion_escrito",
+      fecha_publicacion: hoy,
+      texto: escenasActivas.length === 0 ? original.texto : null,
+    })
+    .select("id")
+    .single();
+
+  if (error || !copia) {
+    throw new Error(error?.message ?? "No se pudo adaptar el guion");
+  }
+
+  if (escenasActivas.length > 0) {
+    const { error: escenasError } = await supabase.from("escenas_guion").insert(
+      escenasActivas.map((e) => ({
+        pieza_id: copia.id,
+        orden: e.orden,
+        tipo_escena: e.tipo_escena,
+        duracion_segundos: e.duracion_segundos,
+        texto: e.texto,
+      }))
+    );
+    if (escenasError) throw new Error(escenasError.message);
+  }
+
+  const [anio, mes, dia] = hoy.split("-");
+  redirect(`/contenido/${plataformaDestino}/videos/${anio}/${mes}/${dia}/${copia.id}`);
 }
 
 export async function guardarTextoEscena(formData: FormData) {

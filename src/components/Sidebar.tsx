@@ -28,6 +28,7 @@ export function Sidebar() {
               key={href}
               href={href}
               aria-current={esActivo ? "page" : undefined}
+              data-tour={href === "/contenido/ideas" ? "nav-ideas" : undefined}
               className={`flex min-h-11 items-center gap-3 rounded-sm px-3 ${
                 esActivo ? "bg-accent-bg" : "hover:bg-accent-bg"
               }`}

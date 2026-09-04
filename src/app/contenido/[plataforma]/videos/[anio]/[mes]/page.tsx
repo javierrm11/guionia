@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarioMensualGrid, type CeldaCalendario } from "@/components/CalendarioMensualGrid";
 import { createClient } from "@/lib/supabase/server";
 import { diasEnMes, isPlataforma, primerDiaSemanaMes } from "@/lib/plataformas";
 import { ESTADOS_VIDEO, MES_LABEL, pad2 } from "@/lib/contenido";
+import { reprogramarFecha } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -37,16 +39,16 @@ export default async function CalendarioPage({
     .lte("fecha_publicacion", finMes)
     .order("numero");
 
-  const porDia = new Map<number, { titulo: string; estado: string }[]>();
+  const porDia = new Map<number, { id: string; titulo: string; estado: string }[]>();
   for (const g of guiones ?? []) {
     const dia = Number(g.fecha_publicacion.slice(8, 10));
     const lista = porDia.get(dia) ?? [];
-    lista.push({ titulo: g.titulo, estado: g.estado });
+    lista.push({ id: g.id, titulo: g.titulo, estado: g.estado });
     porDia.set(dia, lista);
   }
 
   const offset = primerDiaSemanaMes(anio, mes) - 1;
-  const celdas: (number | null)[] = [
+  const numerosDia: (number | null)[] = [
     ...Array(offset).fill(null),
     ...Array.from({ length: totalDias }, (_, i) => i + 1),
   ];
@@ -65,6 +67,21 @@ export default async function CalendarioPage({
     const diffDias = Math.round((fechaDia.getTime() - hoyLocal.getTime()) / 86400000);
     return diffDias <= DIAS_RIESGO;
   }
+
+  const rutaActual = `/contenido/${plataforma}/videos/${anio}/${pad2(mes)}`;
+
+  const celdas: (CeldaCalendario | null)[] = numerosDia.map((dia) => {
+    if (dia === null) return null;
+    const piezas = porDia.get(dia) ?? [];
+    return {
+      dia,
+      fecha: `${anio}-${pad2(mes)}-${pad2(dia)}`,
+      href: `${rutaActual}/${pad2(dia)}`,
+      piezas,
+      riesgo: esRiesgo(dia, piezas),
+      esHoy: esHoy(dia),
+    };
+  });
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
@@ -93,53 +110,16 @@ export default async function CalendarioPage({
         + Nuevo vídeo
       </Link>
 
-      <div className="grid grid-cols-7 gap-1 lg:gap-1.5">
-        {DIAS_CABECERA.map((d) => (
-          <div key={d} className="text-caption text-center text-text-secondary">
-            {d}
-          </div>
-        ))}
-
-        {celdas.map((dia, index) => {
-          if (dia === null) return <div key={`vacio-${index}`} />;
-
-          const piezas = porDia.get(dia) ?? [];
-          const visibles = piezas.slice(0, 2);
-          const restantes = piezas.length - visibles.length;
-          const riesgo = esRiesgo(dia, piezas);
-
-          const colorBorde = riesgo
-            ? "border-danger bg-danger-bg"
-            : esHoy(dia)
-              ? "border-accent bg-accent-bg"
-              : "border-border";
-
-          return (
-            <Link
-              key={dia}
-              href={`/contenido/${plataforma}/videos/${anio}/${pad2(mes)}/${pad2(dia)}`}
-              className={`flex min-h-16 flex-col gap-0.5 rounded-sm border p-1 hover:bg-neutral-bg lg:min-h-24 lg:p-2 ${colorBorde}`}
-            >
-              <span
-                className={`text-caption lg:text-small ${riesgo ? "text-danger" : "text-text-secondary"}`}
-              >
-                {dia}
-              </span>
-              {visibles.map((p, i) => (
-                <span key={i} className="truncate text-caption text-accent lg:text-small" title={p.titulo}>
-                  {p.titulo}
-                </span>
-              ))}
-              {restantes > 0 && (
-                <span className="text-caption text-text-disabled">+{restantes} más</span>
-              )}
-            </Link>
-          );
-        })}
-      </div>
+      <CalendarioMensualGrid
+        celdas={celdas}
+        diasCabecera={DIAS_CABECERA}
+        reprogramarFecha={reprogramarFecha}
+        redirectTo={rutaActual}
+      />
 
       <p className="text-caption text-text-disabled">
-        En rojo: guion sin grabar a {DIAS_RIESGO} días o menos de su publicación.
+        En rojo: guion sin grabar a {DIAS_RIESGO} días o menos de su publicación. Mantén pulsado un
+        vídeo y arrástralo a otro día para reprogramarlo.
       </p>
     </div>
   );

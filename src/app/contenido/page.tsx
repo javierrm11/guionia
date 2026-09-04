@@ -10,6 +10,7 @@ import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
 import { CapturaFlotante } from "@/components/CapturaFlotante";
 import { TendenciasCarrusel } from "@/components/TendenciasCarrusel";
 import { Tile } from "@/components/Tile";
+import { TourControl } from "@/components/TourControl";
 import { createClient } from "@/lib/supabase/server";
 import {
   PLATAFORMA_ICON,
@@ -61,8 +62,17 @@ type Tarea = {
   href: string;
 };
 
+const UMBRAL_CUENTA_NUEVA_MS = 24 * 60 * 60 * 1000; // 24 horas
+
 export default async function ContenidoPage() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const cuentaNueva = user
+    ? new Date().getTime() - new Date(user.created_at).getTime() < UMBRAL_CUENTA_NUEVA_MS
+    : false;
 
   const { data: plataformasActivasData } = await supabase
     .from("plataformas_activas")
@@ -152,7 +162,7 @@ export default async function ContenidoPage() {
 
       <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       {hayCadencia ? (
-        <section className="flex flex-col items-center gap-1 pb-4 lg:gap-2 lg:pb-6">
+        <section data-tour="cadencia" className="flex flex-col items-center gap-1 pb-4 lg:gap-2 lg:pb-6">
           <Link
             href="/contenido/plataformas?vista=calendario"
             className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white lg:mb-2 lg:gap-2 lg:px-4 lg:py-1.5 lg:text-body ${
@@ -187,7 +197,7 @@ export default async function ContenidoPage() {
             <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
           </Link>
 
-          <div className="mb-6 grid grid-cols-3 gap-3 lg:gap-4">
+          <div data-tour="tiles" className="mb-6 grid grid-cols-3 gap-3 lg:gap-4">
             <Tile
               href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
               label="Nuevo vídeo"
@@ -217,6 +227,7 @@ export default async function ContenidoPage() {
             return (
               <Link
                 href={tareaHero.href}
+                data-tour="hero"
                 className="animate-tarjeta-entrada flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg lg:gap-4 lg:p-6"
               >
                 <span
@@ -303,7 +314,7 @@ export default async function ContenidoPage() {
       )}
 
       {hayCadencia && (
-        <div className="grid grid-cols-3 gap-3 lg:gap-4">
+        <div data-tour="tiles" className="grid grid-cols-3 gap-3 lg:gap-4">
           <Tile
             href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
             label="Nueva idea"
@@ -378,6 +389,7 @@ export default async function ContenidoPage() {
       </div>
 
       <CapturaFlotante plataformas={plataformasActivas as Plataforma[]} />
+      <TourControl cuentaNueva={cuentaNueva} />
     </div>
   );
 }

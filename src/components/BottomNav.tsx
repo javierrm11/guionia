@@ -11,6 +11,7 @@ function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
     <Link
       href={item.href}
       aria-current={activo ? "page" : undefined}
+      data-tour={item.href === "/contenido/ideas" ? "nav-ideas" : undefined}
       className="flex flex-col items-center gap-1 px-3.5 py-1.5"
     >
       <Icon size={20} strokeWidth={1.5} className={activo ? "text-text-primary" : "text-text-disabled"} />
