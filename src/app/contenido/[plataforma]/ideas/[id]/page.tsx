@@ -2,19 +2,23 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { ConfirmButton } from "@/components/ConfirmButton";
+import { ToastDeshacerIdea } from "@/components/ToastDeshacerIdea";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, PILAR_LABEL } from "@/lib/contenido";
-import { descartarIdea } from "../../../_shared/ideaEstadoActions";
+import { descartarIdea, restaurarIdea } from "../../../_shared/ideaEstadoActions";
 
 export const dynamic = "force-dynamic";
 
 export default async function IdeaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ plataforma: string; id: string }>;
+  searchParams: Promise<{ descartada?: string }>;
 }) {
   const { plataforma, id } = await params;
+  const { descartada } = await searchParams;
   if (!isPlataforma(plataforma)) notFound();
 
   const supabase = await createClient();
@@ -52,12 +56,21 @@ export default async function IdeaPage({
 
           <form action={descartarIdea}>
             <input type="hidden" name="id" value={idea.id} />
-            <input type="hidden" name="redirectTo" value={rutaActual} />
+            <input type="hidden" name="redirectTo" value={`${rutaActual}?descartada=1`} />
             <ConfirmButton message="¿Descartar esta idea?" className="text-small text-accent">
               Descartar idea
             </ConfirmButton>
           </form>
         </div>
+      )}
+
+      {descartada === "1" && idea.estado === "descartada" && (
+        <ToastDeshacerIdea
+          id={idea.id}
+          redirectTo={rutaActual}
+          pathname={rutaActual}
+          restaurarIdea={restaurarIdea}
+        />
       )}
     </div>
   );

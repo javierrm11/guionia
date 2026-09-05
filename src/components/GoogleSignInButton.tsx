@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { CargandoOverlay } from "@/components/CargandoOverlay";
 import { createClient } from "@/lib/supabase/client";
+import { registrarReferido } from "@/lib/referidos";
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -26,7 +27,7 @@ declare global {
   }
 }
 
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ refCode }: { refCode?: string }) {
   const contenedorRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export function GoogleSignInButton() {
       callback: async (response: CredentialResponse) => {
         setCargando(true);
         const supabase = createClient();
-        const { error: signInError } = await supabase.auth.signInWithIdToken({
+        const { data, error: signInError } = await supabase.auth.signInWithIdToken({
           provider: "google",
           token: response.credential,
         });
@@ -49,6 +50,10 @@ export function GoogleSignInButton() {
           setError("No se pudo iniciar sesión con Google");
           setCargando(false);
           return;
+        }
+
+        if (refCode && data.user) {
+          await registrarReferido(supabase, data.user.id, refCode);
         }
 
         router.push("/contenido");
@@ -63,7 +68,7 @@ export function GoogleSignInButton() {
       shape: "pill",
       width: String(contenedorRef.current.offsetWidth),
     });
-  }, [router]);
+  }, [router, refCode]);
 
   if (!CLIENT_ID) return null;
 

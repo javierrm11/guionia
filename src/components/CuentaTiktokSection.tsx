@@ -31,16 +31,28 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
   const accessToken = await obtenerAccessTokenValido(supabase, user.id);
 
   if (!accessToken) {
+    // Igual que en `CuentaSection.tsx`: si ya había una fila de conexión, el
+    // `null` viene de un fallo al renovar el token (revocado/caducado), no
+    // de que nunca se haya conectado.
+    const { data: conexion } = await supabase
+      .from("tiktok_conexiones")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const yaConectado = Boolean(conexion);
+
     return (
       <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
         <p className="text-small text-text-secondary">
-          Conecta TikTok para ver las estadísticas de tu cuenta.
+          {yaConectado
+            ? "Tu conexión con TikTok ha dejado de funcionar. Reconéctala para seguir viendo las estadísticas."
+            : "Conecta TikTok para ver las estadísticas de tu cuenta."}
         </p>
         <a
           href="/api/tiktok/conectar"
           className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
         >
-          Conectar TikTok
+          {yaConectado ? "Reconectar TikTok" : "Conectar TikTok"}
         </a>
       </div>
     );

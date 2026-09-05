@@ -3,11 +3,14 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { registrarReferido } from "@/lib/referidos";
 
 export async function registroAction(formData: FormData) {
   const email = formData.get("email");
   const password = formData.get("password");
   const confirmarPassword = formData.get("confirmar_password");
+  const ref = formData.get("ref");
+  const refLimpio = typeof ref === "string" && ref ? ref : null;
 
   if (typeof email !== "string" || !email) throw new Error("El email es obligatorio");
   if (typeof password !== "string" || password.length < 6) {
@@ -24,10 +27,14 @@ export async function registroAction(formData: FormData) {
   const origin = (await headers()).get("origin");
   const supabase = await createClient();
 
+  const emailRedirectTo = refLimpio
+    ? `${origin}/auth/confirm?next=/contenido&ref=${encodeURIComponent(refLimpio)}`
+    : `${origin}/auth/confirm?next=/contenido`;
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${origin}/auth/confirm?next=/contenido` },
+    options: { emailRedirectTo },
   });
 
   if (error) {
@@ -35,6 +42,7 @@ export async function registroAction(formData: FormData) {
   }
 
   if (data.session) {
+    if (data.user) await registrarReferido(supabase, data.user.id, refLimpio);
     redirect("/contenido");
   }
 

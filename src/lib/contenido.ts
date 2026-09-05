@@ -101,6 +101,26 @@ export const ESTADO_PIEZA_TONE: Record<string, BadgeTone> = {
   publicado: "success",
 };
 
+/** Qué toca hacer a continuación con una pieza real, según su estado — texto
+ *  usado tanto en la tarjeta "hero" de Control como en el panel "Hoy" fijo
+ *  de escritorio (`PanelHoy.tsx`). */
+export const VERBO_SIGUIENTE_ESTADO: Record<string, string> = {
+  guion_escrito: "Toca grabar",
+  grabado: "Toca editar",
+  editado: "Toca publicar",
+};
+
+export type EventoHistorialPieza = { estado: string; created_at: string };
+
+/** Registra un cambio de estado en la línea de tiempo de la pieza (`piezas_historial`) — ver `HistorialPieza.tsx`. */
+export async function registrarHistorialPieza(
+  supabase: SupabaseClient,
+  piezaId: string,
+  estado: string
+) {
+  await supabase.from("piezas_historial").insert({ pieza_id: piezaId, estado });
+}
+
 export const MES_LABEL = [
   "Enero",
   "Febrero",
@@ -356,6 +376,40 @@ export async function getPiezasEnRiesgo(
     .eq("estado", "guion_escrito")
     .not("fecha_publicacion", "is", null)
     .lte("fecha_publicacion", limite)
+    .order("fecha_publicacion", { ascending: true });
+
+  return data ?? [];
+}
+
+export type PiezaParaGrabar = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma;
+  fecha_publicacion: string;
+};
+
+/**
+ * Piezas con guion escrito (toca grabar) cuya fecha de publicación cae
+ * dentro de la semana [semanaInicio, semanaFin] — base de "Modo grabación"
+ * (`/contenido/grabacion`), que las agrupa por plataforma para grabarlas
+ * todas seguidas en una sola sesión.
+ */
+export async function getPiezasParaGrabarSemana(
+  supabase: SupabaseClient,
+  plataformas: Plataforma[],
+  semanaInicio: string,
+  semanaFin: string
+): Promise<PiezaParaGrabar[]> {
+  if (plataformas.length === 0) return [];
+
+  const { data } = await supabase
+    .from("piezas_contenido")
+    .select("id, titulo, plataforma, fecha_publicacion")
+    .in("plataforma", plataformas)
+    .eq("estado", "guion_escrito")
+    .not("fecha_publicacion", "is", null)
+    .gte("fecha_publicacion", semanaInicio)
+    .lte("fecha_publicacion", semanaFin)
     .order("fecha_publicacion", { ascending: true });
 
   return data ?? [];

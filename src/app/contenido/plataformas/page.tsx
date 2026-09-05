@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, Video } from "lucide-react";
 import { CalendarioPlataformas } from "@/components/CalendarioPlataformas";
 import { CalendarioSemanaTransicion } from "@/components/CalendarioSemanaTransicion";
 import { BarraProgresoCadencia } from "@/components/BarraProgresoCadencia";
@@ -17,6 +17,7 @@ import {
   getIdeasOlvidadas,
   getPendientesDePublicar,
   getPiezasEnRiesgo,
+  getPiezasParaGrabarSemana,
   getProgresoCadenciaSemanal,
 } from "@/lib/contenido";
 
@@ -53,7 +54,7 @@ export default async function PlataformasPage({
     .select("*")
     .order("plataforma");
 
-  const [progreso, pendientes, enRiesgo, ideasOlvidadas] = await Promise.all([
+  const [progreso, pendientes, enRiesgo, ideasOlvidadas, paraGrabar] = await Promise.all([
     getProgresoCadenciaSemanal(
       supabase,
       semanaInicio,
@@ -63,6 +64,7 @@ export default async function PlataformasPage({
     getPendientesDePublicar(supabase, plataformasActivas),
     getPiezasEnRiesgo(supabase, plataformasActivas, hoy),
     getIdeasOlvidadas(supabase, plataformasActivas),
+    getPiezasParaGrabarSemana(supabase, plataformasActivas, semanaInicio, semanaFin),
   ]);
 
   const progresoPorPlataforma = new Map(progreso.map((p) => [p.plataforma, p]));
@@ -89,6 +91,25 @@ export default async function PlataformasPage({
           Calendario
         </Link>
       </div>
+
+      {paraGrabar.length > 0 && (
+        <Link
+          href="/contenido/grabacion"
+          className="flex items-center gap-3 rounded-md border border-border p-4"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-accent-bg">
+            <Video size={18} strokeWidth={1.5} className="text-accent" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="text-h3">Modo grabación</span>
+            <span className="text-caption text-text-secondary">
+              {paraGrabar.length} {paraGrabar.length === 1 ? "guion listo" : "guiones listos"} para
+              grabar esta semana
+            </span>
+          </span>
+          <ChevronRight size={16} strokeWidth={1.5} className="shrink-0 text-text-secondary" />
+        </Link>
+      )}
 
       {enCalendario ? (
         <CalendarioSemanaTransicion semanaKey={semanaCalendario}>

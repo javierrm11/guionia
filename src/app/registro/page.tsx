@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 export default async function RegistroPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; revisaEmail?: string; email?: string }>;
+  searchParams: Promise<{ error?: string; revisaEmail?: string; email?: string; ref?: string }>;
 }) {
-  const { error, revisaEmail, email } = await searchParams;
+  const { error, revisaEmail, email, ref } = await searchParams;
 
   return (
     <AuthShell foto="/fotos/foto4.jpg">
@@ -32,7 +32,7 @@ export default async function RegistroPage({
             </p>
           </div>
 
-          <RegistroForm initialEmail={email ?? ""} />
+          <RegistroForm initialEmail={email ?? ""} refCode={ref} />
 
           {error && <p className="text-small text-danger">{error}</p>}
 
@@ -42,7 +42,7 @@ export default async function RegistroPage({
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <GoogleSignInButton />
+          <GoogleSignInButton refCode={ref} />
 
           <p className="text-center text-caption text-text-disabled">
             Al registrarte, aceptas nuestros{" "}

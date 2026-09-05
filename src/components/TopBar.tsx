@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Search, TrendingUp } from "lucide-react";
@@ -12,9 +12,11 @@ const TITULOS: Record<string, string> = {
   "/contenido/ideas": "Ideas",
   "/contenido/plataformas": "Plataformas",
   "/contenido/publicados": "Publicados",
+  "/contenido/grabacion": "Modo grabación",
   "/configuracion/estructuras": "Estructuras",
   "/configuracion/hooks": "Hooks",
   "/configuracion/ctas": "CTAs",
+  "/configuracion/referidos": "Invitar y referidos",
 };
 
 /** Con la barra inferior encargándose de Inicio / Plataformas / Ideas / Cuenta,
@@ -32,10 +34,45 @@ export function TopBar() {
    *  que el buscador y el icono de Tendencias van en blanco ahí. */
   const sobreOnda = pathname === "/contenido";
   const [query, setQuery] = useState("");
+  const [esMac, setEsMac] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setQuery(new URLSearchParams(window.location.search).get("q") ?? "");
+    const t = setTimeout(() => {
+      setQuery(new URLSearchParams(window.location.search).get("q") ?? "");
+    }, 0);
+    return () => clearTimeout(t);
   }, [pathname]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setEsMac(navigator.platform.toUpperCase().includes("MAC"));
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Atajo Cmd/Ctrl+K, solo en escritorio — en móvil no hay teclado físico que
+  // lo dispare. Si el buscador ya está en pantalla, lo enfoca; si no (guion,
+  // configuración...), navega a /contenido/buscar.
+  useEffect(() => {
+    if (enAuth) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "k") return;
+      if (!window.matchMedia("(min-width: 1024px)").matches) return;
+
+      e.preventDefault();
+      if (mostrarBusqueda && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      } else {
+        router.push("/contenido/buscar");
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [enAuth, mostrarBusqueda, router]);
 
   // En una raíz sin buscador (Cuenta) no hay nada que mostrar aquí — no dejar
   // la barra vacía, que el título de la página quede arriba.
@@ -65,6 +102,7 @@ export function TopBar() {
               <Search size={16} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
               <input
                 key={query}
+                ref={inputRef}
                 type="text"
                 name="q"
                 defaultValue={query}
@@ -72,6 +110,9 @@ export function TopBar() {
                 style={{ "--input-bg": "transparent" } as React.CSSProperties}
                 className="w-full min-w-0 flex-1 bg-transparent text-body text-text-primary focus:outline-none"
               />
+              <kbd className="hidden shrink-0 rounded-sm bg-neutral-bg px-1.5 py-0.5 text-caption text-text-secondary lg:block">
+                {esMac ? "⌘K" : "Ctrl K"}
+              </kbd>
             </div>
           ) : (
             <div className="relative">
@@ -82,13 +123,17 @@ export function TopBar() {
               />
               <input
                 key={query}
+                ref={inputRef}
                 type="text"
                 name="q"
                 defaultValue={query}
                 placeholder="Buscar por título o etiqueta…"
                 style={{ "--input-bg": "transparent" } as React.CSSProperties}
-                className="w-full border-b border-border bg-transparent py-2 pr-3 pl-9 text-body text-text-primary focus:border-accent focus:outline-none"
+                className="w-full border-b border-border bg-transparent py-2 pr-14 pl-9 text-body text-text-primary focus:border-accent focus:outline-none"
               />
+              <kbd className="pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 rounded-sm bg-neutral-bg px-1.5 py-0.5 text-caption text-text-secondary lg:block">
+                {esMac ? "⌘K" : "Ctrl K"}
+              </kbd>
             </div>
           )}
         </form>

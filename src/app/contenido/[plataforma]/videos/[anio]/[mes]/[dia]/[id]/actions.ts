@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma, todayISO } from "@/lib/plataformas";
-import { ESTADOS_VIDEO, TIPOS_ESCENA } from "@/lib/contenido";
+import { ESTADOS_VIDEO, TIPOS_ESCENA, registrarHistorialPieza } from "@/lib/contenido";
 import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
 
@@ -37,6 +37,8 @@ export async function avanzarEstado(formData: FormData) {
   if (error) {
     throw new Error(error.message);
   }
+
+  await registrarHistorialPieza(supabase, id, siguiente);
 
   revalidatePath(redirectTo);
   redirect(redirectTo);
@@ -78,6 +80,8 @@ export async function publicarConMetadatos(formData: FormData) {
   if (error) {
     throw new Error(error.message);
   }
+
+  await registrarHistorialPieza(supabase, id, "publicado");
 
   revalidatePath(redirectTo);
   redirect(redirectTo);
@@ -132,6 +136,8 @@ export async function guardarVideoSubido(
     .eq("id", id);
 
   if (error) throw new Error(error.message);
+
+  await registrarHistorialPieza(supabase, id, "publicado");
 
   revalidatePath(redirectTo);
   redirect(redirectTo);
@@ -190,6 +196,8 @@ export async function adaptarAOtraPlataforma(formData: FormData) {
   if (error || !copia) {
     throw new Error(error?.message ?? "No se pudo adaptar el guion");
   }
+
+  await registrarHistorialPieza(supabase, copia.id, "guion_escrito");
 
   if (escenasActivas.length > 0) {
     const { error: escenasError } = await supabase.from("escenas_guion").insert(

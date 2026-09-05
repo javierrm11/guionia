@@ -2,6 +2,7 @@ import {
   CalendarClock,
   CalendarDays,
   Clapperboard,
+  Gift,
   Lightbulb,
   LogOut,
   MessageSquare,
@@ -26,6 +27,7 @@ export default function ConfiguracionPage() {
         />
         <Tile href="/configuracion/hooks" label="Banco de hooks" icon={Lightbulb} />
         <Tile href="/configuracion/ctas" label="Banco de CTAs" icon={MessageSquare} />
+        <Tile href="/configuracion/referidos" label="Invitar y referidos" icon={Gift} />
         <Tile href="/configuracion/papelera" label="Papelera" icon={Trash2} />
 
         <form action={logoutAction} className="contents">

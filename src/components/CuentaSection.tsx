@@ -29,16 +29,29 @@ export async function CuentaSection({ rango }: { rango: RangoEstadisticas }) {
   const accessToken = await obtenerAccessTokenValido(supabase, user.id);
 
   if (!accessToken) {
+    // Si ya había una fila de conexión, `obtenerAccessTokenValido` devolvió
+    // `null` porque falló la renovación (token revocado/caducado del todo),
+    // no porque nunca se haya conectado — el mensaje y el botón lo dejan
+    // claro en vez de sugerir una primera conexión que ya existía.
+    const { data: conexion } = await supabase
+      .from("youtube_conexiones")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const yaConectado = Boolean(conexion);
+
     return (
       <div className="flex flex-col items-start gap-3 rounded-md bg-bg-primary p-4">
         <p className="text-small text-text-secondary">
-          Conecta YouTube para ver las estadísticas de tu cuenta.
+          {yaConectado
+            ? "Tu conexión con YouTube ha dejado de funcionar. Reconéctala para seguir viendo las estadísticas."
+            : "Conecta YouTube para ver las estadísticas de tu cuenta."}
         </p>
         <a
           href="/api/youtube/conectar"
           className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
         >
-          Conectar YouTube
+          {yaConectado ? "Reconectar YouTube" : "Conectar YouTube"}
         </a>
       </div>
     );

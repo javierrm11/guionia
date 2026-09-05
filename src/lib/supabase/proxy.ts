@@ -8,6 +8,8 @@ const RUTAS_PUBLICAS = [
   "/restablecer-password",
   "/auth",
   "/legal",
+  "/blog",
+  "/comparativas",
 ];
 
 export async function updateSession(request: NextRequest) {

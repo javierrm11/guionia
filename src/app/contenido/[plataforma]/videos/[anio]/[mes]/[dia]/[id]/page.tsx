@@ -10,6 +10,7 @@ import { EstadisticasVideoLoader } from "@/components/EstadisticasVideoLoader";
 import { EstadisticasYoutubeVideo } from "@/components/EstadisticasYoutubeVideo";
 import { GrabarVideoButton } from "@/components/GrabarVideoButton";
 import { GuionEscenas } from "@/components/GuionEscenas";
+import { HistorialPieza } from "@/components/HistorialPieza";
 import { RetencionSection } from "@/components/RetencionSection";
 import { RetencionLoader } from "@/components/RetencionLoader";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -50,6 +51,12 @@ export default async function GuionPage({
     .maybeSingle();
 
   if (!guion) notFound();
+
+  const { data: historial } = await supabase
+    .from("piezas_historial")
+    .select("estado, created_at")
+    .eq("pieza_id", id)
+    .order("created_at", { ascending: true });
 
   const { data: plataformasActivasData } = await supabase
     .from("plataformas_activas")
@@ -223,6 +230,8 @@ export default async function GuionPage({
           )}
         </div>
       )}
+
+      <HistorialPieza eventos={historial ?? []} />
 
       {youtubeVideoId && youtubeAccessToken && (
         <Suspense fallback={<EstadisticasVideoLoader titulo="Estadísticas de YouTube" />}>

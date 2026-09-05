@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
-import { TIPOS_ESCENA } from "@/lib/contenido";
+import { TIPOS_ESCENA, registrarHistorialPieza } from "@/lib/contenido";
 
 export async function convertirEnGuion(formData: FormData) {
   const supabase = await createClient();
@@ -66,6 +66,8 @@ export async function convertirEnGuion(formData: FormData) {
   if (error) {
     throw new Error(error.message);
   }
+
+  await registrarHistorialPieza(supabase, id, "guion_escrito");
 
   if (usaEstructura) {
     const { error: escenasError } = await supabase.from("escenas_guion").insert(

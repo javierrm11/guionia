@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
-import { TIPOS_ESCENA } from "@/lib/contenido";
+import { TIPOS_ESCENA, registrarHistorialPieza } from "@/lib/contenido";
 
 /** Crea un vídeo (guion) directamente, sin pasar por una idea previa. */
 export async function crearVideoDirecto(formData: FormData) {
@@ -72,6 +72,8 @@ export async function crearVideoDirecto(formData: FormData) {
   if (error || !pieza) {
     throw new Error(error?.message ?? "No se pudo crear el vídeo");
   }
+
+  await registrarHistorialPieza(supabase, pieza.id, "guion_escrito");
 
   if (usaEstructura) {
     const { error: escenasError } = await supabase.from("escenas_guion").insert(

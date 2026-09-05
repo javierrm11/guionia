@@ -7,11 +7,17 @@ import { ChevronDown } from "lucide-react";
  *  `0fr`/`1fr`, mismo patrón que `CapturaIdeaInline`/`FilaPapelera`) en vez
  *  del `<details>` nativo, que no deja animar el colapso de forma fiable
  *  entre navegadores. */
-export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: string }) {
+export function FaqItem({
+  pregunta,
+  respuesta,
+}: {
+  pregunta: string;
+  respuesta: string;
+}) {
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="rounded-md bg-bg-primary p-4 lg:p-5">
+    <div className="rounded-2xl bg-bg-primary p-4 lg:p-5">
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
@@ -32,7 +38,9 @@ export function FaqItem({ pregunta, respuesta }: { pregunta: string; respuesta: 
         style={{ gridTemplateRows: abierto ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <p className="pt-2 text-small text-text-secondary lg:text-body">{respuesta}</p>
+          <p className="pt-2 text-small text-text-secondary lg:text-body">
+            {respuesta}
+          </p>
         </div>
       </div>
     </div>

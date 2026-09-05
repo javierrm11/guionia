@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
+import { registrarHistorialPieza } from "@/lib/contenido";
 
 export async function crearIdeaRapida(formData: FormData) {
   const supabase = await createClient();
@@ -17,15 +18,21 @@ export async function crearIdeaRapida(formData: FormData) {
     throw new Error("El título es obligatorio");
   }
 
-  const { error } = await supabase.from("piezas_contenido").insert({
-    plataforma,
-    titulo: titulo.trim(),
-    estado: "idea",
-  });
+  const { data: idea, error } = await supabase
+    .from("piezas_contenido")
+    .insert({
+      plataforma,
+      titulo: titulo.trim(),
+      estado: "idea",
+    })
+    .select("id")
+    .single();
 
-  if (error) {
-    throw new Error(error.message);
+  if (error || !idea) {
+    throw new Error(error?.message ?? "No se pudo crear la idea");
   }
+
+  await registrarHistorialPieza(supabase, idea.id, "idea");
 
   revalidatePath("/contenido");
 }

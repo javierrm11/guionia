@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Sidebar } from "@/components/Sidebar";
 import { Main } from "@/components/Main";
+import { PanelHoy } from "@/components/PanelHoy";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TopBar />
           <Main>{children}</Main>
         </div>
+        <PanelHoy />
         <BottomNav />
       </body>
     </html>

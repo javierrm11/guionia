@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { CalendarDays, ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
+import { CalendarDays, Camera, ChevronRight, Flame, Lightbulb, Link2, Plus, Video } from "lucide-react";
 import { Badge } from "@/components/Badge";
+import { AvisoRachaEnRiesgo } from "@/components/AvisoRachaEnRiesgo";
 import { BarraCadencia } from "@/components/BarraCadencia";
 import { CapturaIdeaInline } from "@/components/CapturaIdeaInline";
 import { OndaCadencia } from "@/components/OndaCadencia";
@@ -24,6 +25,7 @@ import {
 import {
   ESTADO_PIEZA_LABEL,
   ESTADO_PIEZA_TONE,
+  VERBO_SIGUIENTE_ESTADO,
   getPiezasParaHoy,
   getPlantillaDelDia,
   getProgresoCadenciaSemanal,
@@ -43,15 +45,6 @@ function hrefVideo(plataforma: string, fechaPublicacion: string, id: string) {
   const [anio, mes, dia] = fechaPublicacion.split("-");
   return `/contenido/${plataforma}/videos/${anio}/${pad2(Number(mes))}/${pad2(Number(dia))}/${id}`;
 }
-
-/** Qué toca hacer a continuación con una pieza real, según su estado —
- *  mismo criterio que ya usaba el badge de "Hoy": guion escrito → toca
- *  grabar, grabado → toca editar, editado → toca publicar. */
-const VERBO_SIGUIENTE: Record<string, string> = {
-  guion_escrito: "Toca grabar",
-  grabado: "Toca editar",
-  editado: "Toca publicar",
-};
 
 type Tarea = {
   id: string;
@@ -128,6 +121,11 @@ export default async function ContenidoPage() {
   const hechasSemana = progreso.reduce((suma, p) => suma + p.hechas, 0);
   const hayCadencia = objetivoSemana > 0;
   const porcentajeCadencia = hayCadencia ? Math.round((hechasSemana / objetivoSemana) * 100) : 0;
+
+  const diasRestantesSemana = 7 - diaSemanaHoy; // domingo (7) → 0 días restantes
+  const pendientesRacha = progreso
+    .filter((p) => p.hechas < p.cantidad)
+    .map((p) => ({ plataforma: p.plataforma, faltan: p.cantidad - p.hechas }));
 
   // Las piezas reales van primero — así el hero prioriza una pieza ya en
   // curso sobre una entrada de plantilla que todavía no tiene nada empezado.
@@ -221,7 +219,7 @@ export default async function ContenidoPage() {
               ? PLATAFORMA_TONO[tareaHero.plataforma]
               : "var(--neutral)";
             const etiqueta = tareaHero.estado
-              ? (VERBO_SIGUIENTE[tareaHero.estado] ?? ESTADO_PIEZA_LABEL[tareaHero.estado])
+              ? (VERBO_SIGUIENTE_ESTADO[tareaHero.estado] ?? ESTADO_PIEZA_LABEL[tareaHero.estado])
               : "Publicar hoy";
 
             return (
@@ -314,7 +312,7 @@ export default async function ContenidoPage() {
       )}
 
       {hayCadencia && (
-        <div data-tour="tiles" className="grid grid-cols-3 gap-3 lg:gap-4">
+        <div data-tour="tiles" className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
           <Tile
             href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
             label="Nueva idea"
@@ -325,6 +323,7 @@ export default async function ContenidoPage() {
             label="Nuevo vídeo"
             icon={Video}
           />
+          <Tile href="/contenido/grabacion" label="Modo grabación" icon={Camera} />
           <Tile href="/contenido/plataformas?vista=calendario" label="Calendario" icon={CalendarDays} />
         </div>
       )}
@@ -390,6 +389,11 @@ export default async function ContenidoPage() {
 
       <CapturaFlotante plataformas={plataformasActivas as Plataforma[]} />
       <TourControl cuentaNueva={cuentaNueva} />
+      <AvisoRachaEnRiesgo
+        racha={racha}
+        diasRestantes={diasRestantesSemana}
+        pendientes={pendientesRacha}
+      />
     </div>
   );
 }

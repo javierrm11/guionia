@@ -7,6 +7,8 @@ export const RUTAS_AUTH = [
   "/restablecer-password",
   "/auth",
   "/legal",
+  "/blog",
+  "/comparativas",
 ];
 
 export type ItemNav = {

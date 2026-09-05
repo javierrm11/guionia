@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-/** Cabecera de la landing (`/`) — fija arriba, fondo blanco siempre. */
+/** Cabecera de la landing (`/`) — no fija, se desplaza con la página; fondo blanco siempre. */
 export function LandingHeader() {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-bg-page px-4 py-4 lg:px-8">
+    <header className="relative z-20 flex items-center justify-between border-b border-border bg-bg-page px-4 py-4 lg:px-8">
       <div className="flex items-center gap-2 lg:mx-auto lg:w-full lg:max-w-5xl">
         <span className="flex items-center gap-2">
           <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full">

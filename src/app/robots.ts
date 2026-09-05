@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: ["/", "/legal"],
+      allow: ["/", "/legal", "/blog", "/comparativas"],
       // El resto vive detrás de login (redirige a /login si no hay sesión) o
       // es una página transaccional de bajo contenido — sin valor de SEO,
       // y solo diluirían la relevancia de la landing en los resultados.

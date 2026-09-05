@@ -7,7 +7,13 @@ import { PasswordInput } from "@/components/PasswordInput";
 import { SubmitButton } from "@/components/SubmitButton";
 import { registroAction } from "./actions";
 
-export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
+export function RegistroForm({
+  initialEmail = "",
+  refCode,
+}: {
+  initialEmail?: string;
+  refCode?: string;
+}) {
   const [step, setStep] = useState<"email" | "password">(initialEmail ? "password" : "email");
   const [email, setEmail] = useState(initialEmail);
 
@@ -17,6 +23,7 @@ export function RegistroForm({ initialEmail = "" }: { initialEmail?: string }) {
 
   return (
     <form action={registroAction} className="flex flex-col gap-3">
+      {refCode && <input type="hidden" name="ref" value={refCode} />}
       {step === "email" ? (
         <>
           <label className="flex flex-col gap-1">
