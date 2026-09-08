@@ -2,10 +2,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BadgeTone } from "@/components/Badge";
 import { addDaysISO, todayISO, type Plataforma } from "@/lib/plataformas";
 
-export const RANGOS_ESTADISTICAS = ["siempre", "hoy", "semana", "mes", "anio"] as const;
+export const RANGOS_ESTADISTICAS = [
+  "siempre",
+  "hoy",
+  "semana",
+  "mes",
+  "anio",
+] as const;
 export type RangoEstadisticas = (typeof RANGOS_ESTADISTICAS)[number];
 
-export function isRangoEstadisticas(value: string | undefined): value is RangoEstadisticas {
+export function isRangoEstadisticas(
+  value: string | undefined,
+): value is RangoEstadisticas {
   return !!value && (RANGOS_ESTADISTICAS as readonly string[]).includes(value);
 }
 
@@ -63,7 +71,12 @@ export function calcularLimitesRango(rango: RangoEstadisticas): LimitesRango {
         anteriorHasta: addDaysISO(hoy, -365),
       };
     case "siempre":
-      return { actualDesde: "2005-02-01", actualHasta: hoy, anteriorDesde: null, anteriorHasta: null };
+      return {
+        actualDesde: "2005-02-01",
+        actualHasta: hoy,
+        anteriorDesde: null,
+        anteriorHasta: null,
+      };
   }
 }
 
@@ -92,22 +105,19 @@ export const ESTADO_PIEZA_LABEL: Record<string, string> = {
   publicado: "Publicado",
 };
 
+/** "guion_escrito" es el estado final de lo que la app gestiona (Guionia ya
+ *  no graba, edita ni publica) — por eso se marca en éxito, igual que
+ *  "publicado" (que se alcanza pegando la URL a mano una vez publicado
+ *  fuera de la app, ver `guardarUrlPublicado`). "grabado"/"editado" solo
+ *  quedan por compatibilidad con piezas antiguas de cuando sí existía ese
+ *  pipeline — ya no hay forma de llegar a ellos desde la UI. */
 export const ESTADO_PIEZA_TONE: Record<string, BadgeTone> = {
   idea: "neutral",
   descartada: "danger",
-  guion_escrito: "warning",
+  guion_escrito: "success",
   grabado: "warning",
   editado: "warning",
   publicado: "success",
-};
-
-/** Qué toca hacer a continuación con una pieza real, según su estado — texto
- *  usado tanto en la tarjeta "hero" de Control como en el panel "Hoy" fijo
- *  de escritorio (`PanelHoy.tsx`). */
-export const VERBO_SIGUIENTE_ESTADO: Record<string, string> = {
-  guion_escrito: "Toca grabar",
-  grabado: "Toca editar",
-  editado: "Toca publicar",
 };
 
 export type EventoHistorialPieza = { estado: string; created_at: string };
@@ -116,7 +126,7 @@ export type EventoHistorialPieza = { estado: string; created_at: string };
 export async function registrarHistorialPieza(
   supabase: SupabaseClient,
   piezaId: string,
-  estado: string
+  estado: string,
 ) {
   await supabase.from("piezas_historial").insert({ pieza_id: piezaId, estado });
 }
@@ -148,9 +158,11 @@ export function pad2(n: number) {
  */
 export async function activarPlataformaConectada(
   supabase: SupabaseClient,
-  plataforma: Plataforma
+  plataforma: Plataforma,
 ): Promise<{ eraPrimera: boolean }> {
-  const { data: actuales } = await supabase.from("plataformas_activas").select("plataforma");
+  const { data: actuales } = await supabase
+    .from("plataformas_activas")
+    .select("plataforma");
   const eraPrimera = (actuales ?? []).length === 0;
 
   if (!(actuales ?? []).some((r) => r.plataforma === plataforma)) {
@@ -161,24 +173,29 @@ export async function activarPlataformaConectada(
 }
 
 /** Al desconectar una cuenta, se desactiva también la plataforma correspondiente. */
-export async function desactivarPlataforma(supabase: SupabaseClient, plataforma: Plataforma) {
-  await supabase.from("plataformas_activas").delete().eq("plataforma", plataforma);
+export async function desactivarPlataforma(
+  supabase: SupabaseClient,
+  plataforma: Plataforma,
+) {
+  await supabase
+    .from("plataformas_activas")
+    .delete()
+    .eq("plataforma", plataforma);
 }
 
 /** Estados que todavía viven en el banco de ideas (sin fecha, sección "Ideas"). */
 export const ESTADOS_IDEA = ["idea", "descartada"] as const;
 
-/** Estados que ya pasaron a producción (sección "Vídeos", con fecha). */
-export const ESTADOS_VIDEO = ["guion_escrito", "grabado", "editado", "publicado"] as const;
-
-/** Siguiente paso del pipeline guion_escrito → grabado → editado → publicado, o null si ya está publicado. */
-export function getSiguienteEstadoVideo(
-  estado: string
-): (typeof ESTADOS_VIDEO)[number] | null {
-  const index = ESTADOS_VIDEO.indexOf(estado as (typeof ESTADOS_VIDEO)[number]);
-  if (index === -1 || index === ESTADOS_VIDEO.length - 1) return null;
-  return ESTADOS_VIDEO[index + 1];
-}
+/** Estados que ya pasaron a producción (sección "Vídeos", con fecha). Solo
+ *  "guion_escrito" y "publicado" son alcanzables desde la UI actual —
+ *  "grabado"/"editado" quedan solo por compatibilidad con piezas de cuando
+ *  existía el pipeline de grabar/editar/publicar dentro de la app. */
+export const ESTADOS_VIDEO = [
+  "guion_escrito",
+  "grabado",
+  "editado",
+  "publicado",
+] as const;
 
 type CadenciaSemanalRow = {
   id: string;
@@ -204,7 +221,7 @@ export async function getProgresoCadenciaSemanal(
   supabase: SupabaseClient,
   semanaInicio: string,
   semanaFin: string,
-  cadenciaSemanal: CadenciaSemanalRow[]
+  cadenciaSemanal: CadenciaSemanalRow[],
 ): Promise<ProgresoCadencia[]> {
   return Promise.all(
     cadenciaSemanal.map(async (c) => {
@@ -223,7 +240,7 @@ export async function getProgresoCadenciaSemanal(
         hechas: count ?? 0,
         nota: c.nota,
       };
-    })
+    }),
   );
 }
 
@@ -237,9 +254,12 @@ export async function getRachaSemanas(
   supabase: SupabaseClient,
   cadenciaSemanal: CadenciaSemanalRow[],
   semanaActualInicio: string,
-  maxSemanas = 12
+  maxSemanas = 12,
 ): Promise<number> {
-  const objetivoTotal = cadenciaSemanal.reduce((suma, c) => suma + c.cantidad, 0);
+  const objetivoTotal = cadenciaSemanal.reduce(
+    (suma, c) => suma + c.cantidad,
+    0,
+  );
   if (objetivoTotal === 0) return 0;
 
   const plataformas = [...new Set(cadenciaSemanal.map((c) => c.plataforma))];
@@ -260,7 +280,9 @@ export async function getRachaSemanas(
   let inicioSemana = addDaysISO(semanaActualInicio, -7);
   for (let i = 0; i < maxSemanas; i++) {
     const finSemana = addDaysISO(inicioSemana, 6);
-    const hechas = fechas.filter((f) => f >= inicioSemana && f <= finSemana).length;
+    const hechas = fechas.filter(
+      (f) => f >= inicioSemana && f <= finSemana,
+    ).length;
     if (hechas < objetivoTotal) break;
     racha += 1;
     inicioSemana = addDaysISO(inicioSemana, -7);
@@ -269,38 +291,10 @@ export async function getRachaSemanas(
   return racha;
 }
 
-export type PiezaPendiente = {
-  id: string;
-  titulo: string;
-  plataforma: Plataforma;
-  estado: string;
-  fecha_publicacion: string;
-};
-
-/**
- * Piezas ya grabadas o editadas (pero no publicadas todavía) de las
- * plataformas activas, ordenadas por fecha de publicación más próxima.
- */
-export async function getPendientesDePublicar(
-  supabase: SupabaseClient,
-  plataformas: Plataforma[]
-): Promise<PiezaPendiente[]> {
-  if (plataformas.length === 0) return [];
-
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("id, titulo, plataforma, estado, fecha_publicacion")
-    .in("plataforma", plataformas)
-    .in("estado", ["grabado", "editado"])
-    .order("fecha_publicacion", { ascending: true });
-
-  return data ?? [];
-}
-
 /** Etiquetas más usadas en todas las piezas, de más a menos frecuente. */
 export async function getEtiquetasPopulares(
   supabase: SupabaseClient,
-  limite = 12
+  limite = 12,
 ): Promise<string[]> {
   const { data } = await supabase
     .from("piezas_contenido")
@@ -333,7 +327,7 @@ export type IdeaReciente = {
 export async function getUltimasIdeas(
   supabase: SupabaseClient,
   plataformas: Plataforma[],
-  limite = 3
+  limite = 3,
 ): Promise<IdeaReciente[]> {
   if (plataformas.length === 0) return [];
 
@@ -348,104 +342,6 @@ export async function getUltimasIdeas(
   return data ?? [];
 }
 
-export type PiezaRiesgo = {
-  id: string;
-  titulo: string;
-  plataforma: Plataforma;
-  fecha_publicacion: string;
-};
-
-/**
- * Piezas con guion escrito pero sin grabar, con fecha de publicación hoy o
- * dentro de `diasRiesgo` días (incluye las ya vencidas). Base de la vista "Hoy".
- */
-export async function getPiezasEnRiesgo(
-  supabase: SupabaseClient,
-  plataformas: Plataforma[],
-  hoyISO: string,
-  diasRiesgo = 2
-): Promise<PiezaRiesgo[]> {
-  if (plataformas.length === 0) return [];
-
-  const limite = addDaysISO(hoyISO, diasRiesgo);
-
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("id, titulo, plataforma, fecha_publicacion")
-    .in("plataforma", plataformas)
-    .eq("estado", "guion_escrito")
-    .not("fecha_publicacion", "is", null)
-    .lte("fecha_publicacion", limite)
-    .order("fecha_publicacion", { ascending: true });
-
-  return data ?? [];
-}
-
-export type PiezaParaGrabar = {
-  id: string;
-  titulo: string;
-  plataforma: Plataforma;
-  fecha_publicacion: string;
-};
-
-/**
- * Piezas con guion escrito (toca grabar) cuya fecha de publicación cae
- * dentro de la semana [semanaInicio, semanaFin] — base de "Modo grabación"
- * (`/contenido/grabacion`), que las agrupa por plataforma para grabarlas
- * todas seguidas en una sola sesión.
- */
-export async function getPiezasParaGrabarSemana(
-  supabase: SupabaseClient,
-  plataformas: Plataforma[],
-  semanaInicio: string,
-  semanaFin: string
-): Promise<PiezaParaGrabar[]> {
-  if (plataformas.length === 0) return [];
-
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("id, titulo, plataforma, fecha_publicacion")
-    .in("plataforma", plataformas)
-    .eq("estado", "guion_escrito")
-    .not("fecha_publicacion", "is", null)
-    .gte("fecha_publicacion", semanaInicio)
-    .lte("fecha_publicacion", semanaFin)
-    .order("fecha_publicacion", { ascending: true });
-
-  return data ?? [];
-}
-
-export type PiezaHoy = {
-  id: string;
-  titulo: string;
-  plataforma: Plataforma;
-  estado: string;
-  fecha_publicacion: string;
-};
-
-/**
- * Piezas con fecha de publicación hoy que todavía no están publicadas —
- * cualquier estado del pipeline (guion escrito, grabado o editado), no solo
- * "pendiente de grabar" como `getPiezasEnRiesgo`. Es la cola real del día.
- */
-export async function getPiezasParaHoy(
-  supabase: SupabaseClient,
-  plataformas: Plataforma[],
-  hoyISO: string
-): Promise<PiezaHoy[]> {
-  if (plataformas.length === 0) return [];
-
-  const { data } = await supabase
-    .from("piezas_contenido")
-    .select("id, titulo, plataforma, estado, fecha_publicacion")
-    .in("plataforma", plataformas)
-    .in("estado", ["guion_escrito", "grabado", "editado"])
-    .eq("fecha_publicacion", hoyISO)
-    .order("plataforma");
-
-  return data ?? [];
-}
-
 export type EntradaPlantilla = {
   id: string;
   plataforma: Plataforma | null;
@@ -455,7 +351,7 @@ export type EntradaPlantilla = {
 /** Entradas de la plantilla semanal (referencia manual) para un día de la semana (1 = lunes ... 7 = domingo). */
 export async function getPlantillaDelDia(
   supabase: SupabaseClient,
-  diaSemana: number
+  diaSemana: number,
 ): Promise<EntradaPlantilla[]> {
   const { data } = await supabase
     .from("plantilla_semanal")
@@ -463,6 +359,55 @@ export async function getPlantillaDelDia(
     .eq("dia_semana", diaSemana);
 
   return data ?? [];
+}
+
+export type TareaHoy = {
+  id: string;
+  titulo: string;
+  plataforma: Plataforma | null;
+  href: string;
+};
+
+/**
+ * Qué falta por escribir hoy: entradas de la plantilla semanal para las que
+ * todavía no hay un guion real programado ese día — una vez una pieza tiene
+ * guion escrito se considera terminada (Guionia ya no graba, edita ni
+ * publica), así que deja de "pedir" nada más y desaparece de esta lista.
+ */
+export async function getTareasHoy(
+  supabase: SupabaseClient,
+  plataformas: Plataforma[],
+  hoyISO: string,
+  diaSemana: number,
+): Promise<TareaHoy[]> {
+  if (plataformas.length === 0) return [];
+
+  const [{ data: piezasHoy }, plantillaHoy] = await Promise.all([
+    supabase
+      .from("piezas_contenido")
+      .select("plataforma")
+      .in("plataforma", plataformas)
+      .in("estado", ESTADOS_VIDEO)
+      .eq("fecha_publicacion", hoyISO),
+    getPlantillaDelDia(supabase, diaSemana),
+  ]);
+
+  const cubiertas = new Set(
+    (piezasHoy ?? []).map((r) => r.plataforma as Plataforma),
+  );
+
+  return plantillaHoy
+    .filter(
+      (entrada) => !entrada.plataforma || !cubiertas.has(entrada.plataforma),
+    )
+    .map((entrada) => ({
+      id: entrada.id,
+      titulo: entrada.nota,
+      plataforma: entrada.plataforma,
+      href: entrada.plataforma
+        ? `/contenido/${entrada.plataforma}/videos/nueva?fecha=${hoyISO}`
+        : "/configuracion/plantilla",
+    }));
 }
 
 export type IdeaOlvidada = {
@@ -476,7 +421,7 @@ export type IdeaOlvidada = {
 export async function getIdeasOlvidadas(
   supabase: SupabaseClient,
   plataformas: Plataforma[],
-  diasUmbral = 30
+  diasUmbral = 30,
 ): Promise<IdeaOlvidada[]> {
   if (plataformas.length === 0) return [];
 

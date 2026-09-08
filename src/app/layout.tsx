@@ -24,7 +24,9 @@ export const metadata: Metadata = {
   // Rellena NEXT_PUBLIC_SITE_URL en el hosting cuando haya dominio definitivo
   // — de momento cae a localhost, solo afecta a las URLs absolutas de
   // Open Graph (la preview al compartir un enlace), no a la app en sí.
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
   // Páginas que fijan su propio `title` (string corto, p. ej. "Iniciar
   // sesión") heredan esta plantilla — así no hace falta repetir "Guionia" en
   // cada una. La landing ("/") sí pone un `title` completo propio para SEO,
@@ -56,9 +58,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col text-text-primary lg:flex-row">
+      <body className="min-h-full flex flex-col text-text-primary md:flex-row">
         <Sidebar />
-        <div className="flex flex-1 flex-col lg:min-w-0">
+        <div className="flex flex-1 flex-col md:min-w-0">
           <TopBar />
           <Main>{children}</Main>
         </div>

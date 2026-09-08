@@ -12,7 +12,6 @@ const TITULOS: Record<string, string> = {
   "/contenido/ideas": "Ideas",
   "/contenido/plataformas": "Plataformas",
   "/contenido/publicados": "Publicados",
-  "/contenido/grabacion": "Modo grabación",
   "/configuracion/estructuras": "Estructuras",
   "/configuracion/hooks": "Hooks",
   "/configuracion/ctas": "CTAs",
@@ -93,13 +92,19 @@ export function TopBar() {
         </button>
       )}
 
-      {TITULOS[pathname] && <h1 className="pl-2 text-h1">{TITULOS[pathname]}</h1>}
+      {TITULOS[pathname] && (
+        <h1 className="pl-2 text-h1">{TITULOS[pathname]}</h1>
+      )}
 
       {mostrarBusqueda ? (
         <form action="/contenido/buscar" className="flex-1">
           {sobreOnda ? (
             <div className="flex items-center gap-2 rounded-full bg-white py-2.5 px-4 shadow-md">
-              <Search size={16} strokeWidth={1.5} className="shrink-0 text-text-disabled" />
+              <Search
+                size={16}
+                strokeWidth={1.5}
+                className="shrink-0 text-text-disabled"
+              />
               <input
                 key={query}
                 ref={inputRef}

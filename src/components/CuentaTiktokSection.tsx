@@ -17,11 +17,16 @@ function formatoNumero(n: number) {
 
 function chunk<T>(items: T[], tamano: number): T[][] {
   const grupos: T[][] = [];
-  for (let i = 0; i < items.length; i += tamano) grupos.push(items.slice(i, i + tamano));
+  for (let i = 0; i < items.length; i += tamano)
+    grupos.push(items.slice(i, i + tamano));
   return grupos;
 }
 
-export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas }) {
+export async function CuentaTiktokSection({
+  rango,
+}: {
+  rango: RangoEstadisticas;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -59,12 +64,27 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
   }
 
   try {
-    await obtenerCuentaPropia(accessToken);
+    const cuentaPropia = await obtenerCuentaPropia(accessToken);
+    // El `avatar_url` que devuelve TikTok es una URL firmada de corta
+    // duración (caduca en horas) — la que se guardó al conectar la cuenta
+    // (`/api/tiktok/callback`) deja de cargar con el tiempo, y el nombre/
+    // avatar de la cabecera de `/contenido/cuenta` se leen directamente de
+    // esa fila, no en vivo (para no bloquear la cabecera con esta llamada).
+    // Se refresca aquí, de paso, cada vez que se visita la pestaña de
+    // TikTok, así el siguiente `page.tsx` ya lee una URL vigente.
+    await supabase
+      .from("tiktok_conexiones")
+      .update({
+        display_name: cuentaPropia.displayName,
+        avatar_url: cuentaPropia.avatarUrl,
+      })
+      .eq("user_id", user.id);
   } catch {
     return (
       <div className="rounded-md bg-bg-primary p-4">
         <p className="text-small text-danger">
-          No se pudieron cargar las estadísticas de TikTok ahora mismo. Inténtalo de nuevo más tarde.
+          No se pudieron cargar las estadísticas de TikTok ahora mismo.
+          Inténtalo de nuevo más tarde.
         </p>
       </div>
     );
@@ -72,7 +92,9 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
 
   // Aparte de la cuenta básica: requiere el scope `user.info.stats`, que puede
   // no estar activo/aprobado todavía — si falla, seguimos mostrando el resto.
-  const estadisticasCuenta = await obtenerEstadisticasCuentaTiktok(accessToken).catch(() => null);
+  const estadisticasCuenta = await obtenerEstadisticasCuentaTiktok(
+    accessToken,
+  ).catch(() => null);
 
   // TikTok no tiene una API de analítica agregada — sumamos las estadísticas
   // (ya disponibles por vídeo, totales de por vida) de tus propios vídeos
@@ -104,7 +126,9 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
     try {
       const ids = lista.map((p) => p.tiktok_video_id as string);
       const resultados = await Promise.all(
-        chunk(ids, 20).map((grupo) => obtenerEstadisticasVideos(grupo, accessToken))
+        chunk(ids, 20).map((grupo) =>
+          obtenerEstadisticasVideos(grupo, accessToken),
+        ),
       );
       for (const r of resultados) {
         for (const [id, s] of Object.entries(r)) {
@@ -129,7 +153,10 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
       url: p.url_publicado,
       stats: statsPorId.get(p.tiktok_video_id as string),
     }))
-    .filter((v): v is typeof v & { stats: NonNullable<typeof v.stats> } => v.stats != null)
+    .filter(
+      (v): v is typeof v & { stats: NonNullable<typeof v.stats> } =>
+        v.stats != null,
+    )
     .sort((a, b) => b.stats.vistas - a.stats.vistas)
     .slice(0, 10);
 
@@ -147,7 +174,7 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
           compartidos: total.compartidos + s.compartidos,
         };
       },
-      { vistas: 0, likes: 0, comentarios: 0, compartidos: 0 }
+      { vistas: 0, likes: 0, comentarios: 0, compartidos: 0 },
     );
 
   const actual = acumular(limites.actualDesde, limites.actualHasta);
@@ -182,7 +209,12 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
                   actual={actual.vistas}
                   anterior={anterior?.vistas ?? null}
                 />
-                <StatMes icon={Video} etiqueta="Vídeos" actual={videosActual} anterior={videosAnterior} />
+                <StatMes
+                  icon={Video}
+                  etiqueta="Vídeos"
+                  actual={videosActual}
+                  anterior={videosAnterior}
+                />
                 <StatMes
                   icon={MessageSquare}
                   etiqueta="Comentarios"
@@ -227,7 +259,9 @@ export async function CuentaTiktokSection({ rango }: { rango: RangoEstadisticas 
             {destacados.map((video) => (
               <a
                 key={video.videoId}
-                href={video.url ?? `https://www.tiktok.com/video/${video.videoId}`}
+                href={
+                  video.url ?? `https://www.tiktok.com/video/${video.videoId}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg lg:h-48 lg:w-36"

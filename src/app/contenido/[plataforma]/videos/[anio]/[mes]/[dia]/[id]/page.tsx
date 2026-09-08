@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { AdaptarGuionButton } from "@/components/AdaptarGuionButton";
 import { CopiarGuionButton } from "@/components/CopiarGuionButton";
@@ -8,22 +7,19 @@ import { TeleprompterButton } from "@/components/TeleprompterButton";
 import { EstadisticasTiktokVideo } from "@/components/EstadisticasTiktokVideo";
 import { EstadisticasVideoLoader } from "@/components/EstadisticasVideoLoader";
 import { EstadisticasYoutubeVideo } from "@/components/EstadisticasYoutubeVideo";
-import { GrabarVideoButton } from "@/components/GrabarVideoButton";
 import { GuionEscenas } from "@/components/GuionEscenas";
 import { HistorialPieza } from "@/components/HistorialPieza";
 import { RetencionSection } from "@/components/RetencionSection";
 import { RetencionLoader } from "@/components/RetencionLoader";
-import { SubmitButton } from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma } from "@/lib/plataformas";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoYoutube } from "@/lib/youtube/conexion";
 import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
-import { ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE, getSiguienteEstadoVideo } from "@/lib/contenido";
+import { ESTADO_PIEZA_LABEL, ESTADO_PIEZA_TONE } from "@/lib/contenido";
 import {
   adaptarAOtraPlataforma,
   agregarEscenaGuion,
-  avanzarEstado,
   eliminarEscenaGuion,
   guardarTextoEscena,
   guardarUrlPublicado,
@@ -36,7 +32,13 @@ export const dynamic = "force-dynamic";
 export default async function GuionPage({
   params,
 }: {
-  params: Promise<{ plataforma: string; anio: string; mes: string; dia: string; id: string }>;
+  params: Promise<{
+    plataforma: string;
+    anio: string;
+    mes: string;
+    dia: string;
+    id: string;
+  }>;
 }) {
   const { plataforma, anio, mes, dia, id } = await params;
   if (!isPlataforma(plataforma)) notFound();
@@ -93,7 +95,6 @@ export default async function GuionPage({
     versionesPorEscena.set(v.escena_id, lista);
   }
 
-  const siguiente = getSiguienteEstadoVideo(guion.estado);
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
 
   // La llamada a la Data API (vistas/likes/comentarios) y la de retención van
@@ -101,13 +102,20 @@ export default async function GuionPage({
   // el resto de la página, que ya está disponible al instante desde la BD.
   let youtubeVideoId: string | null = null;
   let youtubeAccessToken: string | null = null;
-  if (plataforma === "youtube" && guion.estado === "publicado" && guion.url_publicado) {
-    const videoId = guion.youtube_video_id ?? extraerVideoIdYoutube(guion.url_publicado);
+  if (
+    plataforma === "youtube" &&
+    guion.estado === "publicado" &&
+    guion.url_publicado
+  ) {
+    const videoId =
+      guion.youtube_video_id ?? extraerVideoIdYoutube(guion.url_publicado);
     if (videoId) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      const accessToken = user ? await obtenerAccessTokenValidoYoutube(supabase, user.id) : null;
+      const accessToken = user
+        ? await obtenerAccessTokenValidoYoutube(supabase, user.id)
+        : null;
       if (accessToken) {
         youtubeVideoId = videoId;
         youtubeAccessToken = accessToken;
@@ -116,8 +124,13 @@ export default async function GuionPage({
   }
 
   let tiktokVideoId: string | null = null;
-  if (plataforma === "tiktok" && guion.estado === "publicado" && guion.url_publicado) {
-    tiktokVideoId = guion.tiktok_video_id ?? extraerVideoIdTiktok(guion.url_publicado);
+  if (
+    plataforma === "tiktok" &&
+    guion.estado === "publicado" &&
+    guion.url_publicado
+  ) {
+    tiktokVideoId =
+      guion.tiktok_video_id ?? extraerVideoIdTiktok(guion.url_publicado);
   }
 
   const textoCompleto =
@@ -155,10 +168,16 @@ export default async function GuionPage({
 
           <div className="flex items-center gap-2">
             {guion.numero != null && (
-              <span className="text-small text-text-secondary">#{guion.numero}</span>
+              <span className="text-small text-text-secondary">
+                #{guion.numero}
+              </span>
             )}
-            <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>{ESTADO_PIEZA_LABEL[guion.estado]}</Badge>
-            <span className="text-small text-text-secondary">{guion.fecha_publicacion}</span>
+            <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>
+              {ESTADO_PIEZA_LABEL[guion.estado]}
+            </Badge>
+            <span className="text-small text-text-secondary">
+              {guion.fecha_publicacion}
+            </span>
           </div>
 
           {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
@@ -171,82 +190,78 @@ export default async function GuionPage({
         </>
       )}
 
-      {(guion.descripcion_publicacion ||
-        guion.titulo_publicacion ||
-        guion.etiquetas_publicacion ||
-        guion.estado === "publicado") && (
+      {textoCompleto && (
         <div className="flex flex-col gap-2 rounded-md border border-border p-4 lg:gap-3 lg:p-5">
-          <h2 className="text-h2 lg:text-h1">Datos de publicación</h2>
-          {guion.titulo_publicacion && (
-            <div className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">Título</span>
-              <p className="text-body">{guion.titulo_publicacion}</p>
-            </div>
-          )}
-          {guion.descripcion_publicacion && (
-            <div className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">Descripción</span>
-              <p className="text-body whitespace-pre-wrap">{guion.descripcion_publicacion}</p>
-            </div>
-          )}
-          {guion.etiquetas_publicacion && (
-            <div className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">Etiquetas</span>
-              <p className="text-body">{guion.etiquetas_publicacion}</p>
-            </div>
-          )}
+          <h2 className="text-h2 lg:text-h1">Publicación</h2>
+          <p className="text-small text-text-secondary">
+            Guionia no publica ni sube vídeos — cuando lo publiques donde
+            corresponda, pega aquí la URL para enlazar las estadísticas y que
+            cuente en tu cadencia.
+          </p>
 
-          {guion.estado === "publicado" && (
-            <form action={guardarUrlPublicado} className="flex flex-col gap-1">
-              <input type="hidden" name="id" value={guion.id} />
-              <input type="hidden" name="redirectTo" value={rutaActual} />
-              <span className="text-h3 text-text-secondary">URL del vídeo publicado</span>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  name="url_publicado"
-                  defaultValue={guion.url_publicado ?? ""}
-                  placeholder="https://…"
-                  className="flex-1 rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="rounded-sm bg-bg-secondary px-3 py-2 text-small text-text-primary active:bg-border"
-                >
-                  Guardar
-                </button>
-              </div>
-              {guion.url_publicado && (
-                <a
-                  href={guion.url_publicado}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-small text-accent hover:underline"
-                >
-                  Abrir vídeo ↗
-                </a>
-              )}
-            </form>
-          )}
+          <form action={guardarUrlPublicado} className="flex flex-col gap-1">
+            <input type="hidden" name="id" value={guion.id} />
+            <input type="hidden" name="redirectTo" value={rutaActual} />
+            <span className="text-h3 text-text-secondary">
+              URL del vídeo publicado
+            </span>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                name="url_publicado"
+                defaultValue={guion.url_publicado ?? ""}
+                placeholder="https://…"
+                className="flex-1 rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="rounded-sm bg-bg-secondary px-3 py-2 text-small text-text-primary active:bg-border"
+              >
+                Guardar
+              </button>
+            </div>
+            {guion.url_publicado && (
+              <a
+                href={guion.url_publicado}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-small text-accent hover:underline"
+              >
+                Abrir vídeo ↗
+              </a>
+            )}
+          </form>
         </div>
       )}
 
       <HistorialPieza eventos={historial ?? []} />
 
       {youtubeVideoId && youtubeAccessToken && (
-        <Suspense fallback={<EstadisticasVideoLoader titulo="Estadísticas de YouTube" />}>
-          <EstadisticasYoutubeVideo videoId={youtubeVideoId} accessToken={youtubeAccessToken} />
+        <Suspense
+          fallback={
+            <EstadisticasVideoLoader titulo="Estadísticas de YouTube" />
+          }
+        >
+          <EstadisticasYoutubeVideo
+            videoId={youtubeVideoId}
+            accessToken={youtubeAccessToken}
+          />
         </Suspense>
       )}
 
       {youtubeVideoId && youtubeAccessToken && (
         <Suspense fallback={<RetencionLoader />}>
-          <RetencionSection videoId={youtubeVideoId} accessToken={youtubeAccessToken} />
+          <RetencionSection
+            videoId={youtubeVideoId}
+            accessToken={youtubeAccessToken}
+          />
         </Suspense>
       )}
 
       {tiktokVideoId && (
-        <Suspense fallback={<EstadisticasVideoLoader titulo="Estadísticas de TikTok" />}>
+        <Suspense
+          fallback={<EstadisticasVideoLoader titulo="Estadísticas de TikTok" />}
+        >
           <EstadisticasTiktokVideo videoId={tiktokVideoId} />
         </Suspense>
       )}
@@ -261,37 +276,6 @@ export default async function GuionPage({
             adaptarAOtraPlataforma={adaptarAOtraPlataforma}
           />
         )}
-
-        {siguiente &&
-          (siguiente === "publicado" && plataforma !== "linkedin" ? (
-            <Link
-              href={`${rutaActual}/publicar`}
-              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
-            >
-              Preparar publicación
-            </Link>
-          ) : siguiente === "grabado" ? (
-            <GrabarVideoButton
-              piezaId={guion.id}
-              plataforma={plataforma}
-              redirectTo={rutaActual}
-              tituloArchivo={guion.titulo}
-              avanzarEstado={avanzarEstado}
-            />
-          ) : (
-            <form action={avanzarEstado}>
-              <input type="hidden" name="id" value={guion.id} />
-              <input type="hidden" name="plataforma" value={plataforma} />
-              <input type="hidden" name="siguiente" value={siguiente} />
-              <input type="hidden" name="redirectTo" value={rutaActual} />
-              <SubmitButton
-                pendingLabel="Guardando…"
-                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-60 lg:px-5 lg:py-2.5"
-              >
-                Marcar como {ESTADO_PIEZA_LABEL[siguiente].toLowerCase()}
-              </SubmitButton>
-            </form>
-          ))}
       </div>
     </div>
   );

@@ -1,4 +1,10 @@
-import { Home, LayoutGrid, Lightbulb, User, type LucideIcon } from "lucide-react";
+import {
+  Home,
+  LayoutGrid,
+  Lightbulb,
+  User,
+  type LucideIcon,
+} from "lucide-react";
 
 export const RUTAS_AUTH = [
   "/login",
@@ -27,15 +33,27 @@ export const ITEMS_NAV: readonly ItemNav[] = [
     icon: LayoutGrid,
     prefijo: "/contenido/plataformas",
   },
-  { href: "/contenido/ideas", label: "Ideas", icon: Lightbulb, prefijo: "/contenido/ideas" },
-  { href: "/contenido/cuenta", label: "Cuenta", icon: User, prefijo: "/contenido/cuenta" },
+  {
+    href: "/contenido/ideas",
+    label: "Ideas",
+    icon: Lightbulb,
+    prefijo: "/contenido/ideas",
+  },
+  {
+    href: "/contenido/cuenta",
+    label: "Cuenta",
+    icon: User,
+    prefijo: "/contenido/cuenta",
+  },
 ];
 
 /** `/` es la landing pública (marketing) — sin el "chrome" de la app
  *  (Sidebar/TopBar/BottomNav), igual que las rutas de auth. Comparación
  *  exacta (no `startsWith`) porque toda ruta empieza por "/". */
 export function esRutaSinChrome(pathname: string) {
-  return pathname === "/" || RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta));
+  return (
+    pathname === "/" || RUTAS_AUTH.some((ruta) => pathname.startsWith(ruta))
+  );
 }
 
 export function esRutaActiva(pathname: string, prefijo: string) {

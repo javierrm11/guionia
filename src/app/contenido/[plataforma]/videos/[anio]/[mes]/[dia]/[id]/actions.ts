@@ -4,89 +4,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlataforma, todayISO } from "@/lib/plataformas";
-import { ESTADOS_VIDEO, TIPOS_ESCENA, registrarHistorialPieza } from "@/lib/contenido";
+import { TIPOS_ESCENA, registrarHistorialPieza } from "@/lib/contenido";
 import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
 
-export async function avanzarEstado(formData: FormData) {
-  const supabase = await createClient();
-
-  const id = formData.get("id");
-  const plataforma = formData.get("plataforma");
-  const siguiente = formData.get("siguiente");
-  const redirectTo = formData.get("redirectTo");
-
-  if (typeof id !== "string" || !id) {
-    throw new Error("Guion inválido");
-  }
-  if (typeof plataforma !== "string" || !isPlataforma(plataforma)) {
-    throw new Error("Plataforma inválida");
-  }
-  if (typeof siguiente !== "string" || !(ESTADOS_VIDEO as readonly string[]).includes(siguiente)) {
-    throw new Error("Estado inválido");
-  }
-  if (typeof redirectTo !== "string" || !redirectTo) {
-    throw new Error("Ruta de destino inválida");
-  }
-
-  const { error } = await supabase
-    .from("piezas_contenido")
-    .update({ estado: siguiente })
-    .eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  await registrarHistorialPieza(supabase, id, siguiente);
-
-  revalidatePath(redirectTo);
-  redirect(redirectTo);
-}
-
-export async function publicarConMetadatos(formData: FormData) {
-  const supabase = await createClient();
-
-  const id = formData.get("id");
-  const plataforma = formData.get("plataforma");
-  const redirectTo = formData.get("redirectTo");
-  const tituloPublicacion = formData.get("titulo_publicacion");
-  const descripcionPublicacion = formData.get("descripcion_publicacion");
-  const etiquetasPublicacion = formData.get("etiquetas_publicacion");
-
-  if (typeof id !== "string" || !id) {
-    throw new Error("Guion inválido");
-  }
-  if (typeof plataforma !== "string" || !isPlataforma(plataforma)) {
-    throw new Error("Plataforma inválida");
-  }
-  if (typeof redirectTo !== "string" || !redirectTo) {
-    throw new Error("Ruta de destino inválida");
-  }
-
-  const limpiar = (v: FormDataEntryValue | null) =>
-    typeof v === "string" && v.trim() ? v.trim() : null;
-
-  const { error } = await supabase
-    .from("piezas_contenido")
-    .update({
-      estado: "publicado",
-      titulo_publicacion: plataforma === "youtube" ? limpiar(tituloPublicacion) : null,
-      descripcion_publicacion: limpiar(descripcionPublicacion),
-      etiquetas_publicacion: plataforma === "youtube" ? limpiar(etiquetasPublicacion) : null,
-    })
-    .eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  await registrarHistorialPieza(supabase, id, "publicado");
-
-  revalidatePath(redirectTo);
-  redirect(redirectTo);
-}
-
+/**
+ * Único punto de la app para enlazar un guion con el vídeo ya publicado
+ * (en YouTube/TikTok, fuera de aquí) — no hay grabación, edición ni subida
+ * dentro de la app: se escribe el guion, se publica donde corresponda, y
+ * aquí se pega la URL para que las estadísticas y la cadencia lo cuenten.
+ * Pegar una URL marca la pieza como "publicado"; borrarla la devuelve a
+ * "guion escrito" para no dejar un "publicado" fantasma en la cadencia.
+ */
 export async function guardarUrlPublicado(formData: FormData) {
   const supabase = await createClient();
 
@@ -95,13 +24,16 @@ export async function guardarUrlPublicado(formData: FormData) {
   const redirectTo = formData.get("redirectTo");
 
   if (typeof id !== "string" || !id) throw new Error("Guion inválido");
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const urlLimpia = typeof url === "string" && url.trim() ? url.trim() : null;
+  const nuevoEstado = urlLimpia ? "publicado" : "guion_escrito";
 
   const { error } = await supabase
     .from("piezas_contenido")
     .update({
+      estado: nuevoEstado,
       url_publicado: urlLimpia,
       youtube_video_id: urlLimpia ? extraerVideoIdYoutube(urlLimpia) : null,
       tiktok_video_id: urlLimpia ? extraerVideoIdTiktok(urlLimpia) : null,
@@ -112,35 +44,9 @@ export async function guardarUrlPublicado(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(redirectTo);
-}
-
-/** Tras subir el vídeo directamente desde el navegador a YouTube (subida
- *  resumable, ver `SubirVideoYoutube.tsx`), enlaza el vídeo ya creado con el
- *  guion — mismo resultado final que `publicarConMetadatos` +
- *  `guardarUrlPublicado` juntas, pero sin depender de pegar la URL a mano. */
-export async function guardarVideoSubido(
-  id: string,
-  youtubeVideoId: string,
-  redirectTo: string
-) {
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("piezas_contenido")
-    .update({
-      estado: "publicado",
-      youtube_video_id: youtubeVideoId,
-      url_publicado: `https://www.youtube.com/watch?v=${youtubeVideoId}`,
-    })
-    .eq("id", id);
-
-  if (error) throw new Error(error.message);
-
-  await registrarHistorialPieza(supabase, id, "publicado");
+  await registrarHistorialPieza(supabase, id, nuevoEstado);
 
   revalidatePath(redirectTo);
-  redirect(redirectTo);
 }
 
 type EscenaOriginal = {
@@ -163,7 +69,10 @@ export async function adaptarAOtraPlataforma(formData: FormData) {
   const plataformaDestino = formData.get("plataforma_destino");
 
   if (typeof id !== "string" || !id) throw new Error("Guion inválido");
-  if (typeof plataformaDestino !== "string" || !isPlataforma(plataformaDestino)) {
+  if (
+    typeof plataformaDestino !== "string" ||
+    !isPlataforma(plataformaDestino)
+  ) {
     throw new Error("Plataforma inválida");
   }
 
@@ -175,9 +84,9 @@ export async function adaptarAOtraPlataforma(formData: FormData) {
 
   if (!original) throw new Error("Guion no encontrado");
 
-  const escenasActivas = ((original.escenas_guion ?? []) as EscenaOriginal[]).filter(
-    (e) => !e.deleted_at
-  );
+  const escenasActivas = (
+    (original.escenas_guion ?? []) as EscenaOriginal[]
+  ).filter((e) => !e.deleted_at);
   const hoy = todayISO();
 
   const { data: copia, error } = await supabase
@@ -207,13 +116,15 @@ export async function adaptarAOtraPlataforma(formData: FormData) {
         tipo_escena: e.tipo_escena,
         duracion_segundos: e.duracion_segundos,
         texto: e.texto,
-      }))
+      })),
     );
     if (escenasError) throw new Error(escenasError.message);
   }
 
   const [anio, mes, dia] = hoy.split("-");
-  redirect(`/contenido/${plataformaDestino}/videos/${anio}/${mes}/${dia}/${copia.id}`);
+  redirect(
+    `/contenido/${plataformaDestino}/videos/${anio}/${mes}/${dia}/${copia.id}`,
+  );
 }
 
 export async function guardarTextoEscena(formData: FormData) {
@@ -224,7 +135,8 @@ export async function guardarTextoEscena(formData: FormData) {
   const redirectTo = formData.get("redirectTo");
 
   if (typeof id !== "string" || !id) throw new Error("Escena inválida");
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const nuevoTexto = typeof texto === "string" ? texto : null;
 
@@ -235,10 +147,15 @@ export async function guardarTextoEscena(formData: FormData) {
     .maybeSingle();
 
   if (actual?.texto && actual.texto.trim() && actual.texto !== nuevoTexto) {
-    await supabase.from("escena_versiones").insert({ escena_id: id, texto: actual.texto });
+    await supabase
+      .from("escena_versiones")
+      .insert({ escena_id: id, texto: actual.texto });
   }
 
-  const { error } = await supabase.from("escenas_guion").update({ texto: nuevoTexto }).eq("id", id);
+  const { error } = await supabase
+    .from("escenas_guion")
+    .update({ texto: nuevoTexto })
+    .eq("id", id);
 
   if (error) throw new Error(error.message);
 
@@ -252,9 +169,12 @@ export async function restaurarVersionEscena(formData: FormData) {
   const versionId = formData.get("version_id");
   const redirectTo = formData.get("redirectTo");
 
-  if (typeof escenaId !== "string" || !escenaId) throw new Error("Escena inválida");
-  if (typeof versionId !== "string" || !versionId) throw new Error("Versión inválida");
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof escenaId !== "string" || !escenaId)
+    throw new Error("Escena inválida");
+  if (typeof versionId !== "string" || !versionId)
+    throw new Error("Versión inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const { data: version } = await supabase
     .from("escena_versiones")
@@ -271,7 +191,9 @@ export async function restaurarVersionEscena(formData: FormData) {
     .maybeSingle();
 
   if (actual?.texto && actual.texto.trim() && actual.texto !== version.texto) {
-    await supabase.from("escena_versiones").insert({ escena_id: escenaId, texto: actual.texto });
+    await supabase
+      .from("escena_versiones")
+      .insert({ escena_id: escenaId, texto: actual.texto });
   }
 
   const { error } = await supabase
@@ -292,14 +214,16 @@ export async function agregarEscenaGuion(formData: FormData) {
   const duracionSegundos = formData.get("duracion_segundos");
   const redirectTo = formData.get("redirectTo");
 
-  if (typeof piezaId !== "string" || !piezaId) throw new Error("Guion inválido");
+  if (typeof piezaId !== "string" || !piezaId)
+    throw new Error("Guion inválido");
   if (
     typeof tipoEscena !== "string" ||
     !(TIPOS_ESCENA as readonly string[]).includes(tipoEscena)
   ) {
     throw new Error("Tipo de escena inválido");
   }
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const duracionNum = Number(duracionSegundos);
 
@@ -316,7 +240,8 @@ export async function agregarEscenaGuion(formData: FormData) {
     pieza_id: piezaId,
     orden: (ultima?.orden ?? 0) + 1,
     tipo_escena: tipoEscena,
-    duracion_segundos: Number.isInteger(duracionNum) && duracionNum > 0 ? duracionNum : null,
+    duracion_segundos:
+      Number.isInteger(duracionNum) && duracionNum > 0 ? duracionNum : null,
     texto: null,
   });
 
@@ -334,7 +259,8 @@ export async function eliminarEscenaGuion(formData: FormData) {
   const redirectTo = formData.get("redirectTo");
 
   if (typeof id !== "string" || !id) throw new Error("Escena inválida");
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const { error } = await supabase
     .from("escenas_guion")
@@ -353,9 +279,12 @@ export async function moverEscenaGuion(formData: FormData) {
   const direccion = formData.get("direccion");
   const redirectTo = formData.get("redirectTo");
 
-  if (typeof piezaId !== "string" || !piezaId) throw new Error("Guion inválido");
-  if (direccion !== "arriba" && direccion !== "abajo") throw new Error("Dirección inválida");
-  if (typeof redirectTo !== "string" || !redirectTo) throw new Error("Ruta inválida");
+  if (typeof piezaId !== "string" || !piezaId)
+    throw new Error("Guion inválido");
+  if (direccion !== "arriba" && direccion !== "abajo")
+    throw new Error("Dirección inválida");
+  if (typeof redirectTo !== "string" || !redirectTo)
+    throw new Error("Ruta inválida");
 
   const { data: escenas } = await supabase
     .from("escenas_guion")
@@ -374,8 +303,14 @@ export async function moverEscenaGuion(formData: FormData) {
   const vecino = escenas[vecinoIndex];
 
   await Promise.all([
-    supabase.from("escenas_guion").update({ orden: vecino.orden }).eq("id", actual.id),
-    supabase.from("escenas_guion").update({ orden: actual.orden }).eq("id", vecino.id),
+    supabase
+      .from("escenas_guion")
+      .update({ orden: vecino.orden })
+      .eq("id", actual.id),
+    supabase
+      .from("escenas_guion")
+      .update({ orden: actual.orden })
+      .eq("id", vecino.id),
   ]);
 
   revalidatePath(redirectTo);

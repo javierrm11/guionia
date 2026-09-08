@@ -17,22 +17,24 @@ export function FaqItem({
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="rounded-2xl bg-bg-primary p-4 lg:p-5">
-      <button
-        type="button"
-        onClick={() => setAbierto((v) => !v)}
-        aria-expanded={abierto}
-        className="flex w-full items-center justify-between gap-3 rounded-sm text-left text-h3 focus-visible:ring-2 focus-visible:ring-accent-bg focus-visible:outline-none lg:text-h2"
-      >
-        {pregunta}
-        <ChevronDown
-          size={18}
-          strokeWidth={1.5}
-          className={`shrink-0 text-text-secondary transition-transform duration-200 ${
-            abierto ? "rotate-180" : ""
-          }`}
-        />
-      </button>
+    <div className="rounded-2xl bg-bg-primary p-4 shadow-sm transition-shadow hover:shadow-md lg:p-5">
+      <h3>
+        <button
+          type="button"
+          onClick={() => setAbierto((v) => !v)}
+          aria-expanded={abierto}
+          className="flex w-full items-center justify-between gap-3 rounded-sm text-left text-h3 focus-visible:ring-2 focus-visible:ring-accent-bg focus-visible:outline-none lg:text-h2"
+        >
+          {pregunta}
+          <ChevronDown
+            size={18}
+            strokeWidth={1.5}
+            className={`shrink-0 text-text-secondary transition-transform duration-200 ${
+              abierto ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      </h3>
       <div
         className="grid transition-[grid-template-rows] duration-200 ease-out"
         style={{ gridTemplateRows: abierto ? "1fr" : "0fr" }}

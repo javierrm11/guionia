@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Settings } from "lucide-react";
+import { AvatarCuenta } from "@/components/AvatarCuenta";
 import { CuentaLoader } from "@/components/CuentaLoader";
 import { CuentaSection } from "@/components/CuentaSection";
 import { CuentaTiktokSection } from "@/components/CuentaTiktokSection";
@@ -20,7 +20,9 @@ export default async function CuentaPage({
   searchParams: Promise<{ rango?: string; cuenta?: string }>;
 }) {
   const { rango: rangoParam, cuenta: cuentaParam } = await searchParams;
-  const rango: RangoEstadisticas = isRangoEstadisticas(rangoParam) ? rangoParam : "mes";
+  const rango: RangoEstadisticas = isRangoEstadisticas(rangoParam)
+    ? rangoParam
+    : "mes";
   const cuenta = cuentaParam === "tiktok" ? "tiktok" : "youtube";
 
   const supabase = await createClient();
@@ -49,7 +51,9 @@ export default async function CuentaPage({
       ? (conexionYoutube?.canal_titulo ?? "YouTube")
       : (conexionTiktok?.display_name ?? "TikTok");
   const avatarUrl =
-    cuenta === "youtube" ? conexionYoutube?.canal_thumbnail_url : conexionTiktok?.avatar_url;
+    cuenta === "youtube"
+      ? conexionYoutube?.canal_thumbnail_url
+      : conexionTiktok?.avatar_url;
   const IconCuenta = PLATAFORMA_ICON[cuenta];
   const tonoCuenta = PLATAFORMA_TONO[cuenta];
 
@@ -74,17 +78,17 @@ export default async function CuentaPage({
         <div className="flex flex-col items-center gap-1.5 pt-4 pb-4 lg:gap-2">
           <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center lg:h-24 lg:w-24">
             <span className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-black lg:h-24 lg:w-24">
-              {avatarUrl ? (
-                <Image src={avatarUrl} alt="" fill sizes="96px" className="object-cover" />
-              ) : (
-                <span className="font-display text-h1 text-white">{nombre[0]?.toUpperCase()}</span>
-              )}
+              <AvatarCuenta src={avatarUrl ?? null} nombre={nombre} />
             </span>
             <span
               className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full lg:h-7 lg:w-7"
               style={{ backgroundColor: tonoCuenta }}
             >
-              <IconCuenta size={11} strokeWidth={1.5} className="text-white lg:h-3.5 lg:w-3.5" />
+              <IconCuenta
+                size={11}
+                strokeWidth={1.5}
+                className="text-white lg:h-3.5 lg:w-3.5"
+              />
             </span>
           </span>
           <span className="text-h2 text-white lg:text-h1">{nombre}</span>
@@ -98,7 +102,9 @@ export default async function CuentaPage({
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=youtube`}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption lg:px-4 lg:py-2 lg:text-body ${
-                cuenta === "youtube" ? "bg-accent text-white" : "text-text-secondary"
+                cuenta === "youtube"
+                  ? "bg-accent text-white"
+                  : "text-text-secondary"
               }`}
             >
               <PLATAFORMA_ICON.youtube size={14} strokeWidth={1.5} />
@@ -107,7 +113,9 @@ export default async function CuentaPage({
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=tiktok`}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption lg:px-4 lg:py-2 lg:text-body ${
-                cuenta === "tiktok" ? "bg-accent text-white" : "text-text-secondary"
+                cuenta === "tiktok"
+                  ? "bg-accent text-white"
+                  : "text-text-secondary"
               }`}
             >
               <PLATAFORMA_ICON.tiktok size={14} strokeWidth={1.5} />
@@ -121,7 +129,11 @@ export default async function CuentaPage({
 
       <div className="relative z-10 flex flex-col gap-2 px-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-3 lg:px-8">
         <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
-          {cuenta === "youtube" ? <CuentaSection rango={rango} /> : <CuentaTiktokSection rango={rango} />}
+          {cuenta === "youtube" ? (
+            <CuentaSection rango={rango} />
+          ) : (
+            <CuentaTiktokSection rango={rango} />
+          )}
         </Suspense>
       </div>
     </div>

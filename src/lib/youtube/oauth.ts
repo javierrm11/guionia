@@ -1,7 +1,6 @@
 const SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
   "https://www.googleapis.com/auth/yt-analytics.readonly",
-  "https://www.googleapis.com/auth/youtube.upload",
 ].join(" ");
 
 function clientId() {
@@ -16,7 +15,10 @@ function clientSecret() {
   return secret;
 }
 
-export function construirUrlAutorizacion(redirectUri: string, state: string): string {
+export function construirUrlAutorizacion(
+  redirectUri: string,
+  state: string,
+): string {
   const params = new URLSearchParams({
     client_id: clientId(),
     redirect_uri: redirectUri,
@@ -37,7 +39,7 @@ type TokenResponse = {
 
 export async function intercambiarCodigo(
   code: string,
-  redirectUri: string
+  redirectUri: string,
 ): Promise<TokenResponse> {
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -52,13 +54,17 @@ export async function intercambiarCodigo(
   });
 
   if (!res.ok) {
-    throw new Error(`No se pudo intercambiar el código de Google (${res.status})`);
+    throw new Error(
+      `No se pudo intercambiar el código de Google (${res.status})`,
+    );
   }
 
   return res.json();
 }
 
-export async function renovarAccessToken(refreshToken: string): Promise<TokenResponse> {
+export async function renovarAccessToken(
+  refreshToken: string,
+): Promise<TokenResponse> {
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -83,10 +89,12 @@ export type CanalYoutube = {
   thumbnailUrl: string | null;
 };
 
-export async function obtenerCanalPropio(accessToken: string): Promise<CanalYoutube> {
+export async function obtenerCanalPropio(
+  accessToken: string,
+): Promise<CanalYoutube> {
   const res = await fetch(
     "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
 
   if (!res.ok) {
@@ -95,7 +103,8 @@ export async function obtenerCanalPropio(accessToken: string): Promise<CanalYout
 
   const data = await res.json();
   const canal = data.items?.[0];
-  if (!canal) throw new Error("La cuenta de Google no tiene ningún canal de YouTube");
+  if (!canal)
+    throw new Error("La cuenta de Google no tiene ningún canal de YouTube");
 
   return {
     id: canal.id,
@@ -113,12 +122,13 @@ export type MetricasPeriodo = {
   minutosVistos: number;
 };
 
-const METRICAS_PERIODO = "views,comments,likes,subscribersGained,subscribersLost,estimatedMinutesWatched";
+const METRICAS_PERIODO =
+  "views,comments,likes,subscribersGained,subscribersLost,estimatedMinutesWatched";
 
 async function pedirMetricasPeriodo(
   accessToken: string,
   desde: string,
-  hasta: string
+  hasta: string,
 ): Promise<MetricasPeriodo> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
@@ -127,16 +137,20 @@ async function pedirMetricasPeriodo(
     metrics: METRICAS_PERIODO,
   });
 
-  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!res.ok) {
     throw new Error(`No se pudo leer las métricas del periodo (${res.status})`);
   }
 
   const data = await res.json();
-  const fila: [number, number, number, number, number, number] | undefined = data.rows?.[0];
+  const fila: [number, number, number, number, number, number] | undefined =
+    data.rows?.[0];
 
   return {
     vistas: fila?.[0] ?? 0,
@@ -156,12 +170,21 @@ async function pedirMetricasPeriodo(
  */
 export async function obtenerComparativaPeriodo(
   accessToken: string,
-  limites: { actualDesde: string; actualHasta: string; anteriorDesde: string | null; anteriorHasta: string | null }
+  limites: {
+    actualDesde: string;
+    actualHasta: string;
+    anteriorDesde: string | null;
+    anteriorHasta: string | null;
+  },
 ): Promise<{ actual: MetricasPeriodo; anterior: MetricasPeriodo | null }> {
   const [actual, anterior] = await Promise.all([
     pedirMetricasPeriodo(accessToken, limites.actualDesde, limites.actualHasta),
     limites.anteriorDesde && limites.anteriorHasta
-      ? pedirMetricasPeriodo(accessToken, limites.anteriorDesde, limites.anteriorHasta)
+      ? pedirMetricasPeriodo(
+          accessToken,
+          limites.anteriorDesde,
+          limites.anteriorHasta,
+        )
       : Promise.resolve(null),
   ]);
 
@@ -181,7 +204,8 @@ export function extraerVideoId(url: string): string | null {
     if (u.hostname === "youtu.be") return u.pathname.slice(1) || null;
     if (u.hostname.endsWith("youtube.com")) {
       if (u.pathname === "/watch") return u.searchParams.get("v");
-      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] ?? null;
+      if (u.pathname.startsWith("/shorts/"))
+        return u.pathname.split("/")[2] ?? null;
     }
     return null;
   } catch {
@@ -198,17 +222,18 @@ export type VideoCanal = {
 /** Lista los vídeos subidos al canal propio (los más recientes primero), hasta `limite`. */
 export async function obtenerVideosDelCanal(
   accessToken: string,
-  limite = 100
+  limite = 100,
 ): Promise<VideoCanal[]> {
   const canalRes = await fetch(
     "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true",
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
   if (!canalRes.ok) {
     throw new Error(`No se pudo leer el canal de YouTube (${canalRes.status})`);
   }
   const canalData = await canalRes.json();
-  const playlistSubidas = canalData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+  const playlistSubidas =
+    canalData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
   if (!playlistSubidas) return [];
 
   const videos: VideoCanal[] = [];
@@ -224,7 +249,7 @@ export async function obtenerVideosDelCanal(
 
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: { Authorization: `Bearer ${accessToken}` } },
     );
     if (!res.ok) {
       throw new Error(`No se pudo leer los vídeos del canal (${res.status})`);
@@ -249,17 +274,19 @@ export async function obtenerVideosDelCanal(
 
 export async function obtenerEstadisticasVideos(
   videoIds: string[],
-  accessToken: string
+  accessToken: string,
 ): Promise<Record<string, EstadisticasVideo>> {
   if (videoIds.length === 0) return {};
 
   const res = await fetch(
     `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(",")}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
 
   if (!res.ok) {
-    throw new Error(`No se pudieron leer las estadísticas de YouTube (${res.status})`);
+    throw new Error(
+      `No se pudieron leer las estadísticas de YouTube (${res.status})`,
+    );
   }
 
   const data = await res.json();
@@ -274,6 +301,60 @@ export async function obtenerEstadisticasVideos(
   return resultado;
 }
 
+const PALABRAS_VACIAS = new Set([
+  "de",
+  "la",
+  "el",
+  "en",
+  "y",
+  "a",
+  "los",
+  "las",
+  "un",
+  "una",
+  "con",
+  "por",
+  "para",
+  "que",
+  "es",
+  "su",
+  "se",
+  "lo",
+  "al",
+  "del",
+  "como",
+  "más",
+  "mas",
+  "the",
+  "and",
+  "for",
+  "with",
+  "to",
+  "of",
+  "in",
+  "on",
+  "how",
+  "you",
+  "your",
+  "este",
+  "esta",
+  "estos",
+  "estas",
+]);
+
+/** Palabras de 4+ letras, en minúsculas y sin acentos, quitando conectores
+ *  vacíos — la unidad mínima con la que se compara la temática propia
+ *  contra la de un vídeo en tendencia (ver `obtenerPerfilPropio`). */
+export function palabrasSignificativas(texto: string): string[] {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((p) => p.length >= 4 && !PALABRAS_VACIAS.has(p));
+}
+
 export type VideoTendencia = {
   videoId: string;
   canalId: string;
@@ -283,6 +364,8 @@ export type VideoTendencia = {
   miniatura: string | null;
   vistas: number;
   publicadoEn: string;
+  /** Solo para reordenar por afinidad temática en `obtenerVideosParaTi` — no se pinta en la UI. */
+  etiquetas: string[];
 };
 
 /**
@@ -296,7 +379,7 @@ export async function obtenerVideosTendencia(
   accessToken: string,
   regionCode = "ES",
   maxResults = 20,
-  categoryId?: string
+  categoryId?: string,
 ): Promise<VideoTendencia[]> {
   const params = new URLSearchParams({
     part: "snippet,statistics",
@@ -306,12 +389,17 @@ export async function obtenerVideosTendencia(
   });
   if (categoryId) params.set("videoCategoryId", categoryId);
 
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!res.ok) {
-    throw new Error(`No se pudieron leer los vídeos en tendencia (${res.status})`);
+    throw new Error(
+      `No se pudieron leer los vídeos en tendencia (${res.status})`,
+    );
   }
 
   const data = await res.json();
@@ -325,6 +413,7 @@ export async function obtenerVideosTendencia(
         categoryId?: string;
         publishedAt: string;
         thumbnails?: Record<string, { url: string }>;
+        tags?: string[];
       };
       statistics?: { viewCount?: string };
     }) => ({
@@ -340,40 +429,67 @@ export async function obtenerVideosTendencia(
         null,
       vistas: Number(item.statistics?.viewCount ?? 0),
       publicadoEn: item.snippet.publishedAt,
-    })
+      etiquetas: item.snippet.tags ?? [],
+    }),
   );
 }
 
+export type PerfilPropio = {
+  categoryId: string | null;
+  /** Palabras clave (de tus etiquetas y títulos) para acercar el chart de
+   *  tendencias a tu temática real — ver `ordenarPorAfinidad` en
+   *  `videosParaTi.ts`. */
+  palabrasClave: Set<string>;
+};
+
 /**
  * Categoría de YouTube (`snippet.categoryId`) más repetida entre estos
- * vídeos — para filtrar el chart de tendencias por temática afín a la tuya
- * en vez de por palabras clave de título (mucho más frágil). `null` si
- * no hay vídeos o ninguno tiene categoría.
+ * vídeos, y el conjunto de palabras clave que salen de sus etiquetas y
+ * títulos — para acercar el chart de tendencias a tu temática real (p. ej.
+ * "Educación" agrupa desde finanzas hasta manualidades) sin pasar por
+ * `search.list` (carísimo en cuota y frágil con varias palabras a la vez):
+ * reaprovecha esta misma llamada a `videos.list`, que de todos modos hacía
+ * falta para la categoría.
  */
-export async function obtenerCategoriaMasFrecuente(
+export async function obtenerPerfilPropio(
   videoIds: string[],
-  accessToken: string
-): Promise<string | null> {
-  if (videoIds.length === 0) return null;
+  accessToken: string,
+): Promise<PerfilPropio> {
+  if (videoIds.length === 0)
+    return { categoryId: null, palabrasClave: new Set() };
 
   const res = await fetch(
     `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds.join(",")}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
 
   if (!res.ok) {
-    throw new Error(`No se pudo leer la categoría de tus vídeos (${res.status})`);
+    throw new Error(
+      `No se pudo leer la categoría de tus vídeos (${res.status})`,
+    );
   }
 
   const data = await res.json();
   const conteo = new Map<string, number>();
+  const palabrasClave = new Set<string>();
+
   for (const item of data.items ?? []) {
     const categoryId = item.snippet?.categoryId;
     if (categoryId) conteo.set(categoryId, (conteo.get(categoryId) ?? 0) + 1);
+
+    for (const etiqueta of item.snippet?.tags ?? []) {
+      palabrasSignificativas(etiqueta).forEach((p) => palabrasClave.add(p));
+    }
+    palabrasSignificativas(item.snippet?.title ?? "").forEach((p) =>
+      palabrasClave.add(p),
+    );
   }
 
-  if (conteo.size === 0) return null;
-  return [...conteo.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const categoryId =
+    conteo.size > 0
+      ? [...conteo.entries()].sort((a, b) => b[1] - a[1])[0][0]
+      : null;
+  return { categoryId, palabrasClave };
 }
 
 export type VideoDestacado = {
@@ -400,7 +516,7 @@ export type VideoDestacado = {
  */
 async function obtenerImpresionesVideo(
   videoId: string,
-  accessToken: string
+  accessToken: string,
 ): Promise<{ impresiones: number; ctr: number } | null> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
@@ -411,9 +527,12 @@ async function obtenerImpresionesVideo(
   });
 
   try {
-    const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const res = await fetch(
+      `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
     if (!res.ok) return null;
     const data = await res.json();
     const fila: [number, number] | undefined = data.rows?.[0];
@@ -432,11 +551,15 @@ async function obtenerImpresionesVideo(
  */
 function construirMotivo(
   video: { vistas: number; comentarios: number; retencionMedia: number },
-  medias: { vistas: number; comentarios: number; retencionMedia: number }
+  medias: { vistas: number; comentarios: number; retencionMedia: number },
 ): string {
   const ratioVistas = medias.vistas > 0 ? video.vistas / medias.vistas : 1;
-  const ratioComentarios = medias.comentarios > 0 ? video.comentarios / medias.comentarios : 1;
-  const ratioRetencion = medias.retencionMedia > 0 ? video.retencionMedia / medias.retencionMedia : 1;
+  const ratioComentarios =
+    medias.comentarios > 0 ? video.comentarios / medias.comentarios : 1;
+  const ratioRetencion =
+    medias.retencionMedia > 0
+      ? video.retencionMedia / medias.retencionMedia
+      : 1;
 
   const senales = [
     {
@@ -447,7 +570,10 @@ function construirMotivo(
       ratio: ratioComentarios,
       texto: `genera muchos más comentarios de lo habitual (x${ratioComentarios.toFixed(1)})`,
     },
-    { ratio: ratioVistas, texto: `arrasa en vistas frente a tu media (x${ratioVistas.toFixed(1)})` },
+    {
+      ratio: ratioVistas,
+      texto: `arrasa en vistas frente a tu media (x${ratioVistas.toFixed(1)})`,
+    },
   ]
     .filter((s) => s.ratio >= 1.15)
     .sort((a, b) => b.ratio - a.ratio)
@@ -472,7 +598,7 @@ function construirMotivo(
 export async function obtenerVideosDestacados(
   accessToken: string,
   limite = 5,
-  candidatos = 25
+  candidatos = 25,
 ): Promise<VideoDestacado[]> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
@@ -484,12 +610,17 @@ export async function obtenerVideosDestacados(
     maxResults: String(candidatos),
   });
 
-  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!res.ok) {
-    throw new Error(`No se pudieron leer los vídeos destacados (${res.status})`);
+    throw new Error(
+      `No se pudieron leer los vídeos destacados (${res.status})`,
+    );
   }
 
   const data = await res.json();
@@ -511,31 +642,50 @@ export async function obtenerVideosDestacados(
       comentarios: f[2],
       retencionMedia: f[3],
       duracionMediaSegundos: f[4],
-      puntuacion: (f[1] / maxVistas) * 0.4 + (f[2] / maxComentarios) * 0.3 + (f[3] / 100) * 0.3,
+      puntuacion:
+        (f[1] / maxVistas) * 0.4 +
+        (f[2] / maxComentarios) * 0.3 +
+        (f[3] / 100) * 0.3,
     }))
     .sort((a, b) => b.puntuacion - a.puntuacion)
     .slice(0, limite);
 
   const impresiones = await Promise.all(
-    conPuntuacion.map((v) => obtenerImpresionesVideo(v.videoId, accessToken))
+    conPuntuacion.map((v) => obtenerImpresionesVideo(v.videoId, accessToken)),
   );
 
   const idsRes = await fetch(
     `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${conPuntuacion.map((v) => v.videoId).join(",")}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
   if (!idsRes.ok) {
-    throw new Error(`No se pudieron leer los datos de los vídeos destacados (${idsRes.status})`);
+    throw new Error(
+      `No se pudieron leer los datos de los vídeos destacados (${idsRes.status})`,
+    );
   }
   const idsData = await idsRes.json();
-  const snippetPorId = new Map<string, { titulo: string; miniatura: string | null }>(
-    (idsData.items ?? []).map((item: { id: string; snippet: { title: string; thumbnails?: Record<string, { url: string }> } }) => [
-      item.id,
-      {
-        titulo: item.snippet.title,
-        miniatura: item.snippet.thumbnails?.medium?.url ?? item.snippet.thumbnails?.default?.url ?? null,
-      },
-    ])
+  const snippetPorId = new Map<
+    string,
+    { titulo: string; miniatura: string | null }
+  >(
+    (idsData.items ?? []).map(
+      (item: {
+        id: string;
+        snippet: {
+          title: string;
+          thumbnails?: Record<string, { url: string }>;
+        };
+      }) => [
+        item.id,
+        {
+          titulo: item.snippet.title,
+          miniatura:
+            item.snippet.thumbnails?.medium?.url ??
+            item.snippet.thumbnails?.default?.url ??
+            null,
+        },
+      ],
+    ),
   );
 
   return conPuntuacion.map((v, indice) => ({
@@ -589,7 +739,7 @@ export async function obtenerFuentesTrafico(
   accessToken: string,
   desde: string,
   hasta: string,
-  limite = 6
+  limite = 6,
 ): Promise<FuenteTrafico[]> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
@@ -601,12 +751,17 @@ export async function obtenerFuentesTrafico(
     maxResults: String(limite),
   });
 
-  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!res.ok) {
-    throw new Error(`No se pudieron leer las fuentes de tráfico (${res.status})`);
+    throw new Error(
+      `No se pudieron leer las fuentes de tráfico (${res.status})`,
+    );
   }
 
   const data = await res.json();
@@ -632,7 +787,7 @@ export type PuntoRetencion = {
 /** Curva de retención de audiencia de un vídeo (YouTube Analytics API). [] si no hay datos suficientes. */
 export async function obtenerRetencionVideo(
   videoId: string,
-  accessToken: string
+  accessToken: string,
 ): Promise<PuntoRetencion[]> {
   const params = new URLSearchParams({
     ids: "channel==MINE",
@@ -643,72 +798,24 @@ export async function obtenerRetencionVideo(
     filters: `video==${videoId}`,
   });
 
-  const res = await fetch(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const res = await fetch(
+    `https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!res.ok) {
     throw new Error(`No se pudo leer la retención de YouTube (${res.status})`);
   }
 
   const data = await res.json();
-  const puntos: PuntoRetencion[] = (data.rows ?? []).map((fila: [number, number]) => ({
-    elapsedRatio: fila[0],
-    audienceWatchRatio: fila[1],
-  }));
-
-  return puntos.sort((a, b) => a.elapsedRatio - b.elapsedRatio);
-}
-
-export type MetadatosSubidaYoutube = {
-  titulo: string;
-  descripcion: string;
-  etiquetas: string[];
-  privacidad: "public" | "unlisted" | "private";
-  /** ISO 8601 — si se manda, YouTube publica el vídeo solo en esa fecha/hora
-   *  (lo sube como privado hasta entonces; no hace falta ningún cron propio). */
-  publicarEn?: string;
-};
-
-/**
- * Abre una sesión de subida "resumable" — el servidor solo manda los
- * metadatos (payload minúsculo); los bytes del vídeo los sube el propio
- * navegador directamente contra la URL devuelta, sin pasar por nuestras
- * funciones serverless (Vercel limita el payload a unos pocos MB).
- */
-export async function iniciarSubidaResumable(
-  accessToken: string,
-  metadata: MetadatosSubidaYoutube
-): Promise<string> {
-  const res = await fetch(
-    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        snippet: {
-          title: metadata.titulo,
-          description: metadata.descripcion,
-          tags: metadata.etiquetas,
-        },
-        status: metadata.publicarEn
-          ? { privacyStatus: "private", publishAt: metadata.publicarEn }
-          : { privacyStatus: metadata.privacidad },
-      }),
-    }
+  const puntos: PuntoRetencion[] = (data.rows ?? []).map(
+    (fila: [number, number]) => ({
+      elapsedRatio: fila[0],
+      audienceWatchRatio: fila[1],
+    }),
   );
 
-  if (!res.ok) {
-    throw new Error(`No se pudo iniciar la subida a YouTube (${res.status})`);
-  }
-
-  const uploadUrl = res.headers.get("Location");
-  if (!uploadUrl) {
-    throw new Error("Google no devolvió la URL de subida");
-  }
-
-  return uploadUrl;
+  return puntos.sort((a, b) => a.elapsedRatio - b.elapsedRatio);
 }

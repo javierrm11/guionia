@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ITEMS_NAV, esRutaActiva, esRutaSinChrome, type ItemNav } from "@/lib/navegacion";
+import {
+  ITEMS_NAV,
+  esRutaActiva,
+  esRutaSinChrome,
+  type ItemNav,
+} from "@/lib/navegacion";
 import { NuevoGuionFab } from "@/components/NuevoGuionFab";
 
 function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
@@ -14,8 +19,14 @@ function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
       data-tour={item.href === "/contenido/ideas" ? "nav-ideas" : undefined}
       className="flex flex-col items-center gap-1 px-3.5 py-1.5"
     >
-      <Icon size={20} strokeWidth={1.5} className={activo ? "text-text-primary" : "text-text-disabled"} />
-      <span className={`text-caption ${activo ? "text-text-primary" : "text-text-disabled"}`}>
+      <Icon
+        size={20}
+        strokeWidth={1.5}
+        className={activo ? "text-text-primary" : "text-text-disabled"}
+      />
+      <span
+        className={`text-caption ${activo ? "text-text-primary" : "text-text-disabled"}`}
+      >
         {item.label}
       </span>
     </Link>
@@ -23,8 +34,9 @@ function ItemBottomNav({ item, activo }: { item: ItemNav; activo: boolean }) {
 }
 
 /** Barra de navegación inferior — franja fija a todo el ancho, sin flotar ni
- *  sombra (solo borde superior), solo hasta tablet — en escritorio (`lg:`)
- *  la navegación vive en `Sidebar`. El ítem activo se distingue por color de
+ *  sombra (solo borde superior), solo en móvil — a partir de `md:` (tablet
+ *  en adelante) la navegación vive en `Sidebar` (riel de iconos en tablet,
+ *  completo en escritorio). El ítem activo se distingue por color de
  *  icono/texto (--text-primary vs. --text-disabled), sin fondo. El botón "+"
  *  de crear guion va en el centro, partiendo la lista en dos mitades. */
 export function BottomNav() {
@@ -35,18 +47,26 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center border-t border-border bg-bg-secondary px-2 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center border-t border-border bg-bg-secondary px-2 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] md:hidden"
       style={{ boxShadow: "none" }}
     >
       <div className="flex w-full max-w-[600px] items-center justify-around">
         {ITEMS_NAV.slice(0, mitad).map((item) => (
-          <ItemBottomNav key={item.href} item={item} activo={esRutaActiva(pathname, item.prefijo)} />
+          <ItemBottomNav
+            key={item.href}
+            item={item}
+            activo={esRutaActiva(pathname, item.prefijo)}
+          />
         ))}
 
         <NuevoGuionFab />
 
         {ITEMS_NAV.slice(mitad).map((item) => (
-          <ItemBottomNav key={item.href} item={item} activo={esRutaActiva(pathname, item.prefijo)} />
+          <ItemBottomNav
+            key={item.href}
+            item={item}
+            activo={esRutaActiva(pathname, item.prefijo)}
+          />
         ))}
       </div>
     </nav>

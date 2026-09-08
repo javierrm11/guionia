@@ -18,28 +18,39 @@ const ANCHO_VIEWBOX = 400;
  * su tamaño final) recalculando el `d` del SVG frame a frame — la altura no
  * es una propiedad CSS animable de por sí aquí, ya que cambia también la
  * curva de la onda, no solo el tamaño del contenedor.
+ *
+ * `color` permite anular el `--ai` por defecto — usado en la maqueta de la
+ * landing (`page.tsx`), donde la onda decorativa va en `--accent` (morado)
+ * para no introducir un azul que no aparece en el resto del hero.
  */
 export function OndaCadencia({
   porcentaje,
   alturaFija,
+  color = "var(--ai)",
 }: {
   porcentaje: number;
   alturaFija?: number;
+  color?: string;
 }) {
   const alturaObjetivo =
     alturaFija ??
-    ALTURA_MIN + ((ALTURA_MAX - ALTURA_MIN) * Math.min(100, Math.max(0, porcentaje))) / 100;
+    ALTURA_MIN +
+      ((ALTURA_MAX - ALTURA_MIN) * Math.min(100, Math.max(0, porcentaje))) /
+        100;
 
   const [altura, setAltura] = useState(0);
 
   useEffect(() => {
-    const reducida = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducida = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const duracion = reducida ? 0 : 700;
     const inicio = performance.now();
     let frame: number;
 
     function tick(ahora: number) {
-      const progreso = duracion === 0 ? 1 : Math.min(1, (ahora - inicio) / duracion);
+      const progreso =
+        duracion === 0 ? 1 : Math.min(1, (ahora - inicio) / duracion);
       const eased = 1 - Math.pow(1 - progreso, 3);
       setAltura(alturaObjetivo * eased);
       if (progreso < 1) frame = requestAnimationFrame(tick);
@@ -65,7 +76,7 @@ export function OndaCadencia({
       height={altura}
       className="block"
     >
-      <path d={d} fill="var(--ai)" />
+      <path d={d} fill={color} />
     </svg>
   );
 }

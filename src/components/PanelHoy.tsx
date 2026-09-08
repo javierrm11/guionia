@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { CalendarCheck, Plus } from "lucide-react";
 import { PLATAFORMA_ICON } from "@/lib/plataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
-import { ESTADO_PIEZA_LABEL, VERBO_SIGUIENTE_ESTADO } from "@/lib/contenido";
+import type { TareaHoy } from "@/lib/contenido";
 import { esRutaSinChrome } from "@/lib/navegacion";
-import { obtenerTareasHoy, type TareaHoy } from "@/app/contenido/_shared/tareasHoyActions";
+import { obtenerTareasHoy } from "@/app/contenido/_shared/tareasHoyActions";
 
 /** Panel "Hoy" fijo en escritorio (`lg:` en adelante) — mismas tareas
  *  pendientes que la tarjeta "hero" de Control, pero visible en cualquier
@@ -17,7 +17,8 @@ import { obtenerTareasHoy, type TareaHoy } from "@/app/contenido/_shared/tareasH
  *  completo) y en las rutas sin chrome (auth, landing). Se recarga en cada
  *  cambio de ruta — al ser un componente cliente dentro del layout raíz, que
  *  no vuelve a ejecutarse en cada navegación, no hay otra forma de reflejar
- *  cambios hechos en otra pantalla (p. ej. grabar un vídeo) sin este refetch. */
+ *  cambios hechos en otra pantalla (p. ej. escribir un guion nuevo) sin este
+ *  refetch. */
 export function PanelHoy() {
   const pathname = usePathname();
   const oculto = esRutaSinChrome(pathname) || pathname === "/contenido";
@@ -41,7 +42,11 @@ export function PanelHoy() {
       <div className="flex h-full flex-col gap-3 overflow-y-auto rounded-md bg-bg-secondary p-4">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-h3">
-            <CalendarCheck size={16} strokeWidth={1.5} className="text-accent" />
+            <CalendarCheck
+              size={16}
+              strokeWidth={1.5}
+              className="text-accent"
+            />
             Hoy
           </span>
           <Link href="/contenido" className="text-caption text-text-secondary">
@@ -52,15 +57,16 @@ export function PanelHoy() {
         {tareas === null ? (
           <p className="text-caption text-text-disabled">Cargando…</p>
         ) : tareas.length === 0 ? (
-          <p className="text-caption text-text-disabled">Nada pendiente para hoy.</p>
+          <p className="text-caption text-text-disabled">
+            Nada pendiente para hoy.
+          </p>
         ) : (
           <div className="flex flex-col">
             {tareas.map((t, index) => {
               const Icon = t.plataforma ? PLATAFORMA_ICON[t.plataforma] : Plus;
-              const tono = t.plataforma ? PLATAFORMA_TONO[t.plataforma] : "var(--neutral)";
-              const etiqueta = t.estado
-                ? (VERBO_SIGUIENTE_ESTADO[t.estado] ?? ESTADO_PIEZA_LABEL[t.estado])
-                : "Publicar hoy";
+              const tono = t.plataforma
+                ? PLATAFORMA_TONO[t.plataforma]
+                : "var(--neutral)";
 
               return (
                 <Link
@@ -77,8 +83,12 @@ export function PanelHoy() {
                     <Icon size={14} strokeWidth={1.5} className="text-white" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-small text-text-primary">{t.titulo}</p>
-                    <span className="text-caption text-text-secondary">{etiqueta}</span>
+                    <p className="truncate text-small text-text-primary">
+                      {t.titulo}
+                    </p>
+                    <span className="text-caption text-text-secondary">
+                      Falta el guion
+                    </span>
                   </div>
                 </Link>
               );
