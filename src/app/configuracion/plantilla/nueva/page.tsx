@@ -1,10 +1,17 @@
-import { DIA_SEMANA_LABEL, PLATAFORMAS, PLATAFORMA_LABEL } from "@/lib/plataformas";
+import {
+  DIA_SEMANA_LABEL,
+  PLATAFORMAS,
+  PLATAFORMA_LABEL,
+} from "@/lib/plataformas";
 import { crearPlantilla } from "../actions";
 
 export default function NuevaPlantillaPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
-      <form action={crearPlantilla} className="flex flex-col gap-4">
+      <form
+        action={crearPlantilla}
+        className="flex flex-col gap-4 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5"
+      >
         <label className="flex flex-col gap-1">
           <span className="text-h3 text-text-secondary">
             Día de la semana<span className="text-accent"> *</span>
@@ -27,7 +34,9 @@ export default function NuevaPlantillaPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-h3 text-text-secondary">Plataforma (opcional)</span>
+          <span className="text-h3 text-text-secondary">
+            Plataforma (opcional)
+          </span>
           <select
             name="plataforma"
             defaultValue=""

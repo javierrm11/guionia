@@ -40,7 +40,7 @@ export default async function CtasPage() {
       </div>
 
       {ctas && ctas.length > 0 ? (
-        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+        <ul className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-5">
           {ctas.map((c, index) => (
             <li
               key={c.id}

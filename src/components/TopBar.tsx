@@ -18,6 +18,17 @@ const TITULOS: Record<string, string> = {
   "/configuracion/referidos": "Invitar y referidos",
 };
 
+/** Mismo propósito que `TITULOS`, pero para rutas con un segmento dinámico
+ *  (`[plataforma]`) que no caben como clave fija ahí. */
+const TITULOS_DINAMICOS: { patron: RegExp; titulo: string }[] = [
+  { patron: /^\/contenido\/[^/]+\/ideas\/nueva$/, titulo: "Ideas" },
+  { patron: /^\/contenido\/[^/]+\/videos\/nueva$/, titulo: "Vídeos" },
+  {
+    patron: /^\/contenido\/[^/]+\/videos\/\d+\/\d+\/\d+\/[^/]+$/,
+    titulo: "Vídeos",
+  },
+];
+
 /** Con la barra inferior encargándose de Inicio / Plataformas / Ideas / Cuenta,
  *  la barra superior se queda solo con el buscador (en las raíces y en
  *  /contenido/buscar) y el botón de volver en el resto de pantallas —
@@ -32,6 +43,10 @@ export function TopBar() {
   /** `/contenido` tiene la banda `OndaCadencia` detrás de la cabecera, así
    *  que el buscador y el icono de Tendencias van en blanco ahí. */
   const sobreOnda = pathname === "/contenido";
+  const titulo =
+    TITULOS[pathname] ??
+    TITULOS_DINAMICOS.find((t) => t.patron.test(pathname))?.titulo ??
+    null;
   const [query, setQuery] = useState("");
   const [esMac, setEsMac] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,9 +107,7 @@ export function TopBar() {
         </button>
       )}
 
-      {TITULOS[pathname] && (
-        <h1 className="pl-2 text-h1">{TITULOS[pathname]}</h1>
-      )}
+      {titulo && <h1 className="pl-2 text-h1">{titulo}</h1>}
 
       {mostrarBusqueda ? (
         <form action="/contenido/buscar" className="flex-1">

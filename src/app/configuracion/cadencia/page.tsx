@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { PLATAFORMA_ICON, PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
+import {
+  PLATAFORMA_ICON,
+  PLATAFORMA_LABEL,
+  type Plataforma,
+} from "@/lib/plataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { eliminarCadencia } from "./actions";
@@ -34,7 +38,7 @@ export default async function CadenciaPage() {
         </div>
 
         {cadencia && cadencia.length > 0 ? (
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+          <div className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-5">
             {cadencia.map((c, index) => {
               const plataforma = c.plataforma as Plataforma;
               const Icon = PLATAFORMA_ICON[plataforma];
@@ -51,7 +55,11 @@ export default async function CadenciaPage() {
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-12 lg:w-12"
                     style={{ backgroundColor: tono }}
                   >
-                    <Icon size={20} strokeWidth={1.5} className="text-white lg:h-[22px] lg:w-[22px]" />
+                    <Icon
+                      size={20}
+                      strokeWidth={1.5}
+                      className="text-white lg:h-[22px] lg:w-[22px]"
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-caption text-text-secondary">
@@ -64,7 +72,9 @@ export default async function CadenciaPage() {
                       </span>
                     </p>
                     {c.nota && (
-                      <p className="mt-0.5 truncate text-caption text-text-disabled">{c.nota}</p>
+                      <p className="mt-0.5 truncate text-caption text-text-disabled">
+                        {c.nota}
+                      </p>
                     )}
                   </div>
                   <form action={eliminarCadencia}>
@@ -81,7 +91,9 @@ export default async function CadenciaPage() {
             })}
           </div>
         ) : (
-          <p className="text-small text-text-disabled">Todavía no hay cadencia definida.</p>
+          <p className="text-small text-text-disabled">
+            Todavía no hay cadencia definida.
+          </p>
         )}
       </section>
     </div>

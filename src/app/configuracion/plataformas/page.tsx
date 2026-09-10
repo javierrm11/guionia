@@ -58,7 +58,7 @@ export default async function PlataformasPage({
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-2xl lg:p-8">
       <h1 className="text-h1">Cuentas conectadas</h1>
 
-      <section className="flex flex-col gap-3 rounded-md border border-border p-4 lg:gap-4 lg:p-5">
+      <section className="flex flex-col gap-3 rounded-md bg-bg-primary p-4 shadow-sm lg:gap-4 lg:p-5">
         {youtube_conectado && (
           <p className="text-small text-success">
             Cuenta de YouTube conectada.

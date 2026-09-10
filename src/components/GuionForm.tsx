@@ -8,7 +8,13 @@ import {
   TIPO_ESCENA_LABEL,
   type TipoEscena,
 } from "@/lib/contenido";
-import { DIA_SEMANA_LABEL, type Plataforma } from "@/lib/plataformas";
+import {
+  DIA_SEMANA_LABEL,
+  PLATAFORMA_ICON,
+  PLATAFORMA_LABEL,
+  type Plataforma,
+} from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { AiEscenaButton } from "@/components/AiEscenaButton";
 import { Puntuacion } from "@/components/Puntuacion";
 import { PuntuacionEscena } from "@/components/PuntuacionEscena";
@@ -183,6 +189,7 @@ export function GuionForm({
     setNuevaDuracion("");
   }
 
+  const IconPlataforma = PLATAFORMA_ICON[plataforma];
   const pilarLabel = pilar ? PILAR_LABEL[pilar] : null;
   const subtitulo = [pilarLabel, estructuraActual?.nombre]
     .filter(Boolean)
@@ -200,84 +207,115 @@ export function GuionForm({
       {paso === 1 ? (
         <>
           {!ideaId && (
-            <>
-              <h1 className="text-h1">Nuevo vídeo</h1>
-
-              <label className="flex flex-col gap-1">
-                <span className="text-h3 text-text-secondary">
-                  Título<span className="text-accent"> *</span>
-                </span>
-                <input
-                  type="text"
-                  required
-                  autoFocus
-                  value={titulo}
-                  onChange={(e) => setTitulo(e.target.value)}
-                  className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1">
-                <span className="text-h3 text-text-secondary">Pilar</span>
-                <select
-                  value={pilar}
-                  onChange={(e) => setPilar(e.target.value)}
-                  className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-                >
-                  <option value="">Sin definir</option>
-                  {Object.entries(PILAR_LABEL).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
-
-          {estructuras.length > 0 && (
-            <label className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">
-                Estructura (opcional)
-              </span>
-              <select
-                value={estructuraId}
-                onChange={(e) => elegirEstructura(e.target.value)}
-                className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+            <div className="flex items-center gap-3 rounded-md bg-accent-bg p-4">
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
               >
-                <option value="">Sin estructura (texto libre)</option>
-                {estructuras.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.nombre} ({e.duracion_segundos}s)
-                  </option>
-                ))}
-              </select>
-            </label>
+                <IconPlataforma
+                  size={20}
+                  strokeWidth={1.5}
+                  className="text-white"
+                />
+              </span>
+              <div className="flex flex-col gap-0.5">
+                <h1 className="text-h1">Nuevo vídeo</h1>
+                <span className="text-caption text-text-secondary">
+                  {PLATAFORMA_LABEL[plataforma]}
+                </span>
+              </div>
+            </div>
           )}
 
-          <label className="flex flex-col gap-1">
-            <span className="text-h3 text-text-secondary">
-              Fecha de publicación<span className="text-accent"> *</span>
-            </span>
-            <input
-              type="date"
-              required
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-            />
-            {mejorMomento && (
-              <span className="text-caption text-text-secondary">
-                Sueles tener más vistas publicando los{" "}
-                {DIA_SEMANA_LABEL[mejorMomento.diaSemana - 1].toLowerCase()}{" "}
-                sobre las {mejorMomento.hora}h
-                {mejorMomento.muestras === 1
-                  ? " (basado en 1 vídeo, todavía poca muestra)"
-                  : ` (basado en ${mejorMomento.muestras} vídeos)`}
-                .
-              </span>
-            )}
-          </label>
+          {(() => {
+            const camposComunes = (
+              <>
+                {estructuras.length > 0 && (
+                  <label className="flex flex-col gap-1">
+                    <span className="text-h3 text-text-secondary">
+                      Estructura (opcional)
+                    </span>
+                    <select
+                      value={estructuraId}
+                      onChange={(e) => elegirEstructura(e.target.value)}
+                      className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                    >
+                      <option value="">Sin estructura (texto libre)</option>
+                      {estructuras.map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.nombre} ({e.duracion_segundos}s)
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-h3 text-text-secondary">
+                    Fecha de publicación<span className="text-accent"> *</span>
+                  </span>
+                  <input
+                    type="date"
+                    required
+                    value={fecha}
+                    onChange={(e) => setFecha(e.target.value)}
+                    className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                  />
+                  {mejorMomento && (
+                    <span className="text-caption text-text-secondary">
+                      Sueles tener más vistas publicando los{" "}
+                      {DIA_SEMANA_LABEL[
+                        mejorMomento.diaSemana - 1
+                      ].toLowerCase()}{" "}
+                      sobre las {mejorMomento.hora}h
+                      {mejorMomento.muestras === 1
+                        ? " (basado en 1 vídeo, todavía poca muestra)"
+                        : ` (basado en ${mejorMomento.muestras} vídeos)`}
+                      .
+                    </span>
+                  )}
+                </label>
+              </>
+            );
+
+            if (ideaId) return camposComunes;
+
+            return (
+              <div className="flex flex-col gap-4 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5">
+                <label className="flex flex-col gap-1">
+                  <span className="text-h3 text-text-secondary">
+                    Título<span className="text-accent"> *</span>
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    value={titulo}
+                    onChange={(e) => setTitulo(e.target.value)}
+                    className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-h3 text-text-secondary">Pilar</span>
+                  <select
+                    value={pilar}
+                    onChange={(e) => setPilar(e.target.value)}
+                    className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                  >
+                    <option value="">Sin definir</option>
+                    {Object.entries(PILAR_LABEL).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {camposComunes}
+              </div>
+            );
+          })()}
 
           <button
             type="button"
@@ -290,26 +328,60 @@ export function GuionForm({
         </>
       ) : (
         <>
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <p className="text-h1">{titulo}</p>
-                <button
-                  type="button"
-                  onClick={() => setPaso(1)}
-                  aria-label="Editar título, pilar y estructura"
-                  className="p-2 -m-2 text-accent"
-                >
-                  <Pencil size={16} strokeWidth={1.5} />
-                </button>
+          {ideaId ? (
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-h1">{titulo}</p>
+                  <button
+                    type="button"
+                    onClick={() => setPaso(1)}
+                    aria-label="Editar título, pilar y estructura"
+                    className="p-2 -m-2 text-accent"
+                  >
+                    <Pencil size={16} strokeWidth={1.5} />
+                  </button>
+                </div>
+                {subtitulo && (
+                  <p className="text-small text-text-secondary">{subtitulo}</p>
+                )}
               </div>
-              {subtitulo && (
-                <p className="text-small text-text-secondary">{subtitulo}</p>
-              )}
-            </div>
 
-            <PuntuacionGrande resultado={resultadoGeneral} />
-          </div>
+              <PuntuacionGrande resultado={resultadoGeneral} />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 rounded-md bg-accent-bg p-4">
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
+              >
+                <IconPlataforma
+                  size={20}
+                  strokeWidth={1.5}
+                  className="text-white"
+                />
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-h1">{titulo}</p>
+                  <button
+                    type="button"
+                    onClick={() => setPaso(1)}
+                    aria-label="Editar título, pilar y estructura"
+                    className="-m-2 p-2 text-accent"
+                  >
+                    <Pencil size={16} strokeWidth={1.5} />
+                  </button>
+                </div>
+                <span className="text-caption text-text-secondary">
+                  {PLATAFORMA_LABEL[plataforma]}
+                  {subtitulo ? ` · ${subtitulo}` : ""}
+                </span>
+              </div>
+
+              <PuntuacionGrande resultado={resultadoGeneral} />
+            </div>
+          )}
 
           <Puntuacion
             resultado={resultadoGeneral}
@@ -318,236 +390,247 @@ export function GuionForm({
             modal
           />
 
-          {estructuraId ? (
-            <div className="flex flex-col gap-4">
-              {estructuraActual && (
-                <span
-                  className={`text-small ${
-                    duracionTotal === estructuraActual.duracion_segundos
-                      ? "text-success"
-                      : duracionTotal > estructuraActual.duracion_segundos
-                        ? "text-warning"
-                        : "text-text-secondary"
-                  }`}
-                >
-                  Duración: {duracionTotal}/{estructuraActual.duracion_segundos}
-                  s
-                </span>
-              )}
+          <div
+            className={
+              ideaId
+                ? "flex flex-col gap-4"
+                : "flex flex-col gap-4 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5"
+            }
+          >
+            {estructuraId ? (
+              <div className="flex flex-col gap-4">
+                {estructuraActual && (
+                  <span
+                    className={`text-small ${
+                      duracionTotal === estructuraActual.duracion_segundos
+                        ? "text-success"
+                        : duracionTotal > estructuraActual.duracion_segundos
+                          ? "text-warning"
+                          : "text-text-secondary"
+                    }`}
+                  >
+                    Duración: {duracionTotal}/
+                    {estructuraActual.duracion_segundos}s
+                  </span>
+                )}
 
-              {escenas.map((escena, index) => (
-                <div
-                  key={escena.clientId}
-                  className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="hidden"
-                      name="escena_tipo"
-                      value={escena.tipoEscena}
-                    />
-                    <input
-                      type="hidden"
-                      name="escena_duracion"
-                      value={escena.duracion}
-                    />
-                    <input
-                      type="hidden"
-                      name="escena_frase_origen_id"
-                      value={frasesOrigen[escena.clientId] ?? ""}
-                    />
+                {escenas.map((escena, index) => (
+                  <div
+                    key={escena.clientId}
+                    className={`flex flex-col gap-2 py-3.5 ${index > 0 ? "border-t border-border" : ""}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="hidden"
+                        name="escena_tipo"
+                        value={escena.tipoEscena}
+                      />
+                      <input
+                        type="hidden"
+                        name="escena_duracion"
+                        value={escena.duracion}
+                      />
+                      <input
+                        type="hidden"
+                        name="escena_frase_origen_id"
+                        value={frasesOrigen[escena.clientId] ?? ""}
+                      />
 
-                    <div className="flex flex-col gap-0.5">
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => moverEscena(index, -1)}
+                          disabled={index === 0}
+                          aria-label="Mover escena arriba"
+                          className="p-2 -m-2 text-text-secondary disabled:opacity-30"
+                        >
+                          <ArrowUp size={14} strokeWidth={1.5} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moverEscena(index, 1)}
+                          disabled={index === escenas.length - 1}
+                          aria-label="Mover escena abajo"
+                          className="p-2 -m-2 text-text-secondary disabled:opacity-30"
+                        >
+                          <ArrowDown size={14} strokeWidth={1.5} />
+                        </button>
+                      </div>
+
+                      <span className="text-h3">
+                        {TIPO_ESCENA_LABEL[escena.tipoEscena]}
+                        {escena.duracion !== "" ? ` · ${escena.duracion}s` : ""}
+                      </span>
+
                       <button
                         type="button"
-                        onClick={() => moverEscena(index, -1)}
-                        disabled={index === 0}
-                        aria-label="Mover escena arriba"
-                        className="p-2 -m-2 text-text-secondary disabled:opacity-30"
+                        onClick={() => eliminarEscena(escena.clientId)}
+                        aria-label="Eliminar escena"
+                        className="ml-auto flex items-center justify-center rounded-sm bg-badge-danger p-2 text-white"
                       >
-                        <ArrowUp size={14} strokeWidth={1.5} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moverEscena(index, 1)}
-                        disabled={index === escenas.length - 1}
-                        aria-label="Mover escena abajo"
-                        className="p-2 -m-2 text-text-secondary disabled:opacity-30"
-                      >
-                        <ArrowDown size={14} strokeWidth={1.5} />
+                        <Trash2 size={14} strokeWidth={1.5} />
                       </button>
                     </div>
 
-                    <span className="text-h3">
-                      {TIPO_ESCENA_LABEL[escena.tipoEscena]}
-                      {escena.duracion !== "" ? ` · ${escena.duracion}s` : ""}
-                    </span>
+                    {escena.nota && (
+                      <span className="text-caption text-text-disabled">
+                        {escena.nota}
+                      </span>
+                    )}
 
-                    <button
-                      type="button"
-                      onClick={() => eliminarEscena(escena.clientId)}
-                      aria-label="Eliminar escena"
-                      className="ml-auto flex items-center justify-center rounded-sm bg-badge-danger p-2 text-white"
-                    >
-                      <Trash2 size={14} strokeWidth={1.5} />
-                    </button>
+                    {(() => {
+                      const opciones = frases.filter(
+                        (f) => f.tipo_escena === escena.tipoEscena,
+                      );
+                      const etiqueta = ETIQUETA_BANCO[escena.tipoEscena];
+                      if (opciones.length === 0 || !etiqueta) return null;
+
+                      return (
+                        <select
+                          defaultValue=""
+                          onChange={(e) => {
+                            const frase = opciones.find(
+                              (f) => f.id === e.target.value,
+                            );
+                            const textarea =
+                              textareaRefs.current[escena.clientId];
+                            if (frase && textarea) {
+                              textarea.value = frase.texto;
+                              setTextosPuntuacion((prev) => ({
+                                ...prev,
+                                [escena.clientId]: frase.texto,
+                              }));
+                              setFrasesOrigen((prev) => ({
+                                ...prev,
+                                [escena.clientId]: frase.id,
+                              }));
+                            }
+                            e.target.value = "";
+                          }}
+                          className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-small focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                        >
+                          <option value="">Usar un {etiqueta} guardado…</option>
+                          {opciones.map((f) => (
+                            <option key={f.id} value={f.id}>
+                              {f.texto.length > 60
+                                ? `${f.texto.slice(0, 60)}…`
+                                : f.texto}
+                            </option>
+                          ))}
+                        </select>
+                      );
+                    })()}
+
+                    <AiEscenaButton
+                      contexto={{
+                        plataforma,
+                        tituloIdea: titulo,
+                        pilar: pilar || null,
+                        tipoEscena: escena.tipoEscena,
+                        duracionSegundos:
+                          escena.duracion === "" ? null : escena.duracion,
+                        otrasEscenas: escenas
+                          .filter((e) => e.clientId !== escena.clientId)
+                          .map((e) => ({
+                            tipoEscena: e.tipoEscena,
+                            texto:
+                              textareaRefs.current[e.clientId]?.value ?? "",
+                          })),
+                      }}
+                      obtenerTextoActual={() =>
+                        textareaRefs.current[escena.clientId]?.value ?? ""
+                      }
+                      onResultado={(texto) => {
+                        const textarea = textareaRefs.current[escena.clientId];
+                        if (textarea) textarea.value = texto;
+                        setTextosPuntuacion((prev) => ({
+                          ...prev,
+                          [escena.clientId]: texto,
+                        }));
+                      }}
+                    />
+
+                    <textarea
+                      name="escena_texto"
+                      rows={3}
+                      ref={(el) => {
+                        textareaRefs.current[escena.clientId] = el;
+                      }}
+                      onChange={(e) =>
+                        setTextosPuntuacion((prev) => ({
+                          ...prev,
+                          [escena.clientId]: e.target.value,
+                        }))
+                      }
+                      className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                    />
+
+                    <PuntuacionEscena
+                      texto={textosPuntuacion[escena.clientId] ?? ""}
+                      tipoEscena={escena.tipoEscena}
+                      duracionSegundos={
+                        escena.duracion === "" ? null : escena.duracion
+                      }
+                    />
                   </div>
+                ))}
 
-                  {escena.nota && (
-                    <span className="text-caption text-text-disabled">
-                      {escena.nota}
+                <div className="flex flex-col gap-3 rounded-md border border-border p-3.5">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-h3 text-text-secondary">Tipo</span>
+                    <select
+                      value={nuevoTipo}
+                      onChange={(e) =>
+                        setNuevoTipo(e.target.value as TipoEscena)
+                      }
+                      className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                    >
+                      <option value="">Selecciona un tipo</option>
+                      {TIPOS_ESCENA.map((t) => (
+                        <option key={t} value={t}>
+                          {TIPO_ESCENA_LABEL[t]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col gap-1">
+                    <span className="text-h3 text-text-secondary">
+                      Duración (segundos, opcional)
                     </span>
-                  )}
+                    <input
+                      type="number"
+                      min={1}
+                      value={nuevaDuracion}
+                      onChange={(e) => setNuevaDuracion(e.target.value)}
+                      className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                    />
+                  </label>
 
-                  {(() => {
-                    const opciones = frases.filter(
-                      (f) => f.tipo_escena === escena.tipoEscena,
-                    );
-                    const etiqueta = ETIQUETA_BANCO[escena.tipoEscena];
-                    if (opciones.length === 0 || !etiqueta) return null;
-
-                    return (
-                      <select
-                        defaultValue=""
-                        onChange={(e) => {
-                          const frase = opciones.find(
-                            (f) => f.id === e.target.value,
-                          );
-                          const textarea =
-                            textareaRefs.current[escena.clientId];
-                          if (frase && textarea) {
-                            textarea.value = frase.texto;
-                            setTextosPuntuacion((prev) => ({
-                              ...prev,
-                              [escena.clientId]: frase.texto,
-                            }));
-                            setFrasesOrigen((prev) => ({
-                              ...prev,
-                              [escena.clientId]: frase.id,
-                            }));
-                          }
-                          e.target.value = "";
-                        }}
-                        className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-small focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-                      >
-                        <option value="">Usar un {etiqueta} guardado…</option>
-                        {opciones.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.texto.length > 60
-                              ? `${f.texto.slice(0, 60)}…`
-                              : f.texto}
-                          </option>
-                        ))}
-                      </select>
-                    );
-                  })()}
-
-                  <AiEscenaButton
-                    contexto={{
-                      plataforma,
-                      tituloIdea: titulo,
-                      pilar: pilar || null,
-                      tipoEscena: escena.tipoEscena,
-                      duracionSegundos:
-                        escena.duracion === "" ? null : escena.duracion,
-                      otrasEscenas: escenas
-                        .filter((e) => e.clientId !== escena.clientId)
-                        .map((e) => ({
-                          tipoEscena: e.tipoEscena,
-                          texto: textareaRefs.current[e.clientId]?.value ?? "",
-                        })),
-                    }}
-                    obtenerTextoActual={() =>
-                      textareaRefs.current[escena.clientId]?.value ?? ""
-                    }
-                    onResultado={(texto) => {
-                      const textarea = textareaRefs.current[escena.clientId];
-                      if (textarea) textarea.value = texto;
-                      setTextosPuntuacion((prev) => ({
-                        ...prev,
-                        [escena.clientId]: texto,
-                      }));
-                    }}
-                  />
-
-                  <textarea
-                    name="escena_texto"
-                    rows={3}
-                    ref={(el) => {
-                      textareaRefs.current[escena.clientId] = el;
-                    }}
-                    onChange={(e) =>
-                      setTextosPuntuacion((prev) => ({
-                        ...prev,
-                        [escena.clientId]: e.target.value,
-                      }))
-                    }
-                    className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-                  />
-
-                  <PuntuacionEscena
-                    texto={textosPuntuacion[escena.clientId] ?? ""}
-                    tipoEscena={escena.tipoEscena}
-                    duracionSegundos={
-                      escena.duracion === "" ? null : escena.duracion
-                    }
-                  />
-                </div>
-              ))}
-
-              <div className="flex flex-col gap-3 rounded-md border border-border p-3.5">
-                <label className="flex flex-col gap-1">
-                  <span className="text-h3 text-text-secondary">Tipo</span>
-                  <select
-                    value={nuevoTipo}
-                    onChange={(e) => setNuevoTipo(e.target.value as TipoEscena)}
-                    className="rounded-sm border border-border bg-bg-primary px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                  <button
+                    type="button"
+                    onClick={agregarEscena}
+                    disabled={!nuevoTipo}
+                    className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40 lg:px-5 lg:py-2.5"
                   >
-                    <option value="">Selecciona un tipo</option>
-                    {TIPOS_ESCENA.map((t) => (
-                      <option key={t} value={t}>
-                        {TIPO_ESCENA_LABEL[t]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="flex flex-col gap-1">
-                  <span className="text-h3 text-text-secondary">
-                    Duración (segundos, opcional)
-                  </span>
-                  <input
-                    type="number"
-                    min={1}
-                    value={nuevaDuracion}
-                    onChange={(e) => setNuevaDuracion(e.target.value)}
-                    className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-                  />
-                </label>
-
-                <button
-                  type="button"
-                  onClick={agregarEscena}
-                  disabled={!nuevoTipo}
-                  className="self-start rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover disabled:opacity-40 lg:px-5 lg:py-2.5"
-                >
-                  + Añadir escena
-                </button>
+                    + Añadir escena
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <label className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">
-                Texto del guion<span className="text-accent"> *</span>
-              </span>
-              <textarea
-                name="texto"
-                required
-                rows={8}
-                className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
-              />
-            </label>
-          )}
+            ) : (
+              <label className="flex flex-col gap-1">
+                <span className="text-h3 text-text-secondary">
+                  Texto del guion<span className="text-accent"> *</span>
+                </span>
+                <textarea
+                  name="texto"
+                  required
+                  rows={8}
+                  className="rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none lg:px-4 lg:py-2.5"
+                />
+              </label>
+            )}
+          </div>
 
           <SubmitButton
             pendingLabel={ideaId ? "Convirtiendo…" : "Creando…"}

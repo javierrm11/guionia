@@ -134,16 +134,22 @@ export default async function ContenidoPage() {
   const quedanPocasHoras = new Date().getHours() >= 20;
 
   return (
-    <div className="relative flex flex-1 flex-col bg-surface-tint">
-      <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-6xl lg:p-8">
-        {/* Cabecera plana de color, en vez de la onda: se solapa con la
-           `TopBar` (transparente aquí) tirando de ella hacia arriba con un
-           margen negativo igual a su alto (56px) — mismo efecto visual que
-           antes, sin el SVG ni el cálculo de altura por % de cadencia. */}
-        <div
-          className="-mx-4 -mt-[72px] rounded-b-[32px] bg-accent px-4 pt-[72px] pb-6 lg:-mx-8 lg:-mt-[88px] lg:rounded-b-[40px] lg:px-8 lg:pt-[88px] lg:pb-8"
-          data-tour="cadencia"
-        >
+    <div className="relative flex flex-1 flex-col">
+      {/* Cabecera plana de color, en vez de la onda: se solapa con la
+         `TopBar` (transparente aquí) tirando de ella hacia arriba con un
+         margen negativo igual a su alto (56px) — mismo efecto visual que
+         antes, sin el SVG ni el cálculo de altura por % de cadencia.
+         `relative z-0` explícito (más bajo que el `z-10` de la propia
+         `TopBar`) para que el buscador/icono de Tendencias, que se solapan
+         en esa misma franja, se sigan pintando por encima del panel en vez
+         de quedar tapados por él. Fuera del contenedor centrado de abajo
+         para que en escritorio ocupe todo el ancho, no solo la columna de
+         `max-w-6xl` — el contenido de dentro sí se centra a esa anchura. */}
+      <div
+        className="relative z-0 -mt-[72px] rounded-b-[32px] bg-accent pt-[92px] pb-6 lg:-mt-[88px] lg:rounded-b-[40px] lg:pt-[108px] lg:pb-8"
+        data-tour="cadencia"
+      >
+        <div className="px-4 lg:mx-auto lg:w-full lg:max-w-7xl lg:px-6">
           {hayCadencia ? (
             <section className="flex flex-col items-center gap-1 lg:gap-2">
               <Link
@@ -176,7 +182,9 @@ export default async function ContenidoPage() {
             </p>
           )}
         </div>
+      </div>
 
+      <div className="flex flex-1 flex-col lg:mx-auto lg:w-full lg:px-10">
         {!hayCadencia && (
           <>
             <Link
@@ -402,7 +410,7 @@ export default async function ContenidoPage() {
             </Suspense>
           </div>
 
-          <aside className="pt-8 lg:sticky lg:top-8 lg:col-span-1 lg:ml-8 lg:pt-24">
+          <aside className="pt-8 lg:sticky lg:top-8 lg:col-span-1 lg:ml-8 ">
             {ultimasIdeas.length > 0 && (
               <section className="flex flex-col gap-3 rounded-md bg-ai-bg p-4 lg:gap-4 lg:p-5">
                 <div className="flex items-center justify-between gap-2">

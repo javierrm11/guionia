@@ -204,207 +204,213 @@ export default async function IdeasGlobalPage({
     filtros.length === 1 ? filtros[0] : plataformasActivas[0];
 
   return (
-    <div className="flex flex-1 flex-col gap-5 bg-surface-tint p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <div className="flex items-end justify-between gap-3 px-1">
-        <p className="text-caption text-text-secondary lg:text-body">
-          {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
-          {olvidadas > 0 &&
-            ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
-        </p>
-        <div className="flex items-center gap-2">
-          {!filtros.length &&
-            descartadas.length === 0 &&
-            activas.length > 0 && (
-              <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2.5 py-1">
-                Sin descartar
-              </span>
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-5 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+        <div className="flex items-end justify-between gap-3 px-1">
+          <p className="text-caption text-text-secondary lg:text-body">
+            {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
+            {olvidadas > 0 &&
+              ` · ${olvidadas} ${olvidadas === 1 ? "olvidada" : "olvidadas"}`}
+          </p>
+          <div className="flex items-center gap-2">
+            {!filtros.length &&
+              descartadas.length === 0 &&
+              activas.length > 0 && (
+                <span className="text-caption text-text-secondary rounded-full bg-neutral-bg px-2.5 py-1">
+                  Sin descartar
+                </span>
+              )}
+            {plataformaObjetivo && (
+              <Link
+                href={`/contenido/${plataformaObjetivo}/ideas/nueva`}
+                className="text-caption rounded-full bg-accent px-3 py-1.5 text-white active:bg-accent-hover lg:text-body"
+              >
+                + Nueva idea
+              </Link>
             )}
-          {plataformaObjetivo && (
-            <Link
-              href={`/contenido/${plataformaObjetivo}/ideas/nueva`}
-              className="text-caption rounded-full bg-accent px-3 py-1.5 text-white active:bg-accent-hover lg:text-body"
-            >
-              + Nueva idea
-            </Link>
-          )}
+          </div>
         </div>
-      </div>
 
-      <form
-        action="/contenido/ideas"
-        className="flex items-center gap-2 border-b border-border px-1 pb-2"
-      >
-        {filtros.length > 0 && (
-          <input type="hidden" name="p" value={filtros.join(",")} />
-        )}
-        {pilarFiltro && (
-          <input type="hidden" name="pilar" value={pilarFiltro} />
-        )}
-        <Search
-          size={16}
-          strokeWidth={1.5}
-          className="shrink-0 text-text-disabled"
-        />
-        <input
-          type="search"
-          name="q"
-          defaultValue={q ?? ""}
-          placeholder="Buscar por título..."
-          style={{ "--input-bg": "transparent" } as React.CSSProperties}
-          className="w-full text-body text-text-primary placeholder:text-text-disabled focus:outline-none"
-        />
-      </form>
+        <form
+          action="/contenido/ideas"
+          className="flex items-center gap-2 border-b border-border px-1 pb-2"
+        >
+          {filtros.length > 0 && (
+            <input type="hidden" name="p" value={filtros.join(",")} />
+          )}
+          {pilarFiltro && (
+            <input type="hidden" name="pilar" value={pilarFiltro} />
+          )}
+          <Search
+            size={16}
+            strokeWidth={1.5}
+            className="shrink-0 text-text-disabled"
+          />
+          <input
+            type="search"
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Buscar por título..."
+            style={{ "--input-bg": "transparent" } as React.CSSProperties}
+            className="w-full text-body text-text-primary placeholder:text-text-disabled focus:outline-none"
+          />
+        </form>
 
-      {plataformasConIdeas.length > 1 && (
-        <div className="flex flex-wrap gap-2 lg:gap-2.5">
-          <Link
-            href={(() => {
-              const params = new URLSearchParams();
-              if (pilarFiltro) params.set("pilar", pilarFiltro);
-              if (q) params.set("q", q);
-              const query = params.toString();
-              return `/contenido/ideas${query ? `?${query}` : ""}`;
-            })()}
-            className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
-              filtros.length
-                ? "bg-neutral-bg text-text-secondary"
-                : "bg-accent text-white"
-            }`}
-          >
-            Todas
-          </Link>
-          {plataformasConIdeas.map((plataforma) => (
+        {plataformasConIdeas.length > 1 && (
+          <div className="flex flex-wrap gap-2 lg:gap-2.5">
             <Link
-              key={plataforma}
-              href={hrefTogglePlataforma(plataforma)}
-              className={`text-caption flex items-center gap-1.5 rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
-                filtros.includes(plataforma)
-                  ? "bg-accent text-white"
-                  : "bg-neutral-bg text-text-secondary"
+              href={(() => {
+                const params = new URLSearchParams();
+                if (pilarFiltro) params.set("pilar", pilarFiltro);
+                if (q) params.set("q", q);
+                const query = params.toString();
+                return `/contenido/ideas${query ? `?${query}` : ""}`;
+              })()}
+              className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
+                filtros.length
+                  ? "bg-neutral-bg text-text-secondary"
+                  : "bg-accent text-white"
               }`}
             >
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
-              />
-              {PLATAFORMA_LABEL[plataforma]}
-              <span
-                className={
+              Todas
+            </Link>
+            {plataformasConIdeas.map((plataforma) => (
+              <Link
+                key={plataforma}
+                href={hrefTogglePlataforma(plataforma)}
+                className={`text-caption flex items-center gap-1.5 rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
                   filtros.includes(plataforma)
-                    ? "text-white/70"
-                    : "text-text-disabled"
-                }
+                    ? "bg-accent text-white"
+                    : "bg-neutral-bg text-text-secondary"
+                }`}
               >
-                {contarPlataforma(plataforma)}
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {pilaresConIdeas.length > 1 && (
-        <div className="flex flex-wrap gap-2 lg:gap-2.5">
-          {pilaresConIdeas.map((pilar) => (
-            <Link
-              key={pilar}
-              href={hrefTogglePilar(pilar)}
-              className={`text-caption flex items-center gap-1 rounded-full px-3 py-1.5 lg:text-body ${
-                pilarFiltro === pilar
-                  ? "bg-accent text-white"
-                  : "bg-neutral-bg text-text-secondary"
-              }`}
-            >
-              {PILAR_LABEL[pilar] ?? pilar}
-              <span
-                className={
-                  pilarFiltro === pilar ? "text-white/70" : "text-text-disabled"
-                }
-              >
-                {contarPilar(pilar)}
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {activas.length === 0 && descartadas.length > 0 && (
-        <p className="text-small text-text-secondary px-1">
-          Sin ideas activas
-          {filtros.length === 1 ? ` en ${PLATAFORMA_LABEL[filtros[0]]}` : ""} —
-          pero tienes {descartadas.length}{" "}
-          {descartadas.length === 1 ? "descartada" : "descartadas"}.
-        </p>
-      )}
-
-      {activas.length > 0 && (
-        <section className="flex flex-col gap-2.5">
-          <div className="flex items-baseline gap-2 px-1">
-            <h2
-              className="text-caption font-display text-text-secondary uppercase"
-              style={{ letterSpacing: "0.06em" }}
-            >
-              Activas
-            </h2>
-            <span className="text-caption text-text-disabled">
-              {activas.length}
-            </span>
-          </div>
-          <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
-            {activasOrdenadas.map((idea, index) => (
-              <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
+                />
+                {PLATAFORMA_LABEL[plataforma]}
+                <span
+                  className={
+                    filtros.includes(plataforma)
+                      ? "text-white/70"
+                      : "text-text-disabled"
+                  }
+                >
+                  {contarPlataforma(plataforma)}
+                </span>
+              </Link>
             ))}
           </div>
-        </section>
-      )}
+        )}
 
-      {descartadas.length > 0 && (
-        <section className="flex flex-col gap-2.5">
-          <div className="flex items-baseline gap-2 px-1">
-            <h2
-              className="text-caption font-display text-text-disabled uppercase"
-              style={{ letterSpacing: "0.06em" }}
-            >
-              Descartadas
-            </h2>
-            <span className="text-caption text-text-disabled">
-              {descartadas.length}
-            </span>
-          </div>
-          <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
-            {descartadas.map((idea, index) => (
-              <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
+        {pilaresConIdeas.length > 1 && (
+          <div className="flex flex-wrap gap-2 lg:gap-2.5">
+            {pilaresConIdeas.map((pilar) => (
+              <Link
+                key={pilar}
+                href={hrefTogglePilar(pilar)}
+                className={`text-caption flex items-center gap-1 rounded-full px-3 py-1.5 lg:text-body ${
+                  pilarFiltro === pilar
+                    ? "bg-accent text-white"
+                    : "bg-neutral-bg text-text-secondary"
+                }`}
+              >
+                {PILAR_LABEL[pilar] ?? pilar}
+                <span
+                  className={
+                    pilarFiltro === pilar
+                      ? "text-white/70"
+                      : "text-text-disabled"
+                  }
+                >
+                  {contarPilar(pilar)}
+                </span>
+              </Link>
             ))}
           </div>
-        </section>
-      )}
+        )}
 
-      {ideas.length === 0 && (
-        <section className="flex flex-col items-start gap-3 p-6">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
-            <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
-          </span>
-          <div className="flex flex-col gap-1">
-            <h2 className="text-h2">
-              {busqueda
-                ? "Sin resultados para esa búsqueda"
-                : filtros.length || pilarFiltro
-                  ? "Sin ideas con este filtro"
-                  : "Todavía no hay ideas guardadas"}
-            </h2>
-            <p className="text-small text-text-secondary">
-              Apúntala en cuanto se te ocurra, antes de que se te olvide.
-            </p>
-          </div>
-          {plataformaObjetivo && (
-            <Link
-              href={`/contenido/${plataformaObjetivo}/ideas/nueva`}
-              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
-            >
-              + Nueva idea
-            </Link>
-          )}
-        </section>
-      )}
+        {activas.length === 0 && descartadas.length > 0 && (
+          <p className="text-small text-text-secondary px-1">
+            Sin ideas activas
+            {filtros.length === 1
+              ? ` en ${PLATAFORMA_LABEL[filtros[0]]}`
+              : ""}{" "}
+            — pero tienes {descartadas.length}{" "}
+            {descartadas.length === 1 ? "descartada" : "descartadas"}.
+          </p>
+        )}
+
+        {activas.length > 0 && (
+          <section className="flex flex-col gap-2.5">
+            <div className="flex items-baseline gap-2 px-1">
+              <h2
+                className="text-caption font-display text-text-secondary uppercase"
+                style={{ letterSpacing: "0.06em" }}
+              >
+                Activas
+              </h2>
+              <span className="text-caption text-text-disabled">
+                {activas.length}
+              </span>
+            </div>
+            <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
+              {activasOrdenadas.map((idea, index) => (
+                <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {descartadas.length > 0 && (
+          <section className="flex flex-col gap-2.5">
+            <div className="flex items-baseline gap-2 px-1">
+              <h2
+                className="text-caption font-display text-text-disabled uppercase"
+                style={{ letterSpacing: "0.06em" }}
+              >
+                Descartadas
+              </h2>
+              <span className="text-caption text-text-disabled">
+                {descartadas.length}
+              </span>
+            </div>
+            <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
+              {descartadas.map((idea, index) => (
+                <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {ideas.length === 0 && (
+          <section className="flex flex-col items-start gap-3 p-6">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
+              <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
+            </span>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-h2">
+                {busqueda
+                  ? "Sin resultados para esa búsqueda"
+                  : filtros.length || pilarFiltro
+                    ? "Sin ideas con este filtro"
+                    : "Todavía no hay ideas guardadas"}
+              </h2>
+              <p className="text-small text-text-secondary">
+                Apúntala en cuanto se te ocurra, antes de que se te olvide.
+              </p>
+            </div>
+            {plataformaObjetivo && (
+              <Link
+                href={`/contenido/${plataformaObjetivo}/ideas/nueva`}
+                className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+              >
+                + Nueva idea
+              </Link>
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

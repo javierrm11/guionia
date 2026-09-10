@@ -33,13 +33,14 @@
   --ai-hover: #1f57c9;
   --ai-bg: rgba(47, 111, 237, 0.12);
 
-  /* Color — superficies tintadas de Control (/contenido) y Plataformas
-     (/contenido/plataformas): esas dos pantallas son la única excepción al
-     "todo blanco/hairline" del resto de la app (ver Tarjeta en CLAUDE.md) —
-     un wash muy suave de fondo (`--surface-tint`, la mitad de saturado que
-     `--accent-bg`) para que las superficies de color de las tarjetas se
-     sigan leyendo por encima, en vez de perderse contra un blanco liso. */
-  --surface-tint: rgba(108, 92, 224, 0.05);
+  /* Color — fondo de página con wash lila (ver Tarjeta en CLAUDE.md) — un
+     wash muy suave, la mitad de saturado que `--accent-bg`, para que las
+     superficies de color de las tarjetas se sigan leyendo por encima, en vez
+     de perderse contra un blanco liso. Es el fondo de `body`, así que va en
+     hex sólido (no rgba): un color translúcido ahí se mezclaría con lo que
+     haya detrás del documento (blanco por defecto del navegador), no con
+     `--bg-page`, y en oscuro se vería mal. */
+  --surface-tint: #f6f5fd;
   /* Tinte de marca de YouTube — mismo criterio que `--accent-bg`, pero sobre
      el rojo de `PLATAFORMA_TONO.youtube` (#ff3b30) en vez del acento; TikTok
      no necesita uno propio, reutiliza `--neutral-bg`. */
@@ -94,7 +95,7 @@
   --ai-hover: #7ba3ff;
   --ai-bg: rgba(91, 141, 255, 0.16);
 
-  --surface-tint: rgba(139, 124, 246, 0.08);
+  --surface-tint: #242330;
   --brand-youtube-bg: rgba(255, 59, 48, 0.14);
 
   --success: #34d399;
@@ -182,8 +183,8 @@
 
 body {
   position: relative;
-  min-height: 100%;
-  background: var(--bg-page);
+  min-height: 100vh;
+  background: var(--surface-tint);
   color: var(--text-primary);
   font-family: var(--font-sans);
 }

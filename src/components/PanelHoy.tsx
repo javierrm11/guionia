@@ -38,7 +38,7 @@ export function PanelHoy() {
   if (oculto) return null;
 
   return (
-    <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-72 lg:flex-col lg:pl-4">
+    <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-72 lg:flex-col">
       <div className="flex h-full flex-col gap-3 overflow-y-auto bg-bg-secondary p-4">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-h3">

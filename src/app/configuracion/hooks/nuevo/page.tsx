@@ -4,7 +4,10 @@ import { crearFrase } from "../../_shared/frasesActions";
 export default function NuevoHookPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
-      <form action={crearFrase} className="flex flex-col gap-4">
+      <form
+        action={crearFrase}
+        className="flex flex-col gap-4 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5"
+      >
         <input type="hidden" name="tipo_escena" value="hook" />
         <input type="hidden" name="redirectTo" value="/configuracion/hooks" />
 

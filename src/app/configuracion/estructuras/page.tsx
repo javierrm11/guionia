@@ -28,7 +28,10 @@ export default async function EstructurasPage() {
   const plantillasPorNicho = new Map<string, typeof plantillas>();
   for (const p of plantillas ?? []) {
     const nicho = p.nicho ?? "General";
-    plantillasPorNicho.set(nicho, [...(plantillasPorNicho.get(nicho) ?? []), p]);
+    plantillasPorNicho.set(nicho, [
+      ...(plantillasPorNicho.get(nicho) ?? []),
+      p,
+    ]);
   }
 
   return (
@@ -38,7 +41,8 @@ export default async function EstructurasPage() {
           <div className="flex flex-col gap-0.5">
             <h2 className="text-h2">Plantillas por nicho</h2>
             <p className="text-caption text-text-secondary">
-              Clónalas como punto de partida — quedan como una estructura tuya, editable después.
+              Clónalas como punto de partida — quedan como una estructura tuya,
+              editable después.
             </p>
           </div>
 
@@ -51,21 +55,24 @@ export default async function EstructurasPage() {
                 >
                   {nicho}
                 </span>
-                <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+                <div className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-5">
                   {(filas ?? []).map((p, index) => {
                     const numEscenas = p.estructura_escenas?.[0]?.count ?? 0;
                     return (
                       <div
                         key={p.id}
                         className={`flex items-center justify-between gap-2 py-3 ${
-                          index > 0 ? "border-t border-border lg:border-t-0" : ""
+                          index > 0
+                            ? "border-t border-border lg:border-t-0"
+                            : ""
                         }`}
                       >
                         <div className="flex flex-col gap-0.5">
                           <span className="text-h3">{p.nombre}</span>
                           <span className="text-caption text-text-secondary">
-                            {PLATAFORMA_LABEL[p.plataforma as Plataforma]} · {p.duracion_segundos}s ·{" "}
-                            {numEscenas} {numEscenas === 1 ? "escena" : "escenas"}
+                            {PLATAFORMA_LABEL[p.plataforma as Plataforma]} ·{" "}
+                            {p.duracion_segundos}s · {numEscenas}{" "}
+                            {numEscenas === 1 ? "escena" : "escenas"}
                           </span>
                         </div>
                         <form action={duplicarEstructura}>
@@ -99,7 +106,7 @@ export default async function EstructurasPage() {
         </div>
 
         {estructuras && estructuras.length > 0 ? (
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+          <div className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-5">
             {estructuras.map((e, index) => {
               const numEscenas = e.estructura_escenas?.[0]?.count ?? 0;
               return (
@@ -115,17 +122,23 @@ export default async function EstructurasPage() {
                       className="flex items-center gap-2 text-h3 text-text-primary hover:underline lg:text-h2"
                     >
                       {e.nombre}
-                      {numEscenas === 0 && <Badge tone="warning">Incompleta</Badge>}
+                      {numEscenas === 0 && (
+                        <Badge tone="warning">Incompleta</Badge>
+                      )}
                     </Link>
                     <form action={duplicarEstructura}>
                       <input type="hidden" name="id" value={e.id} />
-                      <SubmitButton pendingLabel="Duplicando…" className="p-2 -m-2 text-small text-accent">
+                      <SubmitButton
+                        pendingLabel="Duplicando…"
+                        className="p-2 -m-2 text-small text-accent"
+                      >
                         Duplicar
                       </SubmitButton>
                     </form>
                   </div>
                   <p className="text-caption text-text-secondary lg:text-small">
-                    {PLATAFORMA_LABEL[e.plataforma as Plataforma]} · {e.duracion_segundos}s · {numEscenas}{" "}
+                    {PLATAFORMA_LABEL[e.plataforma as Plataforma]} ·{" "}
+                    {e.duracion_segundos}s · {numEscenas}{" "}
                     {numEscenas === 1 ? "escena" : "escenas"}
                   </p>
                 </div>
@@ -133,7 +146,9 @@ export default async function EstructurasPage() {
             })}
           </div>
         ) : (
-          <p className="text-small text-text-disabled">Todavía no hay estructuras guardadas.</p>
+          <p className="text-small text-text-disabled">
+            Todavía no hay estructuras guardadas.
+          </p>
         )}
       </section>
     </div>

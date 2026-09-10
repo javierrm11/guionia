@@ -9,8 +9,17 @@ import { Puntuacion } from "@/components/Puntuacion";
 import { PuntuacionGrande } from "@/components/PuntuacionGrande";
 import { SubmitButton } from "@/components/SubmitButton";
 import { calcularPuntuacionVideo, type EscenaInput } from "@/lib/puntuacion";
-import { TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
-import type { Plataforma } from "@/lib/plataformas";
+import {
+  TIPOS_ESCENA,
+  TIPO_ESCENA_LABEL,
+  type TipoEscena,
+} from "@/lib/contenido";
+import {
+  PLATAFORMA_ICON,
+  PLATAFORMA_LABEL,
+  type Plataforma,
+} from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 
 type EscenaGuion = {
   id: string;
@@ -57,7 +66,7 @@ export function GuionEscenas({
   agregarEscenaGuion: (formData: FormData) => void | Promise<void>;
 }) {
   const [textos, setTextos] = useState<Record<string, string>>(() =>
-    Object.fromEntries(escenas.map((e) => [e.id, e.texto ?? ""]))
+    Object.fromEntries(escenas.map((e) => [e.id, e.texto ?? ""])),
   );
   const [editando, setEditando] = useState<Record<string, boolean>>({});
   const [agregando, setAgregando] = useState(false);
@@ -70,28 +79,47 @@ export function GuionEscenas({
 
   const resultadoGeneral = useMemo(
     () => calcularPuntuacionVideo(titulo, pilar, escenasPuntuacion),
-    [titulo, pilar, escenasPuntuacion]
+    [titulo, pilar, escenasPuntuacion],
   );
+
+  const IconPlataforma = PLATAFORMA_ICON[plataforma];
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <p className="text-h2 lg:text-h1">{titulo}</p>
-
-          <div className="flex items-center gap-2">
-            {numero != null && <span className="text-small text-text-secondary">#{numero}</span>}
+      <div className="flex items-center gap-3 rounded-md bg-accent-bg p-4">
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+          style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
+        >
+          <IconPlataforma size={20} strokeWidth={1.5} className="text-white" />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <p className="truncate text-h1">{titulo}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-caption text-text-secondary">
+              {PLATAFORMA_LABEL[plataforma]}
+            </span>
+            {numero != null && (
+              <span className="text-small text-text-secondary">#{numero}</span>
+            )}
             <Badge tone={estadoTone}>{estadoLabel}</Badge>
-            <span className="text-small text-text-secondary">{fechaPublicacion}</span>
+            <span className="text-small text-text-secondary">
+              {fechaPublicacion}
+            </span>
           </div>
         </div>
 
         <PuntuacionGrande resultado={resultadoGeneral} />
       </div>
 
-      <Puntuacion resultado={resultadoGeneral} etiqueta="puntuación general del vídeo" ocultarResumen modal />
+      <Puntuacion
+        resultado={resultadoGeneral}
+        etiqueta="puntuación general del vídeo"
+        ocultarResumen
+        modal
+      />
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5">
         {escenas.map((escena, index) => {
           const enEdicion = editando[escena.id] ?? false;
           const texto = textos[escena.id] ?? "";
@@ -135,13 +163,20 @@ export function GuionEscenas({
 
                 <span className="text-h3">
                   {TIPO_ESCENA_LABEL[escena.tipo_escena as TipoEscena]}
-                  {escena.duracion_segundos ? ` · ${escena.duracion_segundos}s` : ""}
+                  {escena.duracion_segundos
+                    ? ` · ${escena.duracion_segundos}s`
+                    : ""}
                 </span>
 
                 <div className="ml-auto flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setEditando((prev) => ({ ...prev, [escena.id]: !enEdicion }))}
+                    onClick={() =>
+                      setEditando((prev) => ({
+                        ...prev,
+                        [escena.id]: !enEdicion,
+                      }))
+                    }
                     className="flex items-center gap-1 p-2 -m-2 text-small text-accent"
                   >
                     {enEdicion ? (
@@ -160,7 +195,11 @@ export function GuionEscenas({
                   {enEdicion && (
                     <form action={eliminarEscenaGuion}>
                       <input type="hidden" name="id" value={escena.id} />
-                      <input type="hidden" name="redirectTo" value={rutaActual} />
+                      <input
+                        type="hidden"
+                        name="redirectTo"
+                        value={rutaActual}
+                      />
                       <ConfirmButton
                         message="¿Eliminar esta escena?"
                         ariaLabel="Eliminar escena"
@@ -193,27 +232,54 @@ export function GuionEscenas({
                       }))}
                     guardarAction={guardarTextoEscena}
                     onTextoChange={(nuevoTexto) =>
-                      setTextos((prev) => ({ ...prev, [escena.id]: nuevoTexto }))
+                      setTextos((prev) => ({
+                        ...prev,
+                        [escena.id]: nuevoTexto,
+                      }))
                     }
                   />
 
                   {(versionesPorEscena[escena.id] ?? []).length > 0 && (
                     <details className="text-small">
                       <summary className="cursor-pointer text-text-secondary">
-                        {versionesPorEscena[escena.id].length} versión(es) anterior(es)
+                        {versionesPorEscena[escena.id].length} versión(es)
+                        anterior(es)
                       </summary>
                       <ul className="mt-2 flex flex-col gap-2">
                         {versionesPorEscena[escena.id].map((v) => (
-                          <li key={v.id} className="flex flex-col gap-1 rounded-sm border border-border p-2">
+                          <li
+                            key={v.id}
+                            className="flex flex-col gap-1 rounded-sm border border-border p-2"
+                          >
                             <span className="text-caption text-text-disabled">
                               {new Date(v.created_at).toLocaleString("es-ES")}
                             </span>
-                            <p className="whitespace-pre-wrap text-text-secondary">{v.texto}</p>
-                            <form action={restaurarVersionEscena} className="self-start">
-                              <input type="hidden" name="escena_id" value={escena.id} />
-                              <input type="hidden" name="version_id" value={v.id} />
-                              <input type="hidden" name="redirectTo" value={rutaActual} />
-                              <button type="submit" className="text-caption text-accent">
+                            <p className="whitespace-pre-wrap text-text-secondary">
+                              {v.texto}
+                            </p>
+                            <form
+                              action={restaurarVersionEscena}
+                              className="self-start"
+                            >
+                              <input
+                                type="hidden"
+                                name="escena_id"
+                                value={escena.id}
+                              />
+                              <input
+                                type="hidden"
+                                name="version_id"
+                                value={v.id}
+                              />
+                              <input
+                                type="hidden"
+                                name="redirectTo"
+                                value={rutaActual}
+                              />
+                              <button
+                                type="submit"
+                                className="text-caption text-accent"
+                              >
                                 Restaurar esta versión
                               </button>
                             </form>
@@ -224,9 +290,13 @@ export function GuionEscenas({
                   )}
                 </>
               ) : texto.trim() ? (
-                <p className="whitespace-pre-wrap text-body text-text-secondary lg:text-h3">{texto}</p>
+                <p className="whitespace-pre-wrap text-body text-text-secondary lg:text-h3">
+                  {texto}
+                </p>
               ) : (
-                <p className="text-small text-text-disabled">Sin texto todavía.</p>
+                <p className="text-small text-text-disabled">
+                  Sin texto todavía.
+                </p>
               )}
             </div>
           );
@@ -262,7 +332,9 @@ export function GuionEscenas({
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-h3 text-text-secondary">Duración (segundos, opcional)</span>
+              <span className="text-h3 text-text-secondary">
+                Duración (segundos, opcional)
+              </span>
               <input
                 type="number"
                 name="duracion_segundos"

@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PLATAFORMA_LABEL, type Plataforma } from "@/lib/plataformas";
-import { TIPOS_ESCENA, TIPO_ESCENA_LABEL, type TipoEscena } from "@/lib/contenido";
+import {
+  TIPOS_ESCENA,
+  TIPO_ESCENA_LABEL,
+  type TipoEscena,
+} from "@/lib/contenido";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import {
   agregarEscenaEstructura,
@@ -41,8 +45,8 @@ export default async function EstructuraPage({
       <div className="flex flex-col gap-1">
         <h1 className="text-h1">{estructura.nombre}</h1>
         <p className="text-small text-text-secondary">
-          {PLATAFORMA_LABEL[estructura.plataforma as Plataforma]} · {estructura.duracion_segundos}
-          s
+          {PLATAFORMA_LABEL[estructura.plataforma as Plataforma]} ·{" "}
+          {estructura.duracion_segundos}s
         </p>
       </div>
 
@@ -50,11 +54,11 @@ export default async function EstructuraPage({
         <h2 className="text-h2">Escenas</h2>
 
         {escenas && escenas.length > 0 ? (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2 rounded-md bg-bg-primary p-3 shadow-sm">
             {escenas.map((escena, index) => (
               <li
                 key={escena.id}
-                className="flex items-center gap-3 rounded-md border border-border p-3"
+                className={`flex items-center gap-3 py-2 ${index > 0 ? "border-t border-border" : ""}`}
               >
                 <div className="flex flex-col gap-1">
                   <form action={moverEscenaEstructura}>
@@ -91,14 +95,19 @@ export default async function EstructuraPage({
                     {escena.duracion_segundos}s
                   </span>
                   {escena.nota && (
-                    <span className="text-small text-text-secondary">{escena.nota}</span>
+                    <span className="text-small text-text-secondary">
+                      {escena.nota}
+                    </span>
                   )}
                 </div>
 
                 <form action={eliminarEscenaEstructura}>
                   <input type="hidden" name="id" value={escena.id} />
                   <input type="hidden" name="estructura_id" value={id} />
-                  <ConfirmButton message="¿Eliminar esta escena?" className="p-2 -m-2 text-small text-accent">
+                  <ConfirmButton
+                    message="¿Eliminar esta escena?"
+                    className="p-2 -m-2 text-small text-accent"
+                  >
                     Eliminar
                   </ConfirmButton>
                 </form>
@@ -106,12 +115,14 @@ export default async function EstructuraPage({
             ))}
           </ul>
         ) : (
-          <p className="text-small text-text-disabled">Todavía no hay escenas.</p>
+          <p className="text-small text-text-disabled">
+            Todavía no hay escenas.
+          </p>
         )}
 
         <form
           action={agregarEscenaEstructura}
-          className="flex flex-col gap-3 rounded-md border border-border p-3"
+          className="flex flex-col gap-3 rounded-md bg-bg-primary p-3 shadow-sm"
         >
           <input type="hidden" name="estructura_id" value={id} />
 

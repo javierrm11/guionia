@@ -4,7 +4,10 @@ import { crearCadencia } from "../actions";
 export default function NuevaCadenciaPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-xl lg:p-8">
-      <form action={crearCadencia} className="flex flex-col gap-4">
+      <form
+        action={crearCadencia}
+        className="flex flex-col gap-4 rounded-md bg-bg-primary p-4 shadow-sm lg:p-5"
+      >
         <label className="flex flex-col gap-1">
           <span className="text-h3 text-text-secondary">
             Plataforma<span className="text-accent"> *</span>

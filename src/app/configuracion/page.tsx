@@ -78,7 +78,7 @@ export default async function ConfiguracionPage() {
       {nombreCuenta && (
         <Link
           href="/contenido/cuenta"
-          className="flex items-center gap-3 rounded-md border border-border p-3 hover:opacity-70"
+          className="flex items-center gap-3 rounded-md bg-bg-primary p-3 shadow-sm hover:opacity-70"
         >
           <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black">
             {avatarCuenta ? (
@@ -118,18 +118,21 @@ export default async function ConfiguracionPage() {
             href="/configuracion/plataformas"
             label="Plataformas"
             icon={Video}
+            tono="ai"
           />
           <Tile
             href="/configuracion/cadencia"
             label="Cadencia fija"
             icon={CalendarClock}
             badge={cadenciaFijaCount ?? 0}
+            tono="accent"
           />
           <Tile
             href="/configuracion/plantilla"
             label="Plantilla semanal"
             icon={CalendarDays}
             badge={plantillaCount ?? 0}
+            tono="success"
           />
         </div>
       </div>
@@ -146,16 +149,19 @@ export default async function ConfiguracionPage() {
             href="/configuracion/estructuras"
             label="Estructuras de guion"
             icon={Clapperboard}
+            tono="accent"
           />
           <Tile
             href="/configuracion/hooks"
             label="Banco de hooks"
             icon={Lightbulb}
+            tono="ai"
           />
           <Tile
             href="/configuracion/ctas"
             label="Banco de CTAs"
             icon={MessageSquare}
+            tono="success"
           />
         </div>
       </div>
@@ -170,7 +176,7 @@ export default async function ConfiguracionPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:gap-5">
           <Link
             href="/configuracion/referidos"
-            className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-accent/40 p-4 transition-transform duration-100 hover:opacity-70 active:scale-95 lg:min-h-28 lg:gap-3 lg:p-5"
+            className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md bg-accent-bg p-4 transition-transform duration-100 hover:opacity-70 active:scale-95 lg:min-h-28 lg:gap-3 lg:p-5"
           >
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent lg:h-12 lg:w-12">
               <Gift
@@ -188,13 +194,14 @@ export default async function ConfiguracionPage() {
             label="Papelera"
             icon={Trash2}
             badge={papeleraCount}
+            fondo
           />
 
           <form action={logoutAction} className="contents">
             <ConfirmButton
               message="¿Seguro que quieres cerrar sesión?"
               confirmLabel="Cerrar sesión"
-              className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-border p-4 transition-transform duration-100 hover:opacity-70 active:scale-95 lg:min-h-28 lg:gap-3 lg:p-5"
+              className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md bg-bg-primary p-4 shadow-sm transition-transform duration-100 hover:opacity-70 active:scale-95 lg:min-h-28 lg:gap-3 lg:p-5"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-badge-danger lg:h-12 lg:w-12">
                 <LogOut
@@ -233,7 +240,7 @@ export default async function ConfiguracionPage() {
             message="Esto borra tu cuenta y todo tu contenido (ideas, guiones, cadencia, conexiones de YouTube/TikTok...) para siempre. No hay papelera para esto — no se puede deshacer."
             confirmLabel="Eliminar cuenta"
             pendingLabel="Eliminando…"
-            className="flex w-full items-center justify-between rounded-md border border-badge-danger p-4 text-left lg:p-5"
+            className="flex w-full items-center justify-between rounded-md bg-danger-bg p-4 text-left lg:p-5"
           >
             <div className="flex flex-col gap-0.5">
               <span className="text-body text-danger lg:text-h3">

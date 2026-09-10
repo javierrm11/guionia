@@ -12,7 +12,12 @@ import { HistorialPieza } from "@/components/HistorialPieza";
 import { RetencionSection } from "@/components/RetencionSection";
 import { RetencionLoader } from "@/components/RetencionLoader";
 import { createClient } from "@/lib/supabase/server";
-import { isPlataforma } from "@/lib/plataformas";
+import {
+  PLATAFORMA_ICON,
+  PLATAFORMA_LABEL,
+  isPlataforma,
+} from "@/lib/plataformas";
+import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { obtenerAccessTokenValido as obtenerAccessTokenValidoYoutube } from "@/lib/youtube/conexion";
 import { extraerVideoId as extraerVideoIdYoutube } from "@/lib/youtube/oauth";
 import { extraerVideoId as extraerVideoIdTiktok } from "@/lib/tiktok/oauth";
@@ -96,6 +101,7 @@ export default async function GuionPage({
   }
 
   const rutaActual = `/contenido/${plataforma}/videos/${anio}/${mes}/${dia}/${guion.id}`;
+  const IconPlataforma = PLATAFORMA_ICON[plataforma];
 
   // La llamada a la Data API (vistas/likes/comentarios) y la de retención van
   // en componentes async aparte, streamed vía <Suspense> — no deben bloquear
@@ -142,140 +148,160 @@ export default async function GuionPage({
       : (guion.texto ?? "");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-5 lg:p-8">
-      {escenas && escenas.length > 0 ? (
-        <GuionEscenas
-          piezaId={id}
-          titulo={guion.titulo}
-          numero={guion.numero}
-          estadoTone={ESTADO_PIEZA_TONE[guion.estado]}
-          estadoLabel={ESTADO_PIEZA_LABEL[guion.estado]}
-          fechaPublicacion={guion.fecha_publicacion}
-          escenas={escenas}
-          versionesPorEscena={Object.fromEntries(versionesPorEscena)}
-          rutaActual={rutaActual}
-          plataforma={plataforma}
-          pilar={guion.pilar}
-          moverEscenaGuion={moverEscenaGuion}
-          eliminarEscenaGuion={eliminarEscenaGuion}
-          guardarTextoEscena={guardarTextoEscena}
-          restaurarVersionEscena={restaurarVersionEscena}
-          agregarEscenaGuion={agregarEscenaGuion}
-        />
-      ) : (
-        <>
-          <p className="text-h2 lg:text-h1">{guion.titulo}</p>
-
-          <div className="flex items-center gap-2">
-            {guion.numero != null && (
-              <span className="text-small text-text-secondary">
-                #{guion.numero}
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-5 lg:p-8">
+        {escenas && escenas.length > 0 ? (
+          <GuionEscenas
+            piezaId={id}
+            titulo={guion.titulo}
+            numero={guion.numero}
+            estadoTone={ESTADO_PIEZA_TONE[guion.estado]}
+            estadoLabel={ESTADO_PIEZA_LABEL[guion.estado]}
+            fechaPublicacion={guion.fecha_publicacion}
+            escenas={escenas}
+            versionesPorEscena={Object.fromEntries(versionesPorEscena)}
+            rutaActual={rutaActual}
+            plataforma={plataforma}
+            pilar={guion.pilar}
+            moverEscenaGuion={moverEscenaGuion}
+            eliminarEscenaGuion={eliminarEscenaGuion}
+            guardarTextoEscena={guardarTextoEscena}
+            restaurarVersionEscena={restaurarVersionEscena}
+            agregarEscenaGuion={agregarEscenaGuion}
+          />
+        ) : (
+          <>
+            <div className="flex items-center gap-3 rounded-md bg-accent-bg p-4">
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm"
+                style={{ backgroundColor: PLATAFORMA_TONO[plataforma] }}
+              >
+                <IconPlataforma
+                  size={20}
+                  strokeWidth={1.5}
+                  className="text-white"
+                />
               </span>
-            )}
-            <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>
-              {ESTADO_PIEZA_LABEL[guion.estado]}
-            </Badge>
-            <span className="text-small text-text-secondary">
-              {guion.fecha_publicacion}
-            </span>
-          </div>
-
-          {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
-
-          {guion.texto && (
-            <p className="text-body whitespace-pre-wrap rounded-md border border-border p-4 lg:text-h3 lg:p-5">
-              {guion.texto}
-            </p>
-          )}
-        </>
-      )}
-
-      {textoCompleto && plataforma !== "youtube" && (
-        <div className="flex flex-col gap-2 rounded-md border border-border p-4 lg:gap-3 lg:p-5">
-          <h2 className="text-h2 lg:text-h1">Publicación</h2>
-          <p className="text-small text-text-secondary">
-            Guionia no publica ni sube vídeos — cuando lo publiques donde
-            corresponda, pega aquí la URL para enlazar las estadísticas y que
-            cuente en tu cadencia.
-          </p>
-
-          <form action={guardarUrlPublicado} className="flex flex-col gap-1">
-            <input type="hidden" name="id" value={guion.id} />
-            <input type="hidden" name="redirectTo" value={rutaActual} />
-            <span className="text-h3 text-text-secondary">
-              URL del vídeo publicado
-            </span>
-            <div className="flex gap-2">
-              <input
-                type="url"
-                name="url_publicado"
-                defaultValue={guion.url_publicado ?? ""}
-                placeholder="https://…"
-                className="flex-1 rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="rounded-sm bg-bg-secondary px-3 py-2 text-small text-text-primary active:bg-border"
-              >
-                Guardar
-              </button>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <p className="truncate text-h1">{guion.titulo}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-caption text-text-secondary">
+                    {PLATAFORMA_LABEL[plataforma]}
+                  </span>
+                  {guion.numero != null && (
+                    <span className="text-small text-text-secondary">
+                      #{guion.numero}
+                    </span>
+                  )}
+                  <Badge tone={ESTADO_PIEZA_TONE[guion.estado]}>
+                    {ESTADO_PIEZA_LABEL[guion.estado]}
+                  </Badge>
+                  <span className="text-small text-text-secondary">
+                    {guion.fecha_publicacion}
+                  </span>
+                </div>
+              </div>
             </div>
-            {guion.url_publicado && (
-              <a
-                href={guion.url_publicado}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-small text-accent hover:underline"
-              >
-                Abrir vídeo ↗
-              </a>
+
+            {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
+
+            {guion.texto && (
+              <p className="text-body whitespace-pre-wrap rounded-md bg-bg-primary p-4 shadow-sm lg:text-h3 lg:p-5">
+                {guion.texto}
+              </p>
             )}
-          </form>
-        </div>
-      )}
-
-      <HistorialPieza eventos={historial ?? []} />
-
-      {youtubeVideoId && youtubeAccessToken && (
-        <Suspense
-          fallback={
-            <EstadisticasVideoLoader titulo="Estadísticas de YouTube" />
-          }
-        >
-          <EstadisticasYoutubeVideo
-            videoId={youtubeVideoId}
-            accessToken={youtubeAccessToken}
-          />
-        </Suspense>
-      )}
-
-      {youtubeVideoId && youtubeAccessToken && (
-        <Suspense fallback={<RetencionLoader />}>
-          <RetencionSection
-            videoId={youtubeVideoId}
-            accessToken={youtubeAccessToken}
-          />
-        </Suspense>
-      )}
-
-      {tiktokVideoId && (
-        <Suspense
-          fallback={<EstadisticasVideoLoader titulo="Estadísticas de TikTok" />}
-        >
-          <EstadisticasTiktokVideo videoId={tiktokVideoId} />
-        </Suspense>
-      )}
-
-      <div className="flex flex-wrap items-center gap-3">
-        {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
-        {textoCompleto && <TeleprompterButton texto={textoCompleto} />}
-        {textoCompleto && (
-          <AdaptarGuionButton
-            piezaId={guion.id}
-            plataformasDisponibles={plataformasDisponibles}
-            adaptarAOtraPlataforma={adaptarAOtraPlataforma}
-          />
+          </>
         )}
+
+        {textoCompleto && plataforma !== "youtube" && (
+          <div className="flex flex-col gap-2 rounded-md bg-bg-primary p-4 shadow-sm lg:gap-3 lg:p-5">
+            <h2 className="text-h2 lg:text-h1">Publicación</h2>
+            <p className="text-small text-text-secondary">
+              Guionia no publica ni sube vídeos — cuando lo publiques donde
+              corresponda, pega aquí la URL para enlazar las estadísticas y que
+              cuente en tu cadencia.
+            </p>
+
+            <form action={guardarUrlPublicado} className="flex flex-col gap-1">
+              <input type="hidden" name="id" value={guion.id} />
+              <input type="hidden" name="redirectTo" value={rutaActual} />
+              <span className="text-h3 text-text-secondary">
+                URL del vídeo publicado
+              </span>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  name="url_publicado"
+                  defaultValue={guion.url_publicado ?? ""}
+                  placeholder="https://…"
+                  className="flex-1 rounded-sm border border-border px-3 py-2 text-body focus:border-accent focus:ring-2 focus:ring-accent-bg focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="rounded-sm bg-bg-secondary px-3 py-2 text-small text-text-primary active:bg-border"
+                >
+                  Guardar
+                </button>
+              </div>
+              {guion.url_publicado && (
+                <a
+                  href={guion.url_publicado}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-small text-accent hover:underline"
+                >
+                  Abrir vídeo ↗
+                </a>
+              )}
+            </form>
+          </div>
+        )}
+
+        <HistorialPieza eventos={historial ?? []} />
+
+        {youtubeVideoId && youtubeAccessToken && (
+          <Suspense
+            fallback={
+              <EstadisticasVideoLoader titulo="Estadísticas de YouTube" />
+            }
+          >
+            <EstadisticasYoutubeVideo
+              videoId={youtubeVideoId}
+              accessToken={youtubeAccessToken}
+            />
+          </Suspense>
+        )}
+
+        {youtubeVideoId && youtubeAccessToken && (
+          <Suspense fallback={<RetencionLoader />}>
+            <RetencionSection
+              videoId={youtubeVideoId}
+              accessToken={youtubeAccessToken}
+            />
+          </Suspense>
+        )}
+
+        {tiktokVideoId && (
+          <Suspense
+            fallback={
+              <EstadisticasVideoLoader titulo="Estadísticas de TikTok" />
+            }
+          >
+            <EstadisticasTiktokVideo videoId={tiktokVideoId} />
+          </Suspense>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3">
+          {textoCompleto && <CopiarGuionButton texto={textoCompleto} />}
+          {textoCompleto && <TeleprompterButton texto={textoCompleto} />}
+          {textoCompleto && (
+            <AdaptarGuionButton
+              piezaId={guion.id}
+              plataformasDisponibles={plataformasDisponibles}
+              adaptarAOtraPlataforma={adaptarAOtraPlataforma}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

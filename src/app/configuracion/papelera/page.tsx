@@ -33,7 +33,10 @@ export default async function PapeleraPage() {
   const piezaIds = [...new Set((escenas ?? []).map((e) => e.pieza_id))];
   const { data: piezas } =
     piezaIds.length > 0
-      ? await supabase.from("piezas_contenido").select("id, titulo").in("id", piezaIds)
+      ? await supabase
+          .from("piezas_contenido")
+          .select("id, titulo")
+          .in("id", piezaIds)
       : { data: [] };
   const tituloPorPieza = new Map((piezas ?? []).map((p) => [p.id, p.titulo]));
 
@@ -57,7 +60,8 @@ export default async function PapeleraPage() {
     })),
     ...(frases ?? []).map((f) => ({
       id: f.id,
-      tipoBadge: f.tipo_escena === "hook" ? ("Hook" as const) : ("CTA" as const),
+      tipoBadge:
+        f.tipo_escena === "hook" ? ("Hook" as const) : ("CTA" as const),
       texto: f.texto,
       contexto: PLATAFORMA_LABEL[f.plataforma as Plataforma],
       deletedAt: f.deleted_at as string,
@@ -71,7 +75,7 @@ export default async function PapeleraPage() {
       <h1 className="text-h1">Papelera</h1>
 
       {elementos.length > 0 ? (
-        <ul className="flex flex-col">
+        <ul className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:px-5">
           {elementos.map((el, index) => (
             <FilaPapelera
               key={`${el.tipoBadge}-${el.id}`}

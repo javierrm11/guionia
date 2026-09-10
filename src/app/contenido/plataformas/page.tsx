@@ -111,146 +111,149 @@ export default async function PlataformasPage({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 bg-surface-tint p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
-      <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
-        <Link
-          href="/contenido/plataformas"
-          className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
-            enCalendario ? "text-text-secondary" : "bg-accent text-white"
-          }`}
-        >
-          Plataformas
-        </Link>
-        <Link
-          href={`/contenido/plataformas?vista=calendario&semana=${semanaCalendario}`}
-          className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
-            enCalendario ? "bg-accent text-white" : "text-text-secondary"
-          }`}
-        >
-          Calendario
-        </Link>
-      </div>
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-4 lg:mx-auto lg:w-full lg:max-w-4xl">
+        <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
+          <Link
+            href="/contenido/plataformas"
+            className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
+              enCalendario ? "text-text-secondary" : "bg-accent text-white"
+            }`}
+          >
+            Plataformas
+          </Link>
+          <Link
+            href={`/contenido/plataformas?vista=calendario&semana=${semanaCalendario}`}
+            className={`text-caption rounded-full px-3 py-1.5 lg:px-4 lg:py-2 lg:text-body ${
+              enCalendario ? "bg-accent text-white" : "text-text-secondary"
+            }`}
+          >
+            Calendario
+          </Link>
+        </div>
 
-      {enCalendario ? (
-        <CalendarioSemanaTransicion semanaKey={semanaCalendario}>
-          <CalendarioPlataformas
-            plataformasActivas={plataformasActivas}
-            semanaInicio={semanaCalendario}
-          />
-        </CalendarioSemanaTransicion>
-      ) : (
-        <>
-          {sinCadencia && (
-            <Link
-              href="/configuracion/cadencia"
-              className="flex items-center justify-between gap-3 rounded-md border border-border p-4"
-            >
-              <span className="text-small text-text-secondary">
-                Aún no has definido tu cadencia semanal en todas tus plataformas
-              </span>
-              <span className="text-small shrink-0 text-accent">
-                Definirla ahora →
-              </span>
-            </Link>
-          )}
+        {enCalendario ? (
+          <CalendarioSemanaTransicion semanaKey={semanaCalendario}>
+            <CalendarioPlataformas
+              plataformasActivas={plataformasActivas}
+              semanaInicio={semanaCalendario}
+            />
+          </CalendarioSemanaTransicion>
+        ) : (
+          <>
+            {sinCadencia && (
+              <Link
+                href="/configuracion/cadencia"
+                className="flex items-center justify-between gap-3 rounded-md border border-border p-4"
+              >
+                <span className="text-small text-text-secondary">
+                  Aún no has definido tu cadencia semanal en todas tus
+                  plataformas
+                </span>
+                <span className="text-small shrink-0 text-accent">
+                  Definirla ahora →
+                </span>
+              </Link>
+            )}
 
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
-            {plataformasOrdenadas.map((plataforma) => {
-              const Icon = PLATAFORMA_ICON[plataforma];
-              const tono = PLATAFORMA_TONO[plataforma];
-              const p = progresoPorPlataforma.get(plataforma);
-              const completa = p ? p.hechas >= p.cantidad : false;
-              const porcentaje = p
-                ? Math.min(100, (p.hechas / Math.max(1, p.cantidad)) * 100)
-                : 0;
-              const olvidadas = contar(ideasOlvidadas, plataforma);
-              const hayIdeas = contar(ideasActivasData ?? [], plataforma) > 0;
+            <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
+              {plataformasOrdenadas.map((plataforma) => {
+                const Icon = PLATAFORMA_ICON[plataforma];
+                const tono = PLATAFORMA_TONO[plataforma];
+                const p = progresoPorPlataforma.get(plataforma);
+                const completa = p ? p.hechas >= p.cantidad : false;
+                const porcentaje = p
+                  ? Math.min(100, (p.hechas / Math.max(1, p.cantidad)) * 100)
+                  : 0;
+                const olvidadas = contar(ideasOlvidadas, plataforma);
+                const hayIdeas = contar(ideasActivasData ?? [], plataforma) > 0;
 
-              return (
-                <section
-                  key={plataforma}
-                  className={`flex flex-col gap-3.5 rounded-md p-4 shadow-sm lg:gap-4 lg:p-5 ${
-                    completa ? "border border-success" : ""
-                  }`}
-                  style={{ backgroundColor: PLATAFORMA_TONO_BG[plataforma] }}
-                >
-                  <Link
-                    href={`/contenido/${plataforma}/videos`}
-                    className="flex items-center gap-3 lg:gap-3.5"
+                return (
+                  <section
+                    key={plataforma}
+                    className={`flex flex-col gap-3.5 rounded-md p-4 shadow-sm lg:gap-4 lg:p-5 ${
+                      completa ? "border border-success" : ""
+                    }`}
+                    style={{ backgroundColor: PLATAFORMA_TONO_BG[plataforma] }}
                   >
-                    <span
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-12 lg:w-12"
-                      style={{ backgroundColor: tono }}
-                    >
-                      <Icon
-                        size={20}
-                        strokeWidth={1.5}
-                        className="text-white lg:h-[22px] lg:w-[22px]"
-                      />
-                    </span>
-                    <span className="flex min-w-0 flex-1 flex-col gap-px">
-                      <span className="flex items-center gap-1.5 text-h2">
-                        {PLATAFORMA_LABEL[plataforma]}
-                        {completa && (
-                          <Check
-                            size={16}
-                            strokeWidth={2}
-                            className="text-success"
-                          />
-                        )}
-                      </span>
-                      <span className="text-caption text-text-secondary truncate lg:text-small">
-                        {p
-                          ? `${p.hechas} de ${p.cantidad} esta semana`
-                          : "Sin cadencia definida"}
-                        {p?.nota ? ` · ${p.nota}` : ""}
-                      </span>
-                    </span>
-                    <ChevronRight
-                      size={16}
-                      strokeWidth={1.5}
-                      className="shrink-0 text-text-secondary"
-                    />
-                  </Link>
-
-                  {p && (
-                    <div className="flex items-center gap-3">
-                      <BarraProgresoCadencia
-                        porcentaje={porcentaje}
-                        completa={completa}
-                      />
-                      <span className="text-caption shrink-0 text-text-secondary">
-                        {Math.round(porcentaje)}%
-                      </span>
-                    </div>
-                  )}
-
-                  {olvidadas > 0 ? (
                     <Link
-                      href={`/contenido/ideas?p=${plataforma}`}
-                      className="text-caption flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1"
-                      style={{ backgroundColor: "var(--warning-bg)" }}
+                      href={`/contenido/${plataforma}/videos`}
+                      className="flex items-center gap-3 lg:gap-3.5"
                     >
-                      <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-                      {olvidadas}{" "}
-                      {olvidadas === 1 ? "idea olvidada" : "ideas olvidadas"}
+                      <span
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-12 lg:w-12"
+                        style={{ backgroundColor: tono }}
+                      >
+                        <Icon
+                          size={20}
+                          strokeWidth={1.5}
+                          className="text-white lg:h-[22px] lg:w-[22px]"
+                        />
+                      </span>
+                      <span className="flex min-w-0 flex-1 flex-col gap-px">
+                        <span className="flex items-center gap-1.5 text-h2">
+                          {PLATAFORMA_LABEL[plataforma]}
+                          {completa && (
+                            <Check
+                              size={16}
+                              strokeWidth={2}
+                              className="text-success"
+                            />
+                          )}
+                        </span>
+                        <span className="text-caption text-text-secondary truncate lg:text-small">
+                          {p
+                            ? `${p.hechas} de ${p.cantidad} esta semana`
+                            : "Sin cadencia definida"}
+                          {p?.nota ? ` · ${p.nota}` : ""}
+                        </span>
+                      </span>
+                      <ChevronRight
+                        size={16}
+                        strokeWidth={1.5}
+                        className="shrink-0 text-text-secondary"
+                      />
                     </Link>
-                  ) : hayIdeas ? (
-                    <span className="text-caption text-success flex items-center gap-1.5">
-                      <Check size={14} strokeWidth={1.5} />
-                      Al día
-                    </span>
-                  ) : (
-                    <span className="text-caption text-text-disabled">
-                      Sin ideas guardadas
-                    </span>
-                  )}
-                </section>
-              );
-            })}
-          </div>
-        </>
-      )}
+
+                    {p && (
+                      <div className="flex items-center gap-3">
+                        <BarraProgresoCadencia
+                          porcentaje={porcentaje}
+                          completa={completa}
+                        />
+                        <span className="text-caption shrink-0 text-text-secondary">
+                          {Math.round(porcentaje)}%
+                        </span>
+                      </div>
+                    )}
+
+                    {olvidadas > 0 ? (
+                      <Link
+                        href={`/contenido/ideas?p=${plataforma}`}
+                        className="text-caption flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1"
+                        style={{ backgroundColor: "var(--warning-bg)" }}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                        {olvidadas}{" "}
+                        {olvidadas === 1 ? "idea olvidada" : "ideas olvidadas"}
+                      </Link>
+                    ) : hayIdeas ? (
+                      <span className="text-caption text-success flex items-center gap-1.5">
+                        <Check size={14} strokeWidth={1.5} />
+                        Al día
+                      </span>
+                    ) : (
+                      <span className="text-caption text-text-disabled">
+                        Sin ideas guardadas
+                      </span>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

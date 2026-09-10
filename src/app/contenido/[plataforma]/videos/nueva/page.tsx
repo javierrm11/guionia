@@ -52,17 +52,19 @@ export default async function NuevoVideoPage({
   ]);
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
-      <GuionForm
-        plataforma={plataforma}
-        estructuras={estructuras ?? []}
-        estructuraSugeridaId={estructuraSugeridaId ?? undefined}
-        pilarInicial={pilarSugerido}
-        mejorMomento={mejorMomento}
-        frases={frases ?? []}
-        fechaHoy={fecha ?? todayISO()}
-        action={crearVideoDirecto}
-      />
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-6 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+        <GuionForm
+          plataforma={plataforma}
+          estructuras={estructuras ?? []}
+          estructuraSugeridaId={estructuraSugeridaId ?? undefined}
+          pilarInicial={pilarSugerido}
+          mejorMomento={mejorMomento}
+          frases={frases ?? []}
+          fechaHoy={fecha ?? todayISO()}
+          action={crearVideoDirecto}
+        />
+      </div>
     </div>
   );
 }

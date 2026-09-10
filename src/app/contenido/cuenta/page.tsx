@@ -68,58 +68,60 @@ export default async function CuentaPage({
     cuenta === "todas" ? "var(--accent)" : PLATAFORMA_TONO[cuenta];
 
   return (
-    <div className="flex flex-1 flex-col bg-surface-tint">
-      <div className="rounded-b-[32px] bg-accent p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:rounded-b-[40px] lg:p-8">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-h1 text-white">Cuenta</h1>
-          <Link
-            href="/configuracion"
-            aria-label="Ajustes"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/85"
-          >
-            <Settings size={20} strokeWidth={1.5} />
-          </Link>
-        </div>
-
-        <div className="flex flex-col items-center gap-1.5 pt-4 pb-2 lg:gap-2">
-          <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center lg:h-24 lg:w-24">
-            <span
-              className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full lg:h-24 lg:w-24"
-              style={{
-                backgroundColor: cuenta === "todas" ? tonoCuenta : "#000",
-              }}
+    <div className="flex flex-1 flex-col">
+      <div className="rounded-b-[32px] bg-accent lg:rounded-b-[40px]">
+        <div className="p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-h1 text-white">Cuenta</h1>
+            <Link
+              href="/configuracion"
+              aria-label="Ajustes"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/85"
             >
-              {cuenta === "todas" ? (
-                <IconCuenta
-                  size={32}
-                  strokeWidth={1.5}
-                  className="text-white"
-                />
-              ) : (
-                <AvatarCuenta src={avatarUrl ?? null} nombre={nombre} />
+              <Settings size={20} strokeWidth={1.5} />
+            </Link>
+          </div>
+
+          <div className="flex flex-col items-center gap-1.5 pt-4 pb-2 lg:gap-2">
+            <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center lg:h-24 lg:w-24">
+              <span
+                className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full lg:h-24 lg:w-24"
+                style={{
+                  backgroundColor: cuenta === "todas" ? tonoCuenta : "#000",
+                }}
+              >
+                {cuenta === "todas" ? (
+                  <IconCuenta
+                    size={32}
+                    strokeWidth={1.5}
+                    className="text-white"
+                  />
+                ) : (
+                  <AvatarCuenta src={avatarUrl ?? null} nombre={nombre} />
+                )}
+              </span>
+              {cuenta !== "todas" && (
+                <span
+                  className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full lg:h-7 lg:w-7"
+                  style={{ backgroundColor: tonoCuenta }}
+                >
+                  <IconCuenta
+                    size={11}
+                    strokeWidth={1.5}
+                    className="text-white lg:h-3.5 lg:w-3.5"
+                  />
+                </span>
               )}
             </span>
-            {cuenta !== "todas" && (
-              <span
-                className="absolute -right-0.5 -bottom-0.5 flex h-6 w-6 items-center justify-center rounded-full lg:h-7 lg:w-7"
-                style={{ backgroundColor: tonoCuenta }}
-              >
-                <IconCuenta
-                  size={11}
-                  strokeWidth={1.5}
-                  className="text-white lg:h-3.5 lg:w-3.5"
-                />
-              </span>
-            )}
-          </span>
-          <span className="text-h2 text-white lg:text-h1">{nombre}</span>
-          <span className="text-caption text-white/80 lg:text-body">
-            {cuenta === "youtube"
-              ? "Canal de YouTube"
-              : cuenta === "tiktok"
-                ? "Cuenta de TikTok"
-                : "YouTube + TikTok combinados"}
-          </span>
+            <span className="text-h2 text-white lg:text-h1">{nombre}</span>
+            <span className="text-caption text-white/80 lg:text-body">
+              {cuenta === "youtube"
+                ? "Canal de YouTube"
+                : cuenta === "tiktok"
+                  ? "Cuenta de TikTok"
+                  : "YouTube + TikTok combinados"}
+            </span>
+          </div>
         </div>
       </div>
 

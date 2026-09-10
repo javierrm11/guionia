@@ -40,7 +40,7 @@ export default async function HooksPage() {
       </div>
 
       {hooks && hooks.length > 0 ? (
-        <ul className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+        <ul className="flex flex-col rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-5">
           {hooks.map((h, index) => (
             <li
               key={h.id}

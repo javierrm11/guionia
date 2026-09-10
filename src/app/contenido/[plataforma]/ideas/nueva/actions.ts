@@ -12,7 +12,6 @@ export async function crearIdea(formData: FormData) {
   const plataforma = formData.get("plataforma");
   const titulo = formData.get("titulo");
   const pilar = formData.get("pilar");
-  const etiquetas = formData.get("etiquetas");
 
   if (typeof plataforma !== "string" || !isPlataforma(plataforma)) {
     throw new Error("Plataforma inválida");
@@ -27,7 +26,6 @@ export async function crearIdea(formData: FormData) {
       plataforma,
       titulo: titulo.trim(),
       pilar: typeof pilar === "string" && pilar ? pilar : null,
-      etiquetas: typeof etiquetas === "string" && etiquetas.trim() ? etiquetas.trim() : null,
       estado: "idea",
     })
     .select("id")
