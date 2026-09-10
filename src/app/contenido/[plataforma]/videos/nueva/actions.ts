@@ -27,21 +27,27 @@ export async function crearVideoDirecto(formData: FormData) {
     throw new Error("La fecha de publicación es obligatoria");
   }
 
-  const usaEstructura = typeof estructuraId === "string" && estructuraId.length > 0;
+  const usaEstructura =
+    typeof estructuraId === "string" && estructuraId.length > 0;
 
   const tiposEscena = formData.getAll("escena_tipo").map(String);
   const duracionesEscena = formData.getAll("escena_duracion").map(String);
   const textosEscena = formData.getAll("escena_texto").map(String);
+  const frasesOrigenEscena = formData
+    .getAll("escena_frase_origen_id")
+    .map(String);
 
   if (usaEstructura) {
     const invalido = tiposEscena.some(
-      (t) => !(TIPOS_ESCENA as readonly string[]).includes(t)
+      (t) => !(TIPOS_ESCENA as readonly string[]).includes(t),
     );
     if (invalido || tiposEscena.length === 0) {
       throw new Error("Escenas inválidas");
     }
   } else if (typeof texto !== "string" || texto.trim().length === 0) {
-    throw new Error("El texto del guion es obligatorio si no eliges una estructura");
+    throw new Error(
+      "El texto del guion es obligatorio si no eliges una estructura",
+    );
   }
 
   const { data: ultimo } = await supabase
@@ -65,6 +71,7 @@ export async function crearVideoDirecto(formData: FormData) {
       fecha_publicacion: fechaPublicacion,
       numero: siguienteNumero,
       estado: "guion_escrito",
+      estructura_origen_id: usaEstructura ? (estructuraId as string) : null,
     })
     .select("id")
     .single();
@@ -83,7 +90,8 @@ export async function crearVideoDirecto(formData: FormData) {
         tipo_escena: tipo,
         duracion_segundos: Number(duracionesEscena[index]) || null,
         texto: textosEscena[index]?.trim() ? textosEscena[index].trim() : null,
-      }))
+        frase_origen_id: frasesOrigenEscena[index] || null,
+      })),
     );
 
     if (escenasError) {

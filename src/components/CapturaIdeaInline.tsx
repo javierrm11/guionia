@@ -12,16 +12,20 @@ import type { Plataforma } from "@/lib/plataformas";
  *  truco de grid `0fr`/`1fr`) en vez de mostrarse/ocultarse de golpe —
  *  efecto secundario: si se cierra a medio rellenar, el texto se conserva
  *  al volver a abrirlo. */
-export function CapturaIdeaInline({ plataformas }: { plataformas: Plataforma[] }) {
+export function CapturaIdeaInline({
+  plataformas,
+}: {
+  plataformas: Plataforma[];
+}) {
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-end">
       {!abierto && (
         <button
           type="button"
           onClick={() => setAbierto(true)}
-          className="animate-escala-entrada flex items-center gap-1 text-caption text-accent"
+          className="animate-escala-entrada flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-caption text-white active:bg-accent-hover"
         >
           <Plus size={14} strokeWidth={2} />
           Nueva idea
@@ -34,7 +38,10 @@ export function CapturaIdeaInline({ plataformas }: { plataformas: Plataforma[] }
       >
         <div className="overflow-hidden">
           <div className="rounded-md border border-border p-4">
-            <CapturaRapidaForm plataformas={plataformas} onGuardado={() => setAbierto(false)} />
+            <CapturaRapidaForm
+              plataformas={plataformas}
+              onGuardado={() => setAbierto(false)}
+            />
           </div>
         </div>
       </div>

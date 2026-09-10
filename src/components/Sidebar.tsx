@@ -21,8 +21,8 @@ export function Sidebar() {
   const enAjustes = esRutaActiva(pathname, "/configuracion");
 
   return (
-    <aside className="hidden shrink-0 md:sticky md:top-0 md:flex md:h-screen md:w-20 md:flex-col md:p-3 lg:w-60 lg:p-4">
-      <div className="flex h-full flex-col gap-1 rounded-md bg-bg-secondary p-2 lg:p-3">
+    <aside className="hidden shrink-0 md:sticky md:top-0 md:flex md:h-screen md:w-20 md:flex-col md:pr-3 lg:w-60 lg:pr-4">
+      <div className="flex h-full flex-col gap-1 bg-bg-secondary p-2 lg:p-3">
         <div className="flex items-center justify-center px-1 py-3 lg:justify-start lg:px-3">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-accent font-display text-body font-semibold text-white lg:hidden">
             G

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import {
+  CalendarCheck,
   CalendarDays,
   ChevronRight,
   Flame,
   Lightbulb,
   Link2,
   Plus,
+  Target,
   Video,
 } from "lucide-react";
 import { AvisoRachaEnRiesgo } from "@/components/AvisoRachaEnRiesgo";
@@ -17,6 +19,7 @@ import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
 import { CapturaFlotante } from "@/components/CapturaFlotante";
 import { TendenciasCarrusel } from "@/components/TendenciasCarrusel";
+import { TendenciasCarruselSkeleton } from "@/components/TendenciasCarruselSkeleton";
 import { Tile } from "@/components/Tile";
 import { TourControl } from "@/components/TourControl";
 import { createClient } from "@/lib/supabase/server";
@@ -125,6 +128,11 @@ export default async function ContenidoPage() {
     .map((p) => ({ plataforma: p.plataforma, faltan: p.cantidad - p.hechas }));
 
   const [tareaHero, ...tareasResto] = tareas;
+  const tareasVisibles = tareasResto.slice(0, 5);
+  const tareasOcultas = tareasResto.length - tareasVisibles.length;
+  // "Quedan pocas horas" — a partir de las 20h se avisa con un tono sutil de
+  // que el día se acaba y la tarea del hero sigue pendiente.
+  const quedanPocasHoras = new Date().getHours() >= 20;
 
   return (
     <div className="relative flex flex-1 flex-col">
@@ -132,10 +140,10 @@ export default async function ContenidoPage() {
         className="pointer-events-none absolute inset-x-0 z-0 lg:origin-top lg:scale-y-110"
         style={{ top: -56 }}
       >
-        <OndaCadencia porcentaje={porcentajeCadencia} />
+        <OndaCadencia porcentaje={porcentajeCadencia} color="var(--accent)" />
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+      <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-6xl lg:p-8">
         {hayCadencia ? (
           <section
             data-tour="cadencia"
@@ -172,9 +180,16 @@ export default async function ContenidoPage() {
             </p>
             <Link
               href="/configuracion/cadencia"
-              className="mb-6 flex items-center justify-between rounded-md border border-border p-4 lg:p-5"
+              className="mb-6 flex items-center gap-3.5 rounded-md border border-border bg-bg-primary p-4 lg:gap-4 lg:p-5"
             >
-              <div className="flex flex-col gap-0.5">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-accent-bg lg:h-10 lg:w-10">
+                <Target
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-accent lg:h-[18px] lg:w-[18px]"
+                />
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-h3 lg:text-h2">
                   Define tu cadencia semanal
                 </span>
@@ -197,226 +212,282 @@ export default async function ContenidoPage() {
                 href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
                 label="Nuevo vídeo"
                 icon={Video}
+                fondo
               />
               <Tile
                 href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
                 label="Nueva idea"
                 icon={Lightbulb}
+                fondo
               />
               <Tile
                 href="/configuracion/plataformas"
                 label="Conectar cuentas"
                 icon={Link2}
+                fondo
               />
             </div>
           </>
         )}
 
-        {tareaHero && (
-          <section className="flex flex-col gap-3 pt-6 pb-3 lg:gap-4 lg:pt-8 lg:pb-4">
-            {(() => {
-              const Icon = tareaHero.plataforma
-                ? PLATAFORMA_ICON[tareaHero.plataforma]
-                : Plus;
-              const tono = tareaHero.plataforma
-                ? PLATAFORMA_TONO[tareaHero.plataforma]
-                : "var(--neutral)";
-
-              return (
-                <Link
-                  href={tareaHero.href}
-                  data-tour="hero"
-                  className="animate-tarjeta-entrada flex items-center gap-3.5 rounded-md bg-bg-primary p-5 hover:bg-neutral-bg active:bg-neutral-bg lg:gap-4 lg:p-6"
-                >
-                  <span
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-14 lg:w-14"
-                    style={{ backgroundColor: tono }}
-                  >
-                    <Icon
-                      size={20}
-                      strokeWidth={1.5}
-                      className="text-white lg:h-6 lg:w-6"
-                    />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-caption font-semibold text-accent lg:text-body">
-                      Falta el guion
-                    </span>
-                    <p className="truncate text-h2 lg:text-h1">
-                      {tareaHero.titulo}
-                    </p>
-                  </div>
-                  <ChevronRight
-                    size={18}
-                    strokeWidth={1.5}
-                    className="shrink-0 text-text-disabled"
-                  />
-                </Link>
-              );
-            })()}
-
-            {tareasResto.length > 0 && (
-              <div className="flex flex-col pt-1">
-                <div className="flex items-center gap-2 px-1 pb-2">
-                  <span
-                    className="text-caption font-display text-text-secondary uppercase"
-                    style={{ letterSpacing: "0.06em" }}
-                  >
-                    Más para hoy
-                  </span>
-                  <span className="text-caption text-text-disabled">
-                    {tareasResto.length}
-                  </span>
-                </div>
-
-                {tareasResto.map((t, index) => {
-                  const Icon = t.plataforma
-                    ? PLATAFORMA_ICON[t.plataforma]
+        <div className="lg:grid lg:grid-cols-3 lg:items-start lg:gap-8">
+          <div className="lg:col-span-2">
+            {tareaHero && (
+              <section className="flex flex-col gap-3 pt-6 pb-3 lg:gap-4 lg:pt-8 lg:pb-4">
+                {(() => {
+                  const Icon = tareaHero.plataforma
+                    ? PLATAFORMA_ICON[tareaHero.plataforma]
                     : Plus;
-                  const tono = t.plataforma
-                    ? PLATAFORMA_TONO[t.plataforma]
+                  const tono = tareaHero.plataforma
+                    ? PLATAFORMA_TONO[tareaHero.plataforma]
                     : "var(--neutral)";
 
                   return (
                     <Link
-                      key={t.id}
-                      href={t.href}
-                      className={`flex items-center gap-3 py-3 opacity-70 hover:opacity-100 lg:gap-3.5 lg:py-3.5 ${
-                        index > 0 ? "border-t border-border" : ""
+                      href={tareaHero.href}
+                      data-tour="hero"
+                      className={`animate-tarjeta-entrada flex items-center gap-3.5 rounded-md p-5 hover:bg-neutral-bg active:bg-neutral-bg lg:gap-4 lg:p-6 ${
+                        quedanPocasHoras
+                          ? "border-l-4 border-warning bg-warning-bg"
+                          : "bg-bg-primary"
                       }`}
                     >
                       <span
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm lg:h-14 lg:w-14"
                         style={{ backgroundColor: tono }}
                       >
                         <Icon
-                          size={16}
+                          size={20}
                           strokeWidth={1.5}
-                          className="text-white lg:h-[18px] lg:w-[18px]"
+                          className="text-white lg:h-6 lg:w-6"
                         />
                       </span>
-                      <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
-                        {t.titulo}
-                        {t.plataforma && ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
-                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span
+                          className={`text-caption font-semibold lg:text-body ${
+                            quedanPocasHoras ? "text-warning" : "text-accent"
+                          }`}
+                        >
+                          {quedanPocasHoras
+                            ? "Quedan pocas horas"
+                            : "Falta el guion"}
+                        </span>
+                        <p className="truncate text-h2 lg:text-h1">
+                          {tareaHero.titulo}
+                        </p>
+                      </div>
+                      <ChevronRight
+                        size={18}
+                        strokeWidth={1.5}
+                        className="shrink-0 text-text-disabled"
+                      />
                     </Link>
                   );
-                })}
+                })()}
+
+                {tareasResto.length > 0 && (
+                  <div className="flex flex-col pt-1">
+                    <div className="flex items-center gap-2 px-1 pb-2">
+                      <span
+                        className="text-caption font-display text-text-secondary uppercase"
+                        style={{ letterSpacing: "0.06em" }}
+                      >
+                        Más para hoy
+                      </span>
+                      <span className="text-caption text-text-disabled">
+                        {tareasResto.length}
+                      </span>
+                    </div>
+
+                    {tareasVisibles.map((t, index) => {
+                      const Icon = t.plataforma
+                        ? PLATAFORMA_ICON[t.plataforma]
+                        : Plus;
+                      const tono = t.plataforma
+                        ? PLATAFORMA_TONO[t.plataforma]
+                        : "var(--neutral)";
+
+                      return (
+                        <Link
+                          key={t.id}
+                          href={t.href}
+                          className={`flex items-center gap-3 py-3 opacity-70 transition-opacity duration-150 hover:opacity-100 lg:gap-3.5 lg:py-3.5 ${
+                            index > 0 ? "border-t border-border" : ""
+                          }`}
+                        >
+                          <span
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
+                            style={{ backgroundColor: tono }}
+                          >
+                            <Icon
+                              size={16}
+                              strokeWidth={1.5}
+                              className="text-white lg:h-[18px] lg:w-[18px]"
+                            />
+                          </span>
+                          <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
+                            {t.titulo}
+                            {t.plataforma &&
+                              ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
+                          </span>
+                        </Link>
+                      );
+                    })}
+
+                    {tareasOcultas > 0 && (
+                      <Link
+                        href="/contenido/plataformas?vista=calendario"
+                        className="flex items-center gap-1 border-t border-border py-3 text-caption text-text-secondary lg:py-3.5 lg:text-body"
+                      >
+                        +{tareasOcultas} más hoy
+                        <ChevronRight size={14} strokeWidth={2} />
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {!tareaHero && hayCadencia && (
+              <section className="flex flex-col gap-3 pt-6 pb-3 lg:gap-4 lg:pt-8 lg:pb-4">
+                <div className="flex items-center gap-3.5 rounded-md bg-bg-primary p-5 lg:gap-4 lg:p-6">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-success-bg lg:h-14 lg:w-14">
+                    <CalendarCheck
+                      size={20}
+                      strokeWidth={1.5}
+                      className="text-success lg:h-6 lg:w-6"
+                    />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-caption font-semibold text-text-secondary lg:text-body">
+                      Hoy
+                    </span>
+                    <p className="text-h2 lg:text-h1">Nada que hacer hoy</p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {hayCadencia && (
+              <div
+                data-tour="tiles"
+                className="grid grid-cols-3 gap-3 lg:gap-4"
+              >
+                <Tile
+                  href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
+                  label="Nueva idea"
+                  icon={Lightbulb}
+                />
+                <Tile
+                  href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
+                  label="Nuevo vídeo"
+                  icon={Video}
+                />
+                <Tile
+                  href="/contenido/plataformas?vista=calendario"
+                  label="Calendario"
+                  icon={CalendarDays}
+                />
               </div>
             )}
-          </section>
-        )}
 
-        {!hayCadencia && tareas.length === 0 && ultimasIdeas.length === 0 && (
-          <section className="flex flex-col items-center gap-3 py-10 text-center">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
-              <Lightbulb size={20} strokeWidth={1.5} className="text-accent" />
-            </span>
-            <div className="flex flex-col gap-1">
-              <p className="text-h3">Aún no tienes nada por aquí</p>
-              <p className="text-small text-text-secondary">
-                Crea tu primera idea o vídeo para empezar.
-              </p>
-            </div>
-            <Link
-              href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
-              className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
-            >
-              Nueva idea
-            </Link>
-          </section>
-        )}
-
-        {hayCadencia && (
-          <div data-tour="tiles" className="grid grid-cols-3 gap-3 lg:gap-4">
-            <Tile
-              href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
-              label="Nueva idea"
-              icon={Lightbulb}
-            />
-            <Tile
-              href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
-              label="Nuevo vídeo"
-              icon={Video}
-            />
-            <Tile
-              href="/contenido/plataformas?vista=calendario"
-              label="Calendario"
-              icon={CalendarDays}
-            />
+            <Suspense fallback={<TendenciasCarruselSkeleton />}>
+              <TendenciasCarrusel />
+            </Suspense>
           </div>
-        )}
 
-        <Suspense fallback={null}>
-          <TendenciasCarrusel />
-        </Suspense>
+          <aside className="pt-8 lg:sticky lg:top-8 lg:col-span-1 lg:ml-8 lg:pt-24">
+            {ultimasIdeas.length > 0 && (
+              <section className="flex flex-col gap-3 lg:gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
+                    style={{ letterSpacing: "0.06em" }}
+                  >
+                    <Lightbulb
+                      size={14}
+                      strokeWidth={1.5}
+                      className="lg:h-4 lg:w-4"
+                    />
+                    Ideas
+                  </span>
+                  <CapturaIdeaInline
+                    plataformas={plataformasActivas as Plataforma[]}
+                  />
+                </div>
 
-        {ultimasIdeas.length > 0 && (
-          <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
-            <div className="flex items-center justify-between">
-              <span
-                className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
-                style={{ letterSpacing: "0.06em" }}
-              >
-                <Lightbulb
-                  size={14}
-                  strokeWidth={1.5}
-                  className="lg:h-4 lg:w-4"
-                />
-                Ideas
-              </span>
-              <div className="flex items-center gap-3">
-                <CapturaIdeaInline
-                  plataformas={plataformasActivas as Plataforma[]}
-                />
+                <div className="flex flex-col gap-2 lg:gap-2.5">
+                  {ultimasIdeas.map((idea) => {
+                    const Icon = PLATAFORMA_ICON[idea.plataforma];
+                    const tono = PLATAFORMA_TONO[idea.plataforma];
+                    const dias = diasDesde(idea.created_at);
+
+                    return (
+                      <Link
+                        key={idea.id}
+                        href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
+                        className="flex items-center gap-3 rounded-md bg-bg-primary p-3 shadow-sm transition-shadow hover:shadow-md lg:gap-3.5 lg:p-3.5"
+                      >
+                        <span
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
+                          style={{ backgroundColor: tono }}
+                        >
+                          <Icon
+                            size={16}
+                            strokeWidth={1.5}
+                            className="text-white lg:h-[18px] lg:w-[18px]"
+                          />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
+                          {idea.titulo}
+                        </span>
+                        <span className="shrink-0 text-caption text-text-disabled lg:text-small">
+                          {dias === 0
+                            ? "Hoy"
+                            : `hace ${dias} ${dias === 1 ? "día" : "días"}`}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+
                 <Link
                   href="/contenido/ideas"
-                  className="flex items-center gap-0.5 text-caption text-text-secondary"
+                  className="flex items-center gap-0.5 self-start text-caption text-text-secondary"
                 >
-                  Ver todas
+                  Ver todas las ideas
                   <ChevronRight size={14} strokeWidth={2} />
                 </Link>
-              </div>
-            </div>
+              </section>
+            )}
 
-            <div className="flex flex-col">
-              {ultimasIdeas.map((idea, index) => {
-                const Icon = PLATAFORMA_ICON[idea.plataforma];
-                const tono = PLATAFORMA_TONO[idea.plataforma];
-                const dias = diasDesde(idea.created_at);
-
-                return (
+            {!hayCadencia &&
+              tareas.length === 0 &&
+              ultimasIdeas.length === 0 && (
+                <section className="flex flex-col items-center gap-3 py-10 text-center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary">
+                    <Lightbulb
+                      size={20}
+                      strokeWidth={1.5}
+                      className="text-accent"
+                    />
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-h3">Aún no tienes nada por aquí</p>
+                    <p className="text-small text-text-secondary">
+                      Crea tu primera idea o vídeo para empezar.
+                    </p>
+                  </div>
                   <Link
-                    key={idea.id}
-                    href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
-                    className={`flex items-center gap-2.5 py-3 hover:opacity-70 lg:gap-3 lg:py-3.5 ${
-                      index > 0 ? "border-t border-border" : ""
-                    }`}
+                    href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
+                    className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
                   >
-                    <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm lg:h-8 lg:w-8"
-                      style={{ backgroundColor: tono }}
-                    >
-                      <Icon
-                        size={14}
-                        strokeWidth={1.5}
-                        className="text-white lg:h-4 lg:w-4"
-                      />
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
-                      {idea.titulo}
-                    </span>
-                    <span className="shrink-0 text-caption text-text-disabled lg:text-small">
-                      {dias === 0
-                        ? "Hoy"
-                        : `hace ${dias} ${dias === 1 ? "día" : "días"}`}
-                    </span>
+                    Nueva idea
                   </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                </section>
+              )}
+          </aside>
+        </div>
       </div>
 
       <CapturaFlotante plataformas={plataformasActivas as Plataforma[]} />

@@ -213,9 +213,13 @@ export type ProgresoCadencia = {
 };
 
 /**
- * Progreso real de cada cadencia semanal: cuántas piezas ya están
- * `publicado` con `fecha_publicacion` dentro de la semana [semanaInicio, semanaFin],
- * frente a la cantidad objetivo. Se calcula al vuelo, sin checklist manual.
+ * Progreso real de cada cadencia semanal: cuántas piezas ya tienen guion
+ * escrito (o más adelante en el pipeline: grabado/editado/publicado) con
+ * `fecha_publicacion` dentro de la semana [semanaInicio, semanaFin], frente
+ * a la cantidad objetivo. Se calcula al vuelo, sin checklist manual — cuenta
+ * desde `guion_escrito` y no solo `publicado` porque Guionia es una app de
+ * guiones, no de publicación: escribir el guion ya es "el trabajo hecho" en
+ * lo que la app gestiona, publicar de verdad queda fuera de su alcance.
  */
 export async function getProgresoCadenciaSemanal(
   supabase: SupabaseClient,
@@ -229,7 +233,7 @@ export async function getProgresoCadenciaSemanal(
         .from("piezas_contenido")
         .select("id", { count: "exact", head: true })
         .eq("plataforma", c.plataforma)
-        .eq("estado", "publicado")
+        .in("estado", ESTADOS_VIDEO)
         .gte("fecha_publicacion", semanaInicio)
         .lte("fecha_publicacion", semanaFin);
 
@@ -270,7 +274,7 @@ export async function getRachaSemanas(
     .from("piezas_contenido")
     .select("fecha_publicacion")
     .in("plataforma", plataformas)
-    .eq("estado", "publicado")
+    .in("estado", ESTADOS_VIDEO)
     .gte("fecha_publicacion", inicioRango)
     .lte("fecha_publicacion", finRango);
 

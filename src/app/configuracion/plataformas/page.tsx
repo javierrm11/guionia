@@ -1,9 +1,14 @@
 import Image from "next/image";
-import { Briefcase, Camera, Clapperboard, Music } from "lucide-react";
+import { Clapperboard, Music } from "lucide-react";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
-import { desconectarTiktok, desconectarYoutube, sincronizarTiktok, sincronizarYoutube } from "./actions";
+import {
+  desconectarTiktok,
+  desconectarYoutube,
+  sincronizarTiktok,
+  sincronizarYoutube,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +60,9 @@ export default async function PlataformasPage({
 
       <section className="flex flex-col gap-3 rounded-md border border-border p-4 lg:gap-4 lg:p-5">
         {youtube_conectado && (
-          <p className="text-small text-success">Cuenta de YouTube conectada.</p>
+          <p className="text-small text-success">
+            Cuenta de YouTube conectada.
+          </p>
         )}
         {youtube_error && !conexionYoutube && (
           <p className="text-small text-danger">
@@ -97,12 +104,20 @@ export default async function PlataformasPage({
               />
             ) : (
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
-                <Clapperboard size={18} strokeWidth={1.5} className="text-accent" />
+                <Clapperboard
+                  size={18}
+                  strokeWidth={1.5}
+                  className="text-accent"
+                />
               </span>
             )}
             <div className="flex flex-col">
-              <span className="text-body text-text-primary lg:text-h3">YouTube</span>
-              <span className={`text-caption ${youtube_error && conexionYoutube ? "text-danger" : "text-text-secondary"}`}>
+              <span className="text-body text-text-primary lg:text-h3">
+                YouTube
+              </span>
+              <span
+                className={`text-caption ${youtube_error && conexionYoutube ? "text-danger" : "text-text-secondary"}`}
+              >
                 {conexionYoutube
                   ? youtube_error
                     ? "Conexión caducada"
@@ -123,7 +138,10 @@ export default async function PlataformasPage({
             ) : (
               <div className="flex items-center gap-3">
                 <form action={sincronizarYoutube}>
-                  <SubmitButton pendingLabel="Sincronizando…" className="p-2 -m-2 text-small text-accent">
+                  <SubmitButton
+                    pendingLabel="Sincronizando…"
+                    className="p-2 -m-2 text-small text-accent"
+                  >
                     Sincronizar
                   </SubmitButton>
                 </form>
@@ -164,8 +182,12 @@ export default async function PlataformasPage({
               </span>
             )}
             <div className="flex flex-col">
-              <span className="text-body text-text-primary lg:text-h3">TikTok</span>
-              <span className={`text-caption ${tiktok_error && conexionTiktok ? "text-danger" : "text-text-secondary"}`}>
+              <span className="text-body text-text-primary lg:text-h3">
+                TikTok
+              </span>
+              <span
+                className={`text-caption ${tiktok_error && conexionTiktok ? "text-danger" : "text-text-secondary"}`}
+              >
                 {conexionTiktok
                   ? tiktok_error
                     ? "Conexión caducada"
@@ -186,7 +208,10 @@ export default async function PlataformasPage({
             ) : (
               <div className="flex items-center gap-3">
                 <form action={sincronizarTiktok}>
-                  <SubmitButton pendingLabel="Sincronizando…" className="p-2 -m-2 text-small text-accent">
+                  <SubmitButton
+                    pendingLabel="Sincronizando…"
+                    className="p-2 -m-2 text-small text-accent"
+                  >
                     Sincronizar
                   </SubmitButton>
                 </form>
@@ -209,30 +234,6 @@ export default async function PlataformasPage({
               Conectar
             </a>
           )}
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
-              <Camera size={18} strokeWidth={1.5} className="text-accent" />
-            </span>
-            <div className="flex flex-col">
-              <span className="text-body text-text-primary lg:text-h3">Instagram</span>
-              <span className="text-caption text-text-secondary">Próximamente</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-secondary lg:h-10 lg:w-10">
-              <Briefcase size={18} strokeWidth={1.5} className="text-accent" />
-            </span>
-            <div className="flex flex-col">
-              <span className="text-body text-text-primary lg:text-h3">LinkedIn</span>
-              <span className="text-caption text-text-secondary">Próximamente</span>
-            </div>
-          </div>
         </div>
       </section>
     </div>

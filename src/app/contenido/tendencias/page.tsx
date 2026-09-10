@@ -10,7 +10,8 @@ export default function TendenciasPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-h1">Tendencias</h1>
         <p className="text-small text-text-secondary">
-          Vídeos en tendencia de tu misma categoría en YouTube, para inspirarte.
+          Vídeos en tendencia de tu misma categoría en YouTube, para inspirarte
+          — requiere YouTube conectado.
         </p>
       </div>
 

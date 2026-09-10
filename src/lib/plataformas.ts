@@ -1,6 +1,6 @@
-import { Briefcase, Camera, Clapperboard, Music, type LucideIcon } from "lucide-react";
+import { Clapperboard, Music, type LucideIcon } from "lucide-react";
 
-export const PLATAFORMAS = ["tiktok", "instagram", "linkedin", "youtube"] as const;
+export const PLATAFORMAS = ["tiktok", "youtube"] as const;
 export type Plataforma = (typeof PLATAFORMAS)[number];
 
 export function isPlataforma(value: string): value is Plataforma {
@@ -9,15 +9,11 @@ export function isPlataforma(value: string): value is Plataforma {
 
 export const PLATAFORMA_LABEL: Record<Plataforma, string> = {
   tiktok: "TikTok",
-  instagram: "Instagram",
-  linkedin: "LinkedIn",
   youtube: "YouTube",
 };
 
 export const PLATAFORMA_ICON: Record<Plataforma, LucideIcon> = {
   tiktok: Music,
-  instagram: Camera,
-  linkedin: Briefcase,
   youtube: Clapperboard,
 };
 
@@ -42,8 +38,16 @@ export function getMondayISO(date: Date) {
   const day = date.getDay(); // 0 = domingo
   const diff = day === 0 ? -6 : 1 - day;
   // Usar el constructor local (no UTC) evita que un desfase horario cambie el día.
-  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate() + diff);
-  return formatISO(monday.getFullYear(), monday.getMonth() + 1, monday.getDate());
+  const monday = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + diff,
+  );
+  return formatISO(
+    monday.getFullYear(),
+    monday.getMonth() + 1,
+    monday.getDate(),
+  );
 }
 
 /** Fecha (YYYY-MM-DD) de hoy, en hora local. */

@@ -9,7 +9,18 @@ const PASO = 280;
  *  estilo Instagram en vez de depender de la barra de scroll nativa (que
  *  `.scrollbar-none` oculta) — el swipe táctil en móvil sigue funcionando
  *  igual, las flechas son solo para ratón (`lg:`). */
-export function CarruselFlechas({ children }: { children: ReactNode }) {
+export function CarruselFlechas({
+  children,
+  bleedLg = true,
+}: {
+  children: ReactNode;
+  /** Sangrado hasta el borde del contenedor en escritorio (`lg:-mx-8`) —
+   *  pensado para cuando el carrusel ocupa todo el ancho de la página.
+   *  Desactívalo (`false`) cuando vive dentro de una columna estrecha (p.
+   *  ej. la barra lateral de Control), donde ese margen negativo se saldría
+   *  de su columna y se solaparía con la de al lado. */
+  bleedLg?: boolean;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [puedeIzq, setPuedeIzq] = useState(false);
   const [puedeDer, setPuedeDer] = useState(false);
@@ -34,7 +45,7 @@ export function CarruselFlechas({ children }: { children: ReactNode }) {
       <div
         ref={scrollRef}
         onScroll={actualizar}
-        className="scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 lg:-mx-8 lg:px-8"
+        className={`scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 ${bleedLg ? "lg:-mx-8 lg:px-8" : ""}`}
       >
         {children}
       </div>

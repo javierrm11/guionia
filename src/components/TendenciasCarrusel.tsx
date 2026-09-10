@@ -7,8 +7,17 @@ import { obtenerVideosParaTi } from "@/lib/youtube/videosParaTi";
 
 const LIMITE = 10;
 
-/** Tira horizontal de vídeos parecidos a los tuyos, en el dashboard de Control — nada si no hay nada que mostrar. */
-export async function TendenciasCarrusel() {
+/** Tira horizontal de vídeos parecidos a los tuyos, en el dashboard de
+ *  Control. Sin YouTube conectado muestra un CTA para conectarlo en vez de
+ *  desaparecer sin más (antes no salía nada); solo se oculta del todo si el
+ *  chart viene vacío o falla la llamada. `enSidebar` la adapta a la barra
+ *  lateral de escritorio (sin sangrado hasta el borde, que ahí se solaparía
+ *  con la columna principal). */
+export async function TendenciasCarrusel({
+  enSidebar = false,
+}: {
+  enSidebar?: boolean;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -21,20 +30,18 @@ export async function TendenciasCarrusel() {
   } catch {
     return null;
   }
-  if (!resultado || resultado.videos.length === 0) return null;
+  if (resultado && resultado.videos.length === 0) return null;
 
-  const videos = resultado.videos.slice(0, LIMITE);
-
-  return (
-    <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
-      <div className="flex items-center justify-between">
-        <span
-          className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
-          style={{ letterSpacing: "0.06em" }}
-        >
-          <TrendingUp size={14} strokeWidth={1.5} className="lg:h-4 lg:w-4" />
-          Tendencias
-        </span>
+  const cabecera = (
+    <div className="flex items-center justify-between">
+      <span
+        className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
+        style={{ letterSpacing: "0.06em" }}
+      >
+        <TrendingUp size={14} strokeWidth={1.5} className="lg:h-4 lg:w-4" />
+        Tendencias
+      </span>
+      {resultado && (
         <Link
           href="/contenido/tendencias"
           className="flex items-center gap-0.5 text-caption text-text-secondary"
@@ -42,16 +49,43 @@ export async function TendenciasCarrusel() {
           Ver todas
           <ChevronRight size={14} strokeWidth={2} />
         </Link>
-      </div>
+      )}
+    </div>
+  );
 
-      <CarruselFlechas>
+  if (!resultado) {
+    return (
+      <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
+        {cabecera}
+        <div className="flex flex-col items-start gap-4 rounded-md border border-border p-6 lg:p-8">
+          <p className="text-small text-text-secondary">
+            Conecta YouTube para ver vídeos parecidos a los tuyos.
+          </p>
+          <a
+            href="/api/youtube/conectar"
+            className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover"
+          >
+            Conectar YouTube
+          </a>
+        </div>
+      </section>
+    );
+  }
+
+  const videos = resultado.videos.slice(0, LIMITE);
+
+  return (
+    <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
+      {cabecera}
+
+      <CarruselFlechas bleedLg={!enSidebar}>
         {videos.map((v) => (
           <a
             key={v.videoId}
             href={`https://www.youtube.com/watch?v=${v.videoId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg transition-[transform,box-shadow] duration-200 lg:h-48 lg:w-36 lg:hover:-translate-y-0.5 lg:hover:shadow-lg"
+            className={`relative flex h-40 w-32 shrink-0 flex-col justify-end overflow-hidden rounded-md bg-neutral-bg transition-[transform,box-shadow] duration-200 lg:hover:-translate-y-0.5 lg:hover:shadow-lg ${enSidebar ? "" : "lg:h-48 lg:w-36"}`}
           >
             {v.miniatura && (
               <Image

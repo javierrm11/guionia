@@ -190,7 +190,7 @@ export default async function GuionPage({
         </>
       )}
 
-      {textoCompleto && (
+      {textoCompleto && plataforma !== "youtube" && (
         <div className="flex flex-col gap-2 rounded-md border border-border p-4 lg:gap-3 lg:p-5">
           <h2 className="text-h2 lg:text-h1">Publicación</h2>
           <p className="text-small text-text-secondary">

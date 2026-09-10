@@ -819,3 +819,39 @@ export async function obtenerRetencionVideo(
 
   return puntos.sort((a, b) => a.elapsedRatio - b.elapsedRatio);
 }
+
+/**
+ * Fecha/hora real de publicación (`snippet.publishedAt`, con hora real, a
+ * diferencia de `piezas_contenido.fecha_publicacion` que solo guarda el
+ * día) de una lista de vídeos — vale para cualquier vídeo del canal,
+ * independientemente de cómo se haya publicado (subida desde la propia app
+ * o pegando la URL a mano). En bloques de 50 ids, el máximo que admite la
+ * API por llamada.
+ */
+export async function obtenerFechasPublicacionVideos(
+  videoIds: string[],
+  accessToken: string,
+): Promise<Map<string, string>> {
+  const resultado = new Map<string, string>();
+
+  for (let i = 0; i < videoIds.length; i += 50) {
+    const bloque = videoIds.slice(i, i + 50);
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${bloque.join(",")}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        `No se pudieron leer las fechas de publicación (${res.status})`,
+      );
+    }
+
+    const data = await res.json();
+    for (const item of data.items ?? []) {
+      resultado.set(item.id, item.snippet.publishedAt);
+    }
+  }
+
+  return resultado;
+}

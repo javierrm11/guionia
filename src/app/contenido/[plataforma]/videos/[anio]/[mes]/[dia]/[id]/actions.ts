@@ -55,6 +55,7 @@ type EscenaOriginal = {
   tipo_escena: string;
   duracion_segundos: number | null;
   texto: string | null;
+  frase_origen_id: string | null;
 };
 
 /** Crea un guion nuevo en otra plataforma a partir de uno ya escrito —
@@ -116,6 +117,7 @@ export async function adaptarAOtraPlataforma(formData: FormData) {
         tipo_escena: e.tipo_escena,
         duracion_segundos: e.duracion_segundos,
         texto: e.texto,
+        frase_origen_id: e.frase_origen_id,
       })),
     );
     if (escenasError) throw new Error(escenasError.message);

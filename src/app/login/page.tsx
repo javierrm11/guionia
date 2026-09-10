@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; cuenta_eliminada?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, cuenta_eliminada } = await searchParams;
 
   return (
     <AuthShell foto="/fotos/foto1.jpg">
@@ -28,6 +28,12 @@ export default async function LoginPage({
           Entra con tu email para seguir con tu contenido.
         </p>
       </div>
+
+      {cuenta_eliminada && (
+        <p className="rounded-md bg-success-bg p-3 text-center text-small text-success">
+          Tu cuenta se ha eliminado correctamente.
+        </p>
+      )}
 
       <form action={loginAction} className="flex flex-col gap-3">
         <label className="flex flex-col gap-1">
@@ -44,7 +50,9 @@ export default async function LoginPage({
               required
               autoFocus
               placeholder="tú@email.com"
-              style={{ "--input-bg": "var(--neutral-bg)" } as React.CSSProperties}
+              style={
+                { "--input-bg": "var(--neutral-bg)" } as React.CSSProperties
+              }
               className="w-full rounded-full border-0 py-3 pr-4 pl-10 text-body focus:ring-2 focus:ring-accent-bg focus:outline-none"
             />
           </div>
@@ -52,7 +60,10 @@ export default async function LoginPage({
 
         <PasswordInput name="password" />
 
-        <Link href="/olvide-password" className="self-end text-caption text-accent">
+        <Link
+          href="/olvide-password"
+          className="self-end text-caption text-accent"
+        >
           ¿Olvidaste tu contraseña?
         </Link>
 
@@ -78,7 +89,10 @@ export default async function LoginPage({
 
       <p className="text-center text-small text-text-secondary">
         ¿No tienes cuenta?{" "}
-        <Link href="/registro" className="font-medium text-accent hover:underline">
+        <Link
+          href="/registro"
+          className="font-medium text-accent hover:underline"
+        >
           Regístrate
         </Link>
       </p>

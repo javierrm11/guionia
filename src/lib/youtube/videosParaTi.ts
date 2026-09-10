@@ -17,6 +17,28 @@ import {
 const CATEGORIA_MUSICA = "10";
 const LIMITE_TENDENCIA = 20;
 
+/** Nombres de las categorías de YouTube (`videoCategories.list`) más
+ *  comunes en el chart de tendencias de España — solo para mostrar al
+ *  usuario por qué le salen estos vídeos ("tu categoría: Educación"), no
+ *  hace falta la lista completa de las ~30 que existen. */
+const CATEGORIA_LABEL: Record<string, string> = {
+  "1": "Cine y animación",
+  "2": "Autos y vehículos",
+  "10": "Música",
+  "15": "Mascotas y animales",
+  "17": "Deportes",
+  "19": "Viajes y eventos",
+  "20": "Videojuegos",
+  "22": "Blogs",
+  "23": "Comedia",
+  "24": "Entretenimiento",
+  "25": "Noticias y política",
+  "26": "Estilo de vida",
+  "27": "Educación",
+  "28": "Ciencia y tecnología",
+  "29": "Activismo y ONG",
+};
+
 /**
  * Vídeos en tendencia de tu misma categoría de YouTube (Educación, Howto &
  * Style...) — lógica compartida entre `/contenido/tendencias` (lista
@@ -25,7 +47,7 @@ const LIMITE_TENDENCIA = 20;
 export async function obtenerVideosParaTi(
   supabase: SupabaseClient,
   userId: string,
-): Promise<{ videos: VideoTendencia[] } | null> {
+): Promise<{ videos: VideoTendencia[]; categoriaLabel: string | null } | null> {
   const accessToken = await obtenerAccessTokenValido(supabase, userId);
   if (!accessToken) return null;
 
@@ -71,11 +93,23 @@ export async function obtenerVideosParaTi(
     // Sin canal propio identificable: seguimos mostrando los resultados tal cual.
   }
 
+  const { data: ocultos } = await supabase
+    .from("tendencias_ocultas")
+    .select("video_id")
+    .eq("user_id", userId);
+  if (ocultos && ocultos.length > 0) {
+    const idsOcultos = new Set(ocultos.map((o) => o.video_id as string));
+    videos = videos.filter((v) => !idsOcultos.has(v.videoId));
+  }
+
   if (palabrasClave.size > 0) {
     videos = ordenarPorAfinidad(videos, palabrasClave);
   }
 
-  return { videos };
+  return {
+    videos,
+    categoriaLabel: categoryId ? (CATEGORIA_LABEL[categoryId] ?? null) : null,
+  };
 }
 
 /** Reordena (sin descartar ninguno — el chart ya es una lista corta y con
