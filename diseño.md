@@ -44,6 +44,17 @@ Usado en las badges de estado que aparecen en Contenido (idea/guion/grabado/publ
 | `neutral` | `#6B7280` | `#F3F4F6` | Idea, Pendiente |
 | `danger` | `#DC2626` | `#FEF2F2` | Descartada, Cancelado |
 
+### 2.4 Superficies de color (Control y Plataformas)
+
+`/contenido` y `/contenido/plataformas` son la única excepción al fondo de
+página blanco liso: fondo `surface-tint` (wash muy suave del acento) y
+tarjetas con superficie de color propia (acento/IA/éxito para tiles y
+paneles, el tono de marca de cada plataforma en sus tarjetas de Plataformas)
+en vez de blanco — pensado para dar más lenguaje visual de "app" a las dos
+pantallas que más se usan a diario. Valores exactos y tokens (`--surface-tint`,
+`--ai-bg`, `--brand-youtube-bg`) en `CLAUDE.md`, que es la referencia viva de
+colores — los hex de esta sección son el criterio original, no siempre al día.
+
 ## 3. Tipografía
 
 - **Familia**: Inter (sans geométrica), con fallback `-apple-system, "Segoe UI", sans-serif`.

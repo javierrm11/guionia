@@ -61,7 +61,7 @@ function TarjetaIdea({ idea, primera }: { idea: Idea; primera: boolean }) {
       href={`/contenido/${idea.plataforma}/ideas/${idea.id}`}
       className={`flex flex-col gap-3 py-3.5 hover:opacity-70 ${primera ? "" : "border-t border-border"} ${
         descartada ? "opacity-70 hover:opacity-100" : ""
-      } ${olvidada ? "-mx-3 rounded-md border border-warning/40 bg-warning-bg px-3" : ""}`}
+      } ${olvidada ? "-mx-4 rounded-md border border-warning/40 bg-warning-bg px-4" : ""}`}
     >
       <div className="flex items-start gap-3 lg:gap-3.5">
         <span
@@ -204,7 +204,7 @@ export default async function IdeasGlobalPage({
     filtros.length === 1 ? filtros[0] : plataformasActivas[0];
 
   return (
-    <div className="flex flex-1 flex-col gap-5 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+    <div className="flex flex-1 flex-col gap-5 bg-surface-tint p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <div className="flex items-end justify-between gap-3 px-1">
         <p className="text-caption text-text-secondary lg:text-body">
           {activas.length} {activas.length === 1 ? "guardada" : "guardadas"}
@@ -349,7 +349,7 @@ export default async function IdeasGlobalPage({
               {activas.length}
             </span>
           </div>
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+          <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
             {activasOrdenadas.map((idea, index) => (
               <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}
@@ -370,7 +370,7 @@ export default async function IdeasGlobalPage({
               {descartadas.length}
             </span>
           </div>
-          <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+          <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-4.5">
             {descartadas.map((idea, index) => (
               <TarjetaIdea key={idea.id} idea={idea} primera={index === 0} />
             ))}

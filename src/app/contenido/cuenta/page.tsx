@@ -7,7 +7,6 @@ import { CuentaSection } from "@/components/CuentaSection";
 import { CuentaTiktokSection } from "@/components/CuentaTiktokSection";
 import { CuentaUnificadaSection } from "@/components/CuentaUnificadaSection";
 import { SelectorRango } from "@/components/SelectorRango";
-import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_ICON, PLATAFORMA_LABEL } from "@/lib/plataformas";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { createClient } from "@/lib/supabase/server";
@@ -69,12 +68,8 @@ export default async function CuentaPage({
     cuenta === "todas" ? "var(--accent)" : PLATAFORMA_TONO[cuenta];
 
   return (
-    <div className="relative flex flex-1 flex-col">
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-0">
-        <OndaCadencia porcentaje={0} alturaFija={255} color="var(--accent)" />
-      </div>
-
-      <div className="relative z-10 flex flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:p-8">
+    <div className="flex flex-1 flex-col bg-surface-tint">
+      <div className="rounded-b-[32px] bg-accent p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:rounded-b-[40px] lg:p-8">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-h1 text-white">Cuenta</h1>
           <Link
@@ -86,7 +81,7 @@ export default async function CuentaPage({
           </Link>
         </div>
 
-        <div className="flex flex-col items-center gap-1.5 pt-4 pb-4 lg:gap-2">
+        <div className="flex flex-col items-center gap-1.5 pt-4 pb-2 lg:gap-2">
           <span className="animate-escala-entrada relative flex h-20 w-20 shrink-0 items-center justify-center lg:h-24 lg:w-24">
             <span
               className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full lg:h-24 lg:w-24"
@@ -126,8 +121,10 @@ export default async function CuentaPage({
                 : "YouTube + TikTok combinados"}
           </span>
         </div>
+      </div>
 
-        <div className="-mb-4 flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-5 lg:p-8">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=todas`}
@@ -149,7 +146,9 @@ export default async function CuentaPage({
               }`}
             >
               <PLATAFORMA_ICON.youtube size={14} strokeWidth={1.5} />
-              {PLATAFORMA_LABEL.youtube}
+              <span className="hidden sm:inline">
+                {PLATAFORMA_LABEL.youtube}
+              </span>
             </Link>
             <Link
               href={`/contenido/cuenta?rango=${rango}&cuenta=tiktok`}
@@ -160,15 +159,15 @@ export default async function CuentaPage({
               }`}
             >
               <PLATAFORMA_ICON.tiktok size={14} strokeWidth={1.5} />
-              {PLATAFORMA_LABEL.tiktok}
+              <span className="hidden sm:inline">
+                {PLATAFORMA_LABEL.tiktok}
+              </span>
             </Link>
           </div>
 
           <SelectorRango rango={rango} />
         </div>
-      </div>
 
-      <div className="relative z-10 flex flex-col gap-2 px-4 lg:mx-auto lg:w-full lg:max-w-3xl lg:gap-3 lg:px-8">
         <Suspense key={`${cuenta}-${rango}`} fallback={<CuentaLoader />}>
           {cuenta === "youtube" ? (
             <CuentaSection rango={rango} />

@@ -136,10 +136,16 @@ export default async function CalendarioPage({
     (_, i) => {
       const dia = i + 1;
       const piezas = porDia.get(dia) ?? [];
+      const fecha = `${anio}-${pad2(mes)}-${pad2(dia)}`;
       return {
         dia,
-        fecha: `${anio}-${pad2(mes)}-${pad2(dia)}`,
-        href: `${rutaActual}/${pad2(dia)}`,
+        fecha,
+        // Sin nada ese día, ir directo a crear un vídeo en vez de al detalle
+        // del día (que solo mostraría una lista vacía).
+        href:
+          piezas.length === 0
+            ? `${rutaBase}/nueva?fecha=${fecha}`
+            : `${rutaActual}/${pad2(dia)}`,
         piezas,
         riesgo: esRiesgo(dia, piezas),
         esHoy: esHoy(dia),
@@ -167,23 +173,6 @@ export default async function CalendarioPage({
         >
           <ChevronRight size={20} strokeWidth={1.5} />
         </Link>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Link
-          href={`${rutaBase}/nueva?fecha=${inicioMes}`}
-          className="rounded-sm bg-accent px-4 py-2 text-body text-white active:bg-accent-hover lg:px-5 lg:py-2.5"
-        >
-          + Nuevo vídeo
-        </Link>
-        {!esMesActual && (
-          <Link
-            href={rutaBase}
-            className="text-caption text-accent lg:text-body"
-          >
-            Hoy
-          </Link>
-        )}
       </div>
 
       <CalendarioMensualGrid

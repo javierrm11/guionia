@@ -31,6 +31,19 @@
      (morado vs. azul) para que un botón de IA y uno normal no se confundan. */
   --ai: #2f6fed;
   --ai-hover: #1f57c9;
+  --ai-bg: rgba(47, 111, 237, 0.12);
+
+  /* Color — superficies tintadas de Control (/contenido) y Plataformas
+     (/contenido/plataformas): esas dos pantallas son la única excepción al
+     "todo blanco/hairline" del resto de la app (ver Tarjeta en CLAUDE.md) —
+     un wash muy suave de fondo (`--surface-tint`, la mitad de saturado que
+     `--accent-bg`) para que las superficies de color de las tarjetas se
+     sigan leyendo por encima, en vez de perderse contra un blanco liso. */
+  --surface-tint: rgba(108, 92, 224, 0.05);
+  /* Tinte de marca de YouTube — mismo criterio que `--accent-bg`, pero sobre
+     el rojo de `PLATAFORMA_TONO.youtube` (#ff3b30) en vez del acento; TikTok
+     no necesita uno propio, reutiliza `--neutral-bg`. */
+  --brand-youtube-bg: #fdeceb;
 
   /* Color — semántico. Sobre fondo blanco, tonos saturados y oscurecidos lo
      justo para pasar 4.5:1 como texto plano (a diferencia del cristal
@@ -79,6 +92,10 @@
 
   --ai: #5b8dff;
   --ai-hover: #7ba3ff;
+  --ai-bg: rgba(91, 141, 255, 0.16);
+
+  --surface-tint: rgba(139, 124, 246, 0.08);
+  --brand-youtube-bg: rgba(255, 59, 48, 0.14);
 
   --success: #34d399;
   --success-bg: rgba(52, 211, 153, 0.14);
@@ -110,6 +127,9 @@
 
   --color-ai: var(--ai);
   --color-ai-hover: var(--ai-hover);
+  --color-ai-bg: var(--ai-bg);
+
+  --color-surface-tint: var(--surface-tint);
 
   --color-success: var(--success);
   --color-success-bg: var(--success-bg);

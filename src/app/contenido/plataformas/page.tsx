@@ -3,7 +3,10 @@ import { Check, ChevronRight, Lightbulb } from "lucide-react";
 import { CalendarioPlataformas } from "@/components/CalendarioPlataformas";
 import { CalendarioSemanaTransicion } from "@/components/CalendarioSemanaTransicion";
 import { BarraProgresoCadencia } from "@/components/BarraProgresoCadencia";
-import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
+import {
+  PLATAFORMA_TONO,
+  PLATAFORMA_TONO_BG,
+} from "@/components/PlataformaTile";
 import { createClient } from "@/lib/supabase/server";
 import {
   PLATAFORMA_ICON,
@@ -108,7 +111,7 @@ export default async function PlataformasPage({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
+    <div className="flex flex-1 flex-col gap-4 bg-surface-tint p-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:p-8">
       <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
         <Link
           href="/contenido/plataformas"
@@ -166,9 +169,10 @@ export default async function PlataformasPage({
               return (
                 <section
                   key={plataforma}
-                  className={`flex flex-col gap-3.5 rounded-md bg-bg-primary p-4 lg:gap-4 lg:p-5 ${
+                  className={`flex flex-col gap-3.5 rounded-md p-4 shadow-sm lg:gap-4 lg:p-5 ${
                     completa ? "border border-success" : ""
                   }`}
+                  style={{ backgroundColor: PLATAFORMA_TONO_BG[plataforma] }}
                 >
                   <Link
                     href={`/contenido/${plataforma}/videos`}

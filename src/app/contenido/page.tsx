@@ -14,7 +14,6 @@ import {
 import { AvisoRachaEnRiesgo } from "@/components/AvisoRachaEnRiesgo";
 import { BarraCadencia } from "@/components/BarraCadencia";
 import { CapturaIdeaInline } from "@/components/CapturaIdeaInline";
-import { OndaCadencia } from "@/components/OndaCadencia";
 import { PLATAFORMA_TONO } from "@/components/PlataformaTile";
 import { PlataformasActivasForm } from "@/components/PlataformasActivasForm";
 import { CapturaFlotante } from "@/components/CapturaFlotante";
@@ -135,52 +134,54 @@ export default async function ContenidoPage() {
   const quedanPocasHoras = new Date().getHours() >= 20;
 
   return (
-    <div className="relative flex flex-1 flex-col">
-      <div
-        className="pointer-events-none absolute inset-x-0 z-0 lg:origin-top lg:scale-y-110"
-        style={{ top: -56 }}
-      >
-        <OndaCadencia porcentaje={porcentajeCadencia} color="var(--accent)" />
-      </div>
-
+    <div className="relative flex flex-1 flex-col bg-surface-tint">
       <div className="relative z-10 flex flex-1 flex-col p-4 pt-4 lg:mx-auto lg:w-full lg:max-w-6xl lg:p-8">
-        {hayCadencia ? (
-          <section
-            data-tour="cadencia"
-            className="flex flex-col items-center gap-1 pb-4 lg:gap-2 lg:pb-6"
-          >
-            <Link
-              href="/contenido/plataformas?vista=calendario"
-              className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white lg:mb-2 lg:gap-2 lg:px-4 lg:py-1.5 lg:text-body ${
-                racha >= 1 ? "animate-racha-brillo" : ""
-              }`}
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #FFD23F, #FF6B35 55%, #E8393B)",
-                boxShadow: "0 4px 12px rgba(232,57,59,0.35)",
-              }}
-            >
-              <Flame
-                size={14}
-                strokeWidth={0}
-                fill="#FFFFFF"
-                className="lg:h-4 lg:w-4"
-              />
-              {racha} {racha === 1 ? "semana seguida" : "semanas seguidas"}
-            </Link>
-            <BarraCadencia porcentaje={porcentajeCadencia} />
-            <span className="text-caption text-white/80 lg:text-body">
-              de la cadencia semanal
-            </span>
-          </section>
-        ) : (
-          <>
-            <p className="pt-2 pb-6 text-center font-display text-3xl leading-tight font-semibold text-white lg:pt-4 lg:pb-8 lg:text-5xl">
+        {/* Cabecera plana de color, en vez de la onda: se solapa con la
+           `TopBar` (transparente aquí) tirando de ella hacia arriba con un
+           margen negativo igual a su alto (56px) — mismo efecto visual que
+           antes, sin el SVG ni el cálculo de altura por % de cadencia. */}
+        <div
+          className="-mx-4 -mt-[72px] rounded-b-[32px] bg-accent px-4 pt-[72px] pb-6 lg:-mx-8 lg:-mt-[88px] lg:rounded-b-[40px] lg:px-8 lg:pt-[88px] lg:pb-8"
+          data-tour="cadencia"
+        >
+          {hayCadencia ? (
+            <section className="flex flex-col items-center gap-1 lg:gap-2">
+              <Link
+                href="/contenido/plataformas?vista=calendario"
+                className={`mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold text-white lg:mb-2 lg:gap-2 lg:px-4 lg:py-1.5 lg:text-body ${
+                  racha >= 1 ? "animate-racha-brillo" : ""
+                }`}
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #FFD23F, #FF6B35 55%, #E8393B)",
+                  boxShadow: "0 4px 12px rgba(232,57,59,0.35)",
+                }}
+              >
+                <Flame
+                  size={14}
+                  strokeWidth={0}
+                  fill="#FFFFFF"
+                  className="lg:h-4 lg:w-4"
+                />
+                {racha} {racha === 1 ? "semana seguida" : "semanas seguidas"}
+              </Link>
+              <BarraCadencia porcentaje={porcentajeCadencia} />
+              <span className="text-caption text-white/80 lg:text-body">
+                de la cadencia semanal
+              </span>
+            </section>
+          ) : (
+            <p className="text-center font-display text-3xl leading-tight font-semibold text-white lg:text-5xl">
               Bienvenido a Guionia
             </p>
+          )}
+        </div>
+
+        {!hayCadencia && (
+          <>
             <Link
               href="/configuracion/cadencia"
-              className="mb-6 flex items-center gap-3.5 rounded-md border border-border bg-bg-primary p-4 lg:gap-4 lg:p-5"
+              className="mt-6 mb-6 flex items-center gap-3.5 rounded-md border border-border bg-bg-primary p-4 lg:gap-4 lg:p-5"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-accent-bg lg:h-10 lg:w-10">
                 <Target
@@ -212,19 +213,19 @@ export default async function ContenidoPage() {
                 href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
                 label="Nuevo vídeo"
                 icon={Video}
-                fondo
+                tono="ai"
               />
               <Tile
                 href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
                 label="Nueva idea"
                 icon={Lightbulb}
-                fondo
+                tono="accent"
               />
               <Tile
                 href="/configuracion/plataformas"
                 label="Conectar cuentas"
                 icon={Link2}
-                fondo
+                tono="success"
               />
             </div>
           </>
@@ -246,10 +247,10 @@ export default async function ContenidoPage() {
                     <Link
                       href={tareaHero.href}
                       data-tour="hero"
-                      className={`animate-tarjeta-entrada flex items-center gap-3.5 rounded-md p-5 hover:bg-neutral-bg active:bg-neutral-bg lg:gap-4 lg:p-6 ${
+                      className={`animate-tarjeta-entrada flex items-center gap-3.5 rounded-md p-5 shadow-md transition-opacity duration-150 hover:opacity-80 lg:gap-4 lg:p-6 ${
                         quedanPocasHoras
                           ? "border-l-4 border-warning bg-warning-bg"
-                          : "bg-bg-primary"
+                          : "bg-accent-bg"
                       }`}
                     >
                       <span
@@ -299,50 +300,52 @@ export default async function ContenidoPage() {
                       </span>
                     </div>
 
-                    {tareasVisibles.map((t, index) => {
-                      const Icon = t.plataforma
-                        ? PLATAFORMA_ICON[t.plataforma]
-                        : Plus;
-                      const tono = t.plataforma
-                        ? PLATAFORMA_TONO[t.plataforma]
-                        : "var(--neutral)";
+                    <div className="rounded-md bg-bg-primary px-4 shadow-sm lg:px-4.5">
+                      {tareasVisibles.map((t, index) => {
+                        const Icon = t.plataforma
+                          ? PLATAFORMA_ICON[t.plataforma]
+                          : Plus;
+                        const tono = t.plataforma
+                          ? PLATAFORMA_TONO[t.plataforma]
+                          : "var(--neutral)";
 
-                      return (
-                        <Link
-                          key={t.id}
-                          href={t.href}
-                          className={`flex items-center gap-3 py-3 opacity-70 transition-opacity duration-150 hover:opacity-100 lg:gap-3.5 lg:py-3.5 ${
-                            index > 0 ? "border-t border-border" : ""
-                          }`}
-                        >
-                          <span
-                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
-                            style={{ backgroundColor: tono }}
+                        return (
+                          <Link
+                            key={t.id}
+                            href={t.href}
+                            className={`flex items-center gap-3 py-3 opacity-70 transition-opacity duration-150 hover:opacity-100 lg:gap-3.5 lg:py-3.5 ${
+                              index > 0 ? "border-t border-border" : ""
+                            }`}
                           >
-                            <Icon
-                              size={16}
-                              strokeWidth={1.5}
-                              className="text-white lg:h-[18px] lg:w-[18px]"
-                            />
-                          </span>
-                          <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
-                            {t.titulo}
-                            {t.plataforma &&
-                              ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
-                          </span>
-                        </Link>
-                      );
-                    })}
+                            <span
+                              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm lg:h-10 lg:w-10"
+                              style={{ backgroundColor: tono }}
+                            >
+                              <Icon
+                                size={16}
+                                strokeWidth={1.5}
+                                className="text-white lg:h-[18px] lg:w-[18px]"
+                              />
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-body lg:text-h3">
+                              {t.titulo}
+                              {t.plataforma &&
+                                ` · ${PLATAFORMA_LABEL[t.plataforma]}`}
+                            </span>
+                          </Link>
+                        );
+                      })}
 
-                    {tareasOcultas > 0 && (
-                      <Link
-                        href="/contenido/plataformas?vista=calendario"
-                        className="flex items-center gap-1 border-t border-border py-3 text-caption text-text-secondary lg:py-3.5 lg:text-body"
-                      >
-                        +{tareasOcultas} más hoy
-                        <ChevronRight size={14} strokeWidth={2} />
-                      </Link>
-                    )}
+                      {tareasOcultas > 0 && (
+                        <Link
+                          href="/contenido/plataformas?vista=calendario"
+                          className="flex items-center gap-1 border-t border-border py-3 text-caption text-text-secondary lg:py-3.5 lg:text-body"
+                        >
+                          +{tareasOcultas} más hoy
+                          <ChevronRight size={14} strokeWidth={2} />
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 )}
               </section>
@@ -377,16 +380,19 @@ export default async function ContenidoPage() {
                   href={`/contenido/${plataformasActivas[0]}/ideas/nueva`}
                   label="Nueva idea"
                   icon={Lightbulb}
+                  tono="accent"
                 />
                 <Tile
                   href={`/contenido/${plataformasActivas[0]}/videos/nueva`}
                   label="Nuevo vídeo"
                   icon={Video}
+                  tono="ai"
                 />
                 <Tile
                   href="/contenido/plataformas?vista=calendario"
                   label="Calendario"
                   icon={CalendarDays}
+                  tono="success"
                 />
               </div>
             )}
@@ -398,7 +404,7 @@ export default async function ContenidoPage() {
 
           <aside className="pt-8 lg:sticky lg:top-8 lg:col-span-1 lg:ml-8 lg:pt-24">
             {ultimasIdeas.length > 0 && (
-              <section className="flex flex-col gap-3 lg:gap-4">
+              <section className="flex flex-col gap-3 rounded-md bg-ai-bg p-4 lg:gap-4 lg:p-5">
                 <div className="flex items-center justify-between gap-2">
                   <span
                     className="flex items-center gap-1.5 text-caption font-display text-text-secondary uppercase lg:text-body"
