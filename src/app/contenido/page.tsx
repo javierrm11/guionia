@@ -184,7 +184,7 @@ export default async function ContenidoPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col lg:mx-auto lg:w-full lg:px-10">
+      <div className="flex flex-1 flex-col px-4 pb-8 lg:mx-auto lg:w-full lg:px-10 lg:pb-12">
         {!hayCadencia && (
           <>
             <Link
@@ -406,7 +406,7 @@ export default async function ContenidoPage() {
             )}
 
             <Suspense fallback={<TendenciasCarruselSkeleton />}>
-              <TendenciasCarrusel />
+              <TendenciasCarrusel sangrado={false} />
             </Suspense>
           </div>
 

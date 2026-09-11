@@ -112,7 +112,7 @@ export default async function PlataformasPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-1 flex-col gap-4 lg:mx-auto lg:w-full lg:max-w-4xl">
+      <div className="flex flex-1 flex-col gap-4 px-4 pb-8 lg:mx-auto lg:w-full lg:max-w-4xl lg:px-10 lg:pb-12">
         <div className="inline-flex w-fit items-center gap-1 rounded-full bg-bg-primary p-1 shadow-md lg:p-1.5">
           <Link
             href="/contenido/plataformas"

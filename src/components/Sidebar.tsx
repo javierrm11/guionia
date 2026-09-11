@@ -30,10 +30,6 @@ export function Sidebar() {
           <span className="hidden text-h2 lg:inline">Guionia</span>
         </div>
 
-        <div className="mb-2">
-          <NuevoGuionFab variant="sidebar" />
-        </div>
-
         <nav className="flex flex-1 flex-col gap-1">
           {ITEMS_NAV.map(({ href, label, icon: Icon, prefijo }) => {
             const esActivo = esRutaActiva(pathname, prefijo);
@@ -66,6 +62,10 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        <div className="mb-1">
+          <NuevoGuionFab variant="sidebar" />
+        </div>
 
         <div className="mt-1 border-t border-border pt-1">
           <Link

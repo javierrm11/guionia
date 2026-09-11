@@ -12,6 +12,7 @@ const PASO = 280;
 export function CarruselFlechas({
   children,
   bleedLg = true,
+  bleed = true,
 }: {
   children: ReactNode;
   /** Sangrado hasta el borde del contenedor en escritorio (`lg:-mx-8`) —
@@ -20,6 +21,10 @@ export function CarruselFlechas({
    *  ej. la barra lateral de Control), donde ese margen negativo se saldría
    *  de su columna y se solaparía con la de al lado. */
   bleedLg?: boolean;
+  /** Sangrado hasta el borde también en móvil/tablet (`-mx-4`) — desactívalo
+   *  (`false`) para que las tarjetas respeten el mismo margen lateral que el
+   *  resto del contenido en vez de llegar hasta el borde de la pantalla. */
+  bleed?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [puedeIzq, setPuedeIzq] = useState(false);
@@ -45,7 +50,9 @@ export function CarruselFlechas({
       <div
         ref={scrollRef}
         onScroll={actualizar}
-        className={`scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 ${bleedLg ? "lg:-mx-8 lg:px-8" : ""}`}
+        className={`scrollbar-none flex gap-3 overflow-x-auto pb-1 ${
+          bleed ? "-mx-4 px-4" : ""
+        } ${bleed && bleedLg ? "lg:-mx-8 lg:px-8" : ""}`}
       >
         {children}
       </div>

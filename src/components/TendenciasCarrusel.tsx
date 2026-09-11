@@ -15,8 +15,13 @@ const LIMITE = 10;
  *  con la columna principal). */
 export async function TendenciasCarrusel({
   enSidebar = false,
+  sangrado = true,
 }: {
   enSidebar?: boolean;
+  /** Sangrado hasta el borde de la tira de vídeos (ver `CarruselFlechas`) —
+   *  desactívalo (`false`) para que las tarjetas respeten el mismo margen
+   *  lateral que el resto del contenido en vez de llegar hasta el borde. */
+  sangrado?: boolean;
 }) {
   const supabase = await createClient();
   const {
@@ -78,7 +83,7 @@ export async function TendenciasCarrusel({
     <section className="flex flex-col gap-3 border-b border-border pt-8 pb-6 lg:gap-4 lg:pt-10 lg:pb-8">
       {cabecera}
 
-      <CarruselFlechas bleedLg={!enSidebar}>
+      <CarruselFlechas bleedLg={!enSidebar} bleed={sangrado}>
         {videos.map((v) => (
           <a
             key={v.videoId}

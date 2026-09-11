@@ -59,7 +59,7 @@ export function NuevoGuionFab({
           onClick={() => setAbierto(true)}
           aria-label="Crear guion"
           data-tour="fab"
-          className="flex min-h-11 items-center justify-center gap-3 rounded-sm bg-accent px-3 text-body text-white hover:bg-accent-hover lg:justify-start"
+          className="flex min-h-11 w-full items-center justify-center gap-3 rounded-sm bg-accent px-3 text-body text-white hover:bg-accent-hover lg:justify-start"
         >
           <Plus size={20} strokeWidth={1.5} className="shrink-0" />
           <span className="hidden lg:inline">Crear guion</span>
