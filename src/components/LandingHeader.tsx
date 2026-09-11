@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { LogIn, UserPlus } from "lucide-react";
 
 /** Cabecera de la landing (`/`) — no fija, se desplaza con la página. Sin
  *  fondo propio: se superpone (`absolute`) sobre el morado del hero, que es
@@ -10,25 +11,29 @@ import Link from "next/link";
 export function LandingHeader() {
   return (
     <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-4 lg:px-8">
-      <div className="flex items-center gap-2 lg:mx-auto lg:w-full lg:max-w-5xl">
+      <div className="flex w-full items-center gap-2 lg:mx-auto lg:max-w-5xl">
         <span className="flex items-center gap-2">
           <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
             <Image src="/logo/logo.jpg" alt="" fill className="object-cover" />
           </span>
           <span className="text-h2 text-white">Guionia</span>
         </span>
-        <nav className="ml-auto flex items-center gap-4">
+        <nav className="ml-auto flex items-center gap-2 lg:gap-4">
           <Link
             href="/login"
-            className="rounded-sm text-body text-white/80 hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none"
+            aria-label="Iniciar sesión"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/80 hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none lg:h-auto lg:w-auto lg:rounded-sm"
           >
-            Iniciar sesión
+            <LogIn size={20} strokeWidth={1.5} className="lg:hidden" />
+            <span className="hidden text-body lg:inline">Iniciar sesión</span>
           </Link>
           <Link
             href="/registro"
-            className="rounded-full bg-white px-4 py-2 text-body text-accent active:bg-neutral-bg focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none"
+            aria-label="Crear cuenta"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-accent active:bg-neutral-bg focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none lg:h-auto lg:w-auto lg:px-4 lg:py-2"
           >
-            Crear cuenta
+            <UserPlus size={18} strokeWidth={1.5} className="lg:hidden" />
+            <span className="hidden text-body lg:inline">Crear cuenta</span>
           </Link>
         </nav>
       </div>
